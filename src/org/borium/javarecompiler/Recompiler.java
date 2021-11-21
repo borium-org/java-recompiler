@@ -11,7 +11,7 @@ public class Recompiler
 		ClassFile classFile = new ClassFile();
 		try
 		{
-			classFile.load("bin/org/borium/javarecompiler/classfile/ClassFile.class");
+			classFile.read("bin/org/borium/javarecompiler/classfile/ClassFile.class");
 		}
 		catch (ClassFormatError | IOException e)
 		{
