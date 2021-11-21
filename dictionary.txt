@@ -5,3 +5,5 @@ clinit
 invokespecial
 superclasses
 superinterface
+enum
+strictfp

@@ -16,6 +16,15 @@ public class ClassInputStream
 		return in.readDouble();
 	}
 
+	public void read(byte[] array) throws IOException
+	{
+		int length = in.read(array);
+		if (length != array.length)
+		{
+			throw new IOException("Read " + array.length + " bytes failed");
+		}
+	}
+
 	public String readUtf8() throws IOException
 	{
 		return in.readUTF();

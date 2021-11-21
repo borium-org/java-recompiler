@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile;
 
 import java.io.*;
+import java.util.*;
 
 import org.borium.javarecompiler.classfile.constants.*;
 
@@ -175,6 +176,12 @@ public class ClassFile
 	 */
 	private int[] interfaces;
 
+	private ArrayList<ClassField> fields = new ArrayList<>();
+
+	private ArrayList<ClassMethod> methods = new ArrayList<>();
+
+	private ArrayList<ClassAttribute> attributes = new ArrayList<>();
+
 	public void read(String fileName) throws IOException, ClassFormatError
 	{
 		in.open(fileName);
@@ -184,14 +191,21 @@ public class ClassFile
 		readClassInfo();
 		readInterfaces();
 		readFields();
+		readMethods();
 		readAttributes();
 		in.close();
 	}
 
-	private void readAttributes()
+	private void readAttributes() throws IOException
 	{
-		// TODO Auto-generated method stub
-		throw new ClassFormatError("Feature is not supported yet");
+		int attributeCount = in.u2();
+		for (int i = 0; i < attributeCount; i++)
+		{
+			ClassAttribute attribute = new ClassAttribute();
+			attribute.read(in);
+			attributes.add(attribute);
+		}
+		// TODO validation
 	}
 
 	private void readClassInfo() throws IOException
@@ -209,10 +223,17 @@ public class ClassFile
 		cp.verify(majorVersion, minorVersion);
 	}
 
-	private void readFields()
+	private void readFields() throws IOException
 	{
-		// TODO Auto-generated method stub
-		throw new ClassFormatError("Feature is not supported yet");
+		int count = in.u2();
+		for (int i = 0; i < count; i++)
+		{
+			ClassField field = new ClassField();
+			field.read(in);
+			fields.add(field);
+		}
+		// TODO extended validation
+		// throw new ClassFormatError("Feature is not supported yet");
 	}
 
 	private void readID() throws IOException, ClassFormatError
@@ -231,6 +252,19 @@ public class ClassFile
 		for (int i = 0; i < count; i++)
 		{
 			interfaces[i] = in.u2();
+		}
+		// TODO validation
+		// throw new ClassFormatError("Feature is not supported yet");
+	}
+
+	private void readMethods() throws IOException
+	{
+		int count = in.u2();
+		for (int i = 0; i < count; i++)
+		{
+			ClassMethod method = new ClassMethod();
+			method.read(in);
+			methods.add(method);
 		}
 		// TODO validation
 		// throw new ClassFormatError("Feature is not supported yet");
