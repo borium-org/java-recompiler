@@ -11,6 +11,11 @@ public class ClassInputStream
 		return in.readFloat();
 	}
 
+	public double f8() throws IOException
+	{
+		return in.readDouble();
+	}
+
 	public String readUtf8() throws IOException
 	{
 		return in.readUTF();
@@ -29,6 +34,11 @@ public class ClassInputStream
 	public int u4() throws IOException
 	{
 		return in.readInt();
+	}
+
+	public long u8() throws IOException
+	{
+		return in.readLong();
 	}
 
 	protected void close() throws IOException

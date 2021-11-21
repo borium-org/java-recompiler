@@ -41,8 +41,10 @@ public abstract class Constant
 			return new ConstantInteger();
 		case CONSTANT_Float:
 			return new ConstantFloat();
-//		case CONSTANT_Long:
-//		case CONSTANT_Double:
+		case CONSTANT_Long:
+			return new ConstantLong();
+		case CONSTANT_Double:
+			return new ConstantDouble();
 		case CONSTANT_Class:
 			return new ConstantClassInfo();
 		case CONSTANT_String:
@@ -55,12 +57,18 @@ public abstract class Constant
 			return new ConstantInterfaceMethodrefInfo();
 		case CONSTANT_NameAndType:
 			return new ConstantNameAndTypeInfo();
-//		case CONSTANT_MethodHandle:
-//		case CONSTANT_MethodType:
-//		case CONSTANT_Dynamic:
-//		case CONSTANT_InvokeDynamic:
-//		case CONSTANT_Module:
-//		case CONSTANT_Package:
+		case CONSTANT_MethodHandle:
+			return new ConstantMethodHandle();
+		case CONSTANT_MethodType:
+			return new ConstantMethodType();
+		case CONSTANT_Dynamic:
+			return new ConstantDynamic();
+		case CONSTANT_InvokeDynamic:
+			return new ConstantInvokeDynamic();
+		case CONSTANT_Module:
+			return new ConstantModule();
+		case CONSTANT_Package:
+			return new ConstantPackage();
 		}
 		throw new ClassFormatError("Bad constant type " + tag);
 	}
