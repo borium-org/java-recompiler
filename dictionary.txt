@@ -1,0 +1,9 @@
+endian
+bytecode
+init
+clinit
+invokespecial
+superclasses
+superinterface
+enum
+strictfp
