@@ -3,6 +3,8 @@ package org.borium.javarecompiler.classfile;
 import java.io.*;
 import java.util.*;
 
+import org.borium.javarecompiler.classfile.constants.*;
+
 /**
  * Each field is described by a field_info structure. No two fields in one class
  * file may have the same name and descriptor (4.3.2).
@@ -119,9 +121,9 @@ public class ClassField
 	@SuppressWarnings("unused")
 	private int descriptorIndex;
 
-	private ArrayList<ClassAttribute> attributes = new ArrayList<>();
+	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
-	public void read(ClassInputStream in) throws IOException
+	public void read(ClassInputStream in, ConstantPool cp) throws IOException
 	{
 		accessFlags = in.u2();
 		nameIndex = in.u2();
@@ -129,9 +131,8 @@ public class ClassField
 		int attributeCount = in.u2();
 		for (int i = 0; i < attributeCount; i++)
 		{
-			ClassAttribute attribute = new ClassAttribute();
-			attribute.read(in);
-			attributes.add(attribute);
+			ClassAttribute attribute = ClassAttribute.readAttribute(in, cp);
+			attributes.put(attribute.getName(), attribute);
 		}
 		// TODO validation
 	}

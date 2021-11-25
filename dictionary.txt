@@ -7,3 +7,5 @@ superclasses
 superinterface
 enum
 strictfp
+unicode
+codespace

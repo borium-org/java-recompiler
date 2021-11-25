@@ -18,6 +18,16 @@ public class ConstantPool
 		return constants.get(index);
 	}
 
+	public String getString(int index)
+	{
+		Constant constant = get(index);
+		if (constant instanceof ConstantUtf8Info utf8)
+		{
+			return utf8.string();
+		}
+		throw new ClassFormatError("Index " + index + " is not a string but " + constant.getClass().getSimpleName());
+	}
+
 	public void read(ClassInputStream in) throws IOException
 	{
 		int count = in.u2();
