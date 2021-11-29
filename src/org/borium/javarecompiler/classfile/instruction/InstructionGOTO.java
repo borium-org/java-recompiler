@@ -14,7 +14,6 @@ public class InstructionGOTO extends Instruction
 	 * instruction. The target address must be that of an opcode of an instruction
 	 * within the method that contains this goto instruction.
 	 */
-	@SuppressWarnings("unused")
 	private int offset;
 
 	public InstructionGOTO(ByteArrayInputStream in)

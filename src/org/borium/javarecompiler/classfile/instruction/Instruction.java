@@ -272,13 +272,13 @@ public abstract class Instruction
 		case ALOAD:
 			return new InstructionALOAD(in);
 		case ILOAD_0:
-			return new InstructionILOAD_0(in);
+			return new InstructionILOAD(in, 0);
 		case ILOAD_1:
-			return new InstructionILOAD_1(in);
+			return new InstructionILOAD(in, 1);
 		case ILOAD_2:
-			return new InstructionILOAD_2(in);
+			return new InstructionILOAD(in, 2);
 		case ILOAD_3:
-			return new InstructionILOAD_3(in);
+			return new InstructionILOAD(in, 3);
 		case LLOAD_0:
 			return new InstructionLLOAD_0(in);
 		case LLOAD_1:
@@ -623,14 +623,13 @@ public abstract class Instruction
 			return new InstructionGOTO_W(in);
 		case JSR_W:
 			return new InstructionJSR_W(in);
-		case BREAKPOINT:
-			return new InstructionBREAKPOINT(in);
-		case IMPDEP1:
-			return new InstructionIMPDEP1(in);
-		case IMPDEP2:
-			return new InstructionIMPDEP2(in);
+//		case BREAKPOINT:
+//			return new InstructionBREAKPOINT(in);
+//		case IMPDEP1:
+//			return new InstructionIMPDEP1(in);
+//		case IMPDEP2:
+//			return new InstructionIMPDEP2(in);
 		}
-		// TODO Auto-generated method stub
 		return null;
 	}
 

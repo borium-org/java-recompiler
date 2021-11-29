@@ -13,3 +13,4 @@ objectref
 int
 branchoffset
 cond
+const
