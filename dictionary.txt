@@ -11,3 +11,4 @@ unicode
 codespace
 objectref
 int
+branchoffset

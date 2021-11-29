@@ -224,19 +224,19 @@ public abstract class Instruction
 		case ACONST_NULL:
 			return new InstructionACONST_NULL(in);
 		case ICONST_M1:
-			return new InstructionICONST_M1(in);
+			return new InstructionICONST(in, -1);
 		case ICONST_0:
-			return new InstructionICONST_0(in);
+			return new InstructionICONST(in, 0);
 		case ICONST_1:
-			return new InstructionICONST_1(in);
+			return new InstructionICONST(in, 1);
 		case ICONST_2:
-			return new InstructionICONST_2(in);
+			return new InstructionICONST(in, 2);
 		case ICONST_3:
-			return new InstructionICONST_3(in);
+			return new InstructionICONST(in, 3);
 		case ICONST_4:
-			return new InstructionICONST_4(in);
+			return new InstructionICONST(in, 4);
 		case ICONST_5:
-			return new InstructionICONST_5(in);
+			return new InstructionICONST(in, 5);
 		case LCONST_0:
 			return new InstructionLCONST_0(in);
 		case LCONST_1:
@@ -354,13 +354,13 @@ public abstract class Instruction
 		case LSTORE_3:
 			return new InstructionLSTORE_3(in);
 		case FSTORE_0:
-			return new InstructionFSTORE_0(in);
+			return new InstructionFSTORE(in, 0);
 		case FSTORE_1:
-			return new InstructionFSTORE_1(in);
+			return new InstructionFSTORE(in, 1);
 		case FSTORE_2:
-			return new InstructionFSTORE_2(in);
+			return new InstructionFSTORE(in, 2);
 		case FSTORE_3:
-			return new InstructionFSTORE_3(in);
+			return new InstructionFSTORE(in, 3);
 		case DSTORE_0:
 			return new InstructionDSTORE(in, 0);
 		case DSTORE_1:
