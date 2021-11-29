@@ -20,6 +20,10 @@ public class InstructionGOTO extends Instruction
 	public InstructionGOTO(ByteArrayInputStream in)
 	{
 		offset = in.read() << 8 | in.read();
+		if (offset >= 0x8000)
+		{
+			offset -= 0x10000;
+		}
 	}
 
 	@Override
