@@ -68,7 +68,7 @@ public class ClassAttribute
 	/**
 	 * Attribute data.
 	 */
-	private byte[] info;
+	protected byte[] info;
 
 	/**
 	 * Copy constructor for decoded attributes. All fields from base class are

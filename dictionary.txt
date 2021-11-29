@@ -9,3 +9,5 @@ enum
 strictfp
 unicode
 codespace
+objectref
+int
