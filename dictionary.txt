@@ -7,3 +7,12 @@ superclasses
 superinterface
 enum
 strictfp
+unicode
+codespace
+objectref
+int
+branchoffset
+cond
+const
+jsr
+atype

@@ -7,7 +7,7 @@ import org.borium.javarecompiler.classfile.constants.*;
 
 public class ClassFile
 {
-	private ClassInputStream in = new ClassInputStream();
+	private ByteInputStream in;
 
 	/**
 	 * Major version number, 45..61
@@ -180,11 +180,16 @@ public class ClassFile
 
 	private ArrayList<ClassMethod> methods = new ArrayList<>();
 
-	private ArrayList<ClassAttribute> attributes = new ArrayList<>();
+	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
 	public void read(String fileName) throws IOException, ClassFormatError
 	{
-		in.open(fileName);
+		DataInputStream dataIn = new DataInputStream(new FileInputStream(fileName));
+		byte[] data = new byte[dataIn.available()];
+		dataIn.read(data);
+		dataIn.close();
+		in = new ByteInputStream(data);
+
 		readID();
 		readVersion();
 		readConstants();
@@ -193,6 +198,7 @@ public class ClassFile
 		readFields();
 		readMethods();
 		readAttributes();
+
 		in.close();
 	}
 
@@ -201,9 +207,8 @@ public class ClassFile
 		int attributeCount = in.u2();
 		for (int i = 0; i < attributeCount; i++)
 		{
-			ClassAttribute attribute = new ClassAttribute();
-			attribute.read(in);
-			attributes.add(attribute);
+			ClassAttribute attribute = ClassAttribute.readAttribute(in, cp);
+			attributes.put(attribute.getName(), attribute);
 		}
 		// TODO validation
 	}
@@ -229,7 +234,7 @@ public class ClassFile
 		for (int i = 0; i < count; i++)
 		{
 			ClassField field = new ClassField();
-			field.read(in);
+			field.read(in, cp);
 			fields.add(field);
 		}
 		// TODO extended validation
@@ -263,7 +268,7 @@ public class ClassFile
 		for (int i = 0; i < count; i++)
 		{
 			ClassMethod method = new ClassMethod();
-			method.read(in);
+			method.read(in, cp);
 			methods.add(method);
 		}
 		// TODO validation

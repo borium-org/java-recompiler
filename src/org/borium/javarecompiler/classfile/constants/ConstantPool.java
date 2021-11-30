@@ -1,6 +1,5 @@
 package org.borium.javarecompiler.classfile.constants;
 
-import java.io.*;
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.*;
@@ -18,7 +17,17 @@ public class ConstantPool
 		return constants.get(index);
 	}
 
-	public void read(ClassInputStream in) throws IOException
+	public String getString(int index)
+	{
+		Constant constant = get(index);
+		if (constant instanceof ConstantUtf8Info utf8)
+		{
+			return utf8.string();
+		}
+		throw new ClassFormatError("Index " + index + " is not a string but " + constant.getClass().getSimpleName());
+	}
+
+	public void read(ByteInputStream in)
 	{
 		int count = in.u2();
 		constants.add(null);

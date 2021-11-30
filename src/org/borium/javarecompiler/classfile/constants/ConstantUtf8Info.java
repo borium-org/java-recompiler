@@ -1,7 +1,5 @@
 package org.borium.javarecompiler.classfile.constants;
 
-import java.io.*;
-
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -27,13 +25,17 @@ public class ConstantUtf8Info extends Constant
 	 * points in the Unicode codespace can be represented. Modified UTF-8 strings
 	 * are not null-terminated.
 	 */
-	@SuppressWarnings("unused")
 	private String utf8;
 
-	@Override
-	protected void read(ClassInputStream in) throws IOException
+	public String string()
 	{
-		utf8 = in.readUtf8();
+		return utf8;
+	}
+
+	@Override
+	protected void read(ByteInputStream in)
+	{
+		utf8 = in.utf8();
 	}
 
 	@Override

@@ -1,7 +1,8 @@
 package org.borium.javarecompiler.classfile;
 
-import java.io.*;
 import java.util.*;
+
+import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Each method, including each instance initialization method (2.9.1) and the
@@ -188,9 +189,9 @@ public class ClassMethod
 	@SuppressWarnings("unused")
 	private int descriptorIndex;
 
-	private ArrayList<ClassAttribute> attributes = new ArrayList<>();
+	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
-	public void read(ClassInputStream in) throws IOException
+	public void read(ByteInputStream in, ConstantPool cp)
 	{
 		accessFlags = in.u2();
 		nameIndex = in.u2();
@@ -198,9 +199,8 @@ public class ClassMethod
 		int attributeCount = in.u2();
 		for (int i = 0; i < attributeCount; i++)
 		{
-			ClassAttribute attribute = new ClassAttribute();
-			attribute.read(in);
-			attributes.add(attribute);
+			ClassAttribute attribute = ClassAttribute.readAttribute(in, cp);
+			attributes.put(attribute.getName(), attribute);
 		}
 		// TODO validation
 	}
