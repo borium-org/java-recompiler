@@ -14,3 +14,5 @@ int
 branchoffset
 cond
 const
+jsr
+atype
