@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Branch always (wide index).
@@ -18,9 +18,9 @@ public class InstructionGOTO_W extends Instruction
 	@SuppressWarnings("unused")
 	private int offset;
 
-	public InstructionGOTO_W(ByteArrayInputStream in)
+	public InstructionGOTO_W(ByteInputStream in)
 	{
-		offset = in.read() << 24 | in.read() << 16 | in.read() << 8 | in.read();
+		offset = in.s4();
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Fetch field from object.
@@ -15,9 +15,9 @@ public class InstructionGETFIELD extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionGETFIELD(ByteArrayInputStream in)
+	public InstructionGETFIELD(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

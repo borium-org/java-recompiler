@@ -89,7 +89,7 @@ public abstract class Constant
 	 * @param in The class input stream.
 	 * @throws IOException I/O Error.
 	 */
-	protected abstract void read(ClassInputStream in) throws IOException;
+	protected abstract void read(ByteInputStream in);
 
 	/**
 	 * Verify if the constant is valid, considering the entire constant pool if

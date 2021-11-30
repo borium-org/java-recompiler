@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Check whether object is of given type.
@@ -17,9 +17,9 @@ public class InstructionCHECKCAST extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionCHECKCAST(ByteArrayInputStream in)
+	public InstructionCHECKCAST(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

@@ -1,13 +1,11 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
-
 /**
  * Convert double to int.
  */
 public class InstructionD2I extends Instruction
 {
-	public InstructionD2I(ByteArrayInputStream in)
+	public InstructionD2I()
 	{
 	}
 }

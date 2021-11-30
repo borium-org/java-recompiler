@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Return from subroutine.
@@ -15,14 +15,17 @@ public class InstructionRET extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionRET(ByteArrayInputStream in)
+	private boolean wide;
+
+	public InstructionRET(ByteInputStream in, boolean wide)
 	{
-		index = in.read();
+		this.wide = wide;
+		index = wide ? in.u2() : in.u1();
 	}
 
 	@Override
 	public int length()
 	{
-		return 2;
+		return wide ? 3 : 2;
 	}
 }

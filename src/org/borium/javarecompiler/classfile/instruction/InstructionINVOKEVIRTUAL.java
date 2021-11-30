@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 public class InstructionINVOKEVIRTUAL extends Instruction
 {
@@ -15,9 +15,9 @@ public class InstructionINVOKEVIRTUAL extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionINVOKEVIRTUAL(ByteArrayInputStream in)
+	public InstructionINVOKEVIRTUAL(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Create new object.
@@ -16,9 +16,9 @@ public class InstructionNEW extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionNEW(ByteArrayInputStream in)
+	public InstructionNEW(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

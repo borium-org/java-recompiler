@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Increment local variable by constant.
@@ -20,21 +20,21 @@ public class InstructionIINC extends Instruction
 	 * to an int, and then the local variable at index is incremented by that
 	 * amount.
 	 */
+	@SuppressWarnings("unused")
 	private int constant;
 
-	public InstructionIINC(ByteArrayInputStream in)
+	private boolean wide;
+
+	public InstructionIINC(ByteInputStream in, boolean wide)
 	{
-		index = in.read();
-		constant = in.read();
-		if (constant >= 0x80)
-		{
-			constant -= 0x100;
-		}
+		this.wide = wide;
+		index = wide ? in.u2() : in.u1();
+		constant = wide ? in.s2() : in.s1();
 	}
 
 	@Override
 	public int length()
 	{
-		return 3;
+		return wide ? 5 : 3;
 	}
 }

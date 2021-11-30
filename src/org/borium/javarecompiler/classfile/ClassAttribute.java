@@ -1,7 +1,5 @@
 package org.borium.javarecompiler.classfile;
 
-import java.io.*;
-
 import org.borium.javarecompiler.classfile.attribute.*;
 import org.borium.javarecompiler.classfile.constants.*;
 
@@ -31,16 +29,15 @@ public class ClassAttribute
 	 *                  object.
 	 * @return Generic ClassAttribute object or specific derived object, based on
 	 *         attribute name.
-	 * @throws IOException I/O error.
 	 */
-	public static ClassAttribute readAttribute(ClassInputStream in, ConstantPool constants) throws IOException
+	public static ClassAttribute readAttribute(ByteInputStream in, ConstantPool constants)
 	{
 		ClassAttribute attribute = new ClassAttribute();
 		attribute.read(in, constants);
 		switch (attribute.attributeName)
 		{
 		case "Code":
-			return new AttributeCode(attribute);
+			return new AttributeCode(attribute, constants);
 		}
 		return attribute;
 	}
@@ -99,12 +96,11 @@ public class ClassAttribute
 		return attributeName;
 	}
 
-	private void read(ClassInputStream in, ConstantPool constants) throws IOException
+	private void read(ByteInputStream in, ConstantPool constants)
 	{
 		attributeNameIndex = in.u2();
 		attributeLength = in.u4();
-		info = new byte[attributeLength];
-		in.read(info);
+		info = in.read(attributeLength);
 		// TODO validation and decoding
 		attributeName = constants.getString(attributeNameIndex);
 	}

@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Set static field in class.
@@ -15,9 +15,9 @@ public class InstructionPUTSTATIC extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionPUTSTATIC(ByteArrayInputStream in)
+	public InstructionPUTSTATIC(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

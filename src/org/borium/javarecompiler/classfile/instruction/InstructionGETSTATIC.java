@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Get static field from class.
@@ -15,9 +15,9 @@ public class InstructionGETSTATIC extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionGETSTATIC(ByteArrayInputStream in)
+	public InstructionGETSTATIC(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 public abstract class Instruction
 {
@@ -210,9 +210,9 @@ public abstract class Instruction
 	public static final int IMPDEP1 = 254;
 	public static final int IMPDEP2 = 255;
 
-	public static Instruction read(ByteArrayInputStream in)
+	public static Instruction read(ByteInputStream in)
 	{
-		int code = in.read();
+		int code = in.u1();
 		if (code == -1)
 		{
 			throw new ClassFormatError("Read error");
@@ -220,37 +220,37 @@ public abstract class Instruction
 		switch (code)
 		{
 		case NOP:
-			return new InstructionNOP(in);
+			return new InstructionNOP();
 		case ACONST_NULL:
-			return new InstructionACONST_NULL(in);
+			return new InstructionACONST_NULL();
 		case ICONST_M1:
-			return new InstructionICONST(in, -1);
+			return new InstructionICONST(-1);
 		case ICONST_0:
-			return new InstructionICONST(in, 0);
+			return new InstructionICONST(0);
 		case ICONST_1:
-			return new InstructionICONST(in, 1);
+			return new InstructionICONST(1);
 		case ICONST_2:
-			return new InstructionICONST(in, 2);
+			return new InstructionICONST(2);
 		case ICONST_3:
-			return new InstructionICONST(in, 3);
+			return new InstructionICONST(3);
 		case ICONST_4:
-			return new InstructionICONST(in, 4);
+			return new InstructionICONST(4);
 		case ICONST_5:
-			return new InstructionICONST(in, 5);
+			return new InstructionICONST(5);
 		case LCONST_0:
-			return new InstructionLCONST(in, 0);
+			return new InstructionLCONST(0);
 		case LCONST_1:
-			return new InstructionLCONST(in, 1);
+			return new InstructionLCONST(1);
 		case FCONST_0:
-			return new InstructionFCONST(in, 0);
+			return new InstructionFCONST(0);
 		case FCONST_1:
-			return new InstructionFCONST(in, 1);
+			return new InstructionFCONST(1);
 		case FCONST_2:
-			return new InstructionFCONST(in, 2);
+			return new InstructionFCONST(2);
 		case DCONST_0:
-			return new InstructionDCONST(in, 0);
+			return new InstructionDCONST(0);
 		case DCONST_1:
-			return new InstructionDCONST(in, 1);
+			return new InstructionDCONST(1);
 		case BIPUSH:
 			return new InstructionBIPUSH(in);
 		case SIPUSH:
@@ -262,269 +262,269 @@ public abstract class Instruction
 		case LDC2_W:
 			return new InstructionLDC2_W(in);
 		case ILOAD:
-			return new InstructionILOAD(in);
+			return new InstructionILOAD(in, false);
 		case LLOAD:
-			return new InstructionLLOAD(in);
+			return new InstructionLLOAD(in, false);
 		case FLOAD:
-			return new InstructionFLOAD(in);
+			return new InstructionFLOAD(in, false);
 		case DLOAD:
-			return new InstructionDLOAD(in);
+			return new InstructionDLOAD(in, false);
 		case ALOAD:
-			return new InstructionALOAD(in);
+			return new InstructionALOAD(in, false);
 		case ILOAD_0:
-			return new InstructionILOAD(in, 0);
+			return new InstructionILOAD(0);
 		case ILOAD_1:
-			return new InstructionILOAD(in, 1);
+			return new InstructionILOAD(1);
 		case ILOAD_2:
-			return new InstructionILOAD(in, 2);
+			return new InstructionILOAD(2);
 		case ILOAD_3:
-			return new InstructionILOAD(in, 3);
+			return new InstructionILOAD(3);
 		case LLOAD_0:
-			return new InstructionLLOAD(in, 0);
+			return new InstructionLLOAD(0);
 		case LLOAD_1:
-			return new InstructionLLOAD(in, 1);
+			return new InstructionLLOAD(1);
 		case LLOAD_2:
-			return new InstructionLLOAD(in, 2);
+			return new InstructionLLOAD(2);
 		case LLOAD_3:
-			return new InstructionLLOAD(in, 3);
+			return new InstructionLLOAD(3);
 		case FLOAD_0:
-			return new InstructionFLOAD(in, 0);
+			return new InstructionFLOAD(0);
 		case FLOAD_1:
-			return new InstructionFLOAD(in, 1);
+			return new InstructionFLOAD(1);
 		case FLOAD_2:
-			return new InstructionFLOAD(in, 2);
+			return new InstructionFLOAD(2);
 		case FLOAD_3:
-			return new InstructionFLOAD(in, 3);
+			return new InstructionFLOAD(3);
 		case DLOAD_0:
-			return new InstructionDLOAD(in, 0);
+			return new InstructionDLOAD(0);
 		case DLOAD_1:
-			return new InstructionDLOAD(in, 1);
+			return new InstructionDLOAD(1);
 		case DLOAD_2:
-			return new InstructionDLOAD(in, 2);
+			return new InstructionDLOAD(2);
 		case DLOAD_3:
-			return new InstructionDLOAD(in, 3);
+			return new InstructionDLOAD(3);
 		case ALOAD_0:
-			return new InstructionALOAD(in, 0);
+			return new InstructionALOAD(0);
 		case ALOAD_1:
-			return new InstructionALOAD(in, 1);
+			return new InstructionALOAD(1);
 		case ALOAD_2:
-			return new InstructionALOAD(in, 2);
+			return new InstructionALOAD(2);
 		case ALOAD_3:
-			return new InstructionALOAD(in, 3);
+			return new InstructionALOAD(3);
 		case IALOAD:
-			return new InstructionIALOAD(in);
+			return new InstructionIALOAD();
 		case LALOAD:
-			return new InstructionLALOAD(in);
+			return new InstructionLALOAD();
 		case FALOAD:
-			return new InstructionFALOAD(in);
+			return new InstructionFALOAD();
 		case DALOAD:
-			return new InstructionDALOAD(in);
+			return new InstructionDALOAD();
 		case AALOAD:
-			return new InstructionAALOAD(in);
+			return new InstructionAALOAD();
 		case BALOAD:
-			return new InstructionBALOAD(in);
+			return new InstructionBALOAD();
 		case CALOAD:
-			return new InstructionCALOAD(in);
+			return new InstructionCALOAD();
 		case SALOAD:
-			return new InstructionSALOAD(in);
+			return new InstructionSALOAD();
 		case ISTORE:
-			return new InstructionISTORE(in);
+			return new InstructionISTORE(in, false);
 		case LSTORE:
-			return new InstructionLSTORE(in);
+			return new InstructionLSTORE(in, false);
 		case FSTORE:
-			return new InstructionFSTORE(in);
+			return new InstructionFSTORE(in, false);
 		case DSTORE:
-			return new InstructionDSTORE(in);
+			return new InstructionDSTORE(in, false);
 		case ASTORE:
-			return new InstructionASTORE(in);
+			return new InstructionASTORE(in, false);
 		case ISTORE_0:
-			return new InstructionISTORE(in, 0);
+			return new InstructionISTORE(0);
 		case ISTORE_1:
-			return new InstructionISTORE(in, 1);
+			return new InstructionISTORE(1);
 		case ISTORE_2:
-			return new InstructionISTORE(in, 2);
+			return new InstructionISTORE(2);
 		case ISTORE_3:
-			return new InstructionISTORE(in, 3);
+			return new InstructionISTORE(3);
 		case LSTORE_0:
-			return new InstructionLSTORE(in, 0);
+			return new InstructionLSTORE(0);
 		case LSTORE_1:
-			return new InstructionLSTORE(in, 1);
+			return new InstructionLSTORE(1);
 		case LSTORE_2:
-			return new InstructionLSTORE(in, 2);
+			return new InstructionLSTORE(2);
 		case LSTORE_3:
-			return new InstructionLSTORE(in, 3);
+			return new InstructionLSTORE(3);
 		case FSTORE_0:
-			return new InstructionFSTORE(in, 0);
+			return new InstructionFSTORE(0);
 		case FSTORE_1:
-			return new InstructionFSTORE(in, 1);
+			return new InstructionFSTORE(1);
 		case FSTORE_2:
-			return new InstructionFSTORE(in, 2);
+			return new InstructionFSTORE(2);
 		case FSTORE_3:
-			return new InstructionFSTORE(in, 3);
+			return new InstructionFSTORE(3);
 		case DSTORE_0:
-			return new InstructionDSTORE(in, 0);
+			return new InstructionDSTORE(0);
 		case DSTORE_1:
-			return new InstructionDSTORE(in, 1);
+			return new InstructionDSTORE(1);
 		case DSTORE_2:
-			return new InstructionDSTORE(in, 2);
+			return new InstructionDSTORE(2);
 		case DSTORE_3:
-			return new InstructionDSTORE(in, 3);
+			return new InstructionDSTORE(3);
 		case ASTORE_0:
-			return new InstructionASTORE(in, 0);
+			return new InstructionASTORE(0);
 		case ASTORE_1:
-			return new InstructionASTORE(in, 1);
+			return new InstructionASTORE(1);
 		case ASTORE_2:
-			return new InstructionASTORE(in, 2);
+			return new InstructionASTORE(2);
 		case ASTORE_3:
-			return new InstructionASTORE(in, 3);
+			return new InstructionASTORE(3);
 		case IASTORE:
-			return new InstructionIASTORE(in);
+			return new InstructionIASTORE();
 		case LASTORE:
-			return new InstructionLASTORE(in);
+			return new InstructionLASTORE();
 		case FASTORE:
-			return new InstructionFASTORE(in);
+			return new InstructionFASTORE();
 		case DASTORE:
-			return new InstructionDASTORE(in);
+			return new InstructionDASTORE();
 		case AASTORE:
-			return new InstructionAASTORE(in);
+			return new InstructionAASTORE();
 		case BASTORE:
-			return new InstructionBASTORE(in);
+			return new InstructionBASTORE();
 		case CASTORE:
-			return new InstructionCASTORE(in);
+			return new InstructionCASTORE();
 		case SASTORE:
-			return new InstructionSASTORE(in);
+			return new InstructionSASTORE();
 		case POP:
-			return new InstructionPOP(in);
+			return new InstructionPOP();
 		case POP2:
-			return new InstructionPOP2(in);
+			return new InstructionPOP2();
 		case DUP:
-			return new InstructionDUP(in);
+			return new InstructionDUP();
 		case DUP_X1:
-			return new InstructionDUP_X1(in);
+			return new InstructionDUP_X1();
 		case DUP_X2:
-			return new InstructionDUP_X2(in);
+			return new InstructionDUP_X2();
 		case DUP2:
-			return new InstructionDUP2(in);
+			return new InstructionDUP2();
 		case DUP2_X1:
-			return new InstructionDUP2_X1(in);
+			return new InstructionDUP2_X1();
 		case DUP2_X2:
-			return new InstructionDUP2_X2(in);
+			return new InstructionDUP2_X2();
 		case SWAP:
-			return new InstructionSWAP(in);
+			return new InstructionSWAP();
 		case IADD:
-			return new InstructionIADD(in);
+			return new InstructionIADD();
 		case LADD:
-			return new InstructionLADD(in);
+			return new InstructionLADD();
 		case FADD:
-			return new InstructionFADD(in);
+			return new InstructionFADD();
 		case DADD:
-			return new InstructionDADD(in);
+			return new InstructionDADD();
 		case ISUB:
-			return new InstructionISUB(in);
+			return new InstructionISUB();
 		case LSUB:
-			return new InstructionLSUB(in);
+			return new InstructionLSUB();
 		case FSUB:
-			return new InstructionFSUB(in);
+			return new InstructionFSUB();
 		case DSUB:
-			return new InstructionDSUB(in);
+			return new InstructionDSUB();
 		case IMUL:
-			return new InstructionIMUL(in);
+			return new InstructionIMUL();
 		case LMUL:
-			return new InstructionLMUL(in);
+			return new InstructionLMUL();
 		case FMUL:
-			return new InstructionFMUL(in);
+			return new InstructionFMUL();
 		case DMUL:
-			return new InstructionDMUL(in);
+			return new InstructionDMUL();
 		case IDIV:
-			return new InstructionIDIV(in);
+			return new InstructionIDIV();
 		case LDIV:
-			return new InstructionLDIV(in);
+			return new InstructionLDIV();
 		case FDIV:
-			return new InstructionFDIV(in);
+			return new InstructionFDIV();
 		case DDIV:
-			return new InstructionDDIV(in);
+			return new InstructionDDIV();
 		case IREM:
-			return new InstructionIREM(in);
+			return new InstructionIREM();
 		case LREM:
-			return new InstructionLREM(in);
+			return new InstructionLREM();
 		case FREM:
-			return new InstructionFREM(in);
+			return new InstructionFREM();
 		case DREM:
-			return new InstructionDREM(in);
+			return new InstructionDREM();
 		case INEG:
-			return new InstructionINEG(in);
+			return new InstructionINEG();
 		case LNEG:
-			return new InstructionLNEG(in);
+			return new InstructionLNEG();
 		case FNEG:
-			return new InstructionFNEG(in);
+			return new InstructionFNEG();
 		case DNEG:
-			return new InstructionDNEG(in);
+			return new InstructionDNEG();
 		case ISHL:
-			return new InstructionISHL(in);
+			return new InstructionISHL();
 		case LSHL:
-			return new InstructionLSHL(in);
+			return new InstructionLSHL();
 		case ISHR:
-			return new InstructionISHR(in);
+			return new InstructionISHR();
 		case LSHR:
-			return new InstructionLSHR(in);
+			return new InstructionLSHR();
 		case IUSHR:
-			return new InstructionIUSHR(in);
+			return new InstructionIUSHR();
 		case LUSHR:
-			return new InstructionLUSHR(in);
+			return new InstructionLUSHR();
 		case IAND:
-			return new InstructionIAND(in);
+			return new InstructionIAND();
 		case LAND:
-			return new InstructionLAND(in);
+			return new InstructionLAND();
 		case IOR:
-			return new InstructionIOR(in);
+			return new InstructionIOR();
 		case LOR:
-			return new InstructionLOR(in);
+			return new InstructionLOR();
 		case IXOR:
-			return new InstructionIXOR(in);
+			return new InstructionIXOR();
 		case LXOR:
-			return new InstructionLXOR(in);
+			return new InstructionLXOR();
 		case IINC:
-			return new InstructionIINC(in);
+			return new InstructionIINC(in, false);
 		case I2L:
-			return new InstructionI2L(in);
+			return new InstructionI2L();
 		case I2F:
-			return new InstructionI2F(in);
+			return new InstructionI2F();
 		case I2D:
-			return new InstructionI2D(in);
+			return new InstructionI2D();
 		case L2I:
-			return new InstructionL2I(in);
+			return new InstructionL2I();
 		case L2F:
-			return new InstructionL2F(in);
+			return new InstructionL2F();
 		case L2D:
-			return new InstructionL2D(in);
+			return new InstructionL2D();
 		case F2I:
-			return new InstructionF2I(in);
+			return new InstructionF2I();
 		case F2L:
-			return new InstructionF2L(in);
+			return new InstructionF2L();
 		case F2D:
-			return new InstructionF2D(in);
+			return new InstructionF2D();
 		case D2I:
-			return new InstructionD2I(in);
+			return new InstructionD2I();
 		case D2L:
-			return new InstructionD2L(in);
+			return new InstructionD2L();
 		case D2F:
-			return new InstructionD2F(in);
+			return new InstructionD2F();
 		case I2B:
-			return new InstructionI2B(in);
+			return new InstructionI2B();
 		case I2C:
-			return new InstructionI2C(in);
+			return new InstructionI2C();
 		case I2S:
-			return new InstructionI2S(in);
+			return new InstructionI2S();
 		case LCMP:
-			return new InstructionLCMP(in);
+			return new InstructionLCMP();
 		case FCMPL:
-			return new InstructionFCMPL(in);
+			return new InstructionFCMPL();
 		case FCMPG:
-			return new InstructionFCMPG(in);
+			return new InstructionFCMPG();
 		case DCMPL:
-			return new InstructionDCMPL(in);
+			return new InstructionDCMPL();
 		case DCMPG:
-			return new InstructionDCMPG(in);
+			return new InstructionDCMPG();
 		case IFEQ:
 			return new InstructionIFEQ(in);
 		case IFNE:
@@ -564,17 +564,17 @@ public abstract class Instruction
 		case LOOKUPSWITCH:
 			return new InstructionLOOKUPSWITCH(in);
 		case IRETURN:
-			return new InstructionIRETURN(in);
+			return new InstructionIRETURN();
 		case LRETURN:
-			return new InstructionLRETURN(in);
+			return new InstructionLRETURN();
 		case FRETURN:
-			return new InstructionFRETURN(in);
+			return new InstructionFRETURN();
 		case DRETURN:
-			return new InstructionDRETURN(in);
+			return new InstructionDRETURN();
 		case ARETURN:
-			return new InstructionARETURN(in);
+			return new InstructionARETURN();
 		case RETURN:
-			return new InstructionRETURN(in);
+			return new InstructionRETURN();
 		case GETSTATIC:
 			return new InstructionGETSTATIC(in);
 		case PUTSTATIC:
@@ -600,17 +600,17 @@ public abstract class Instruction
 		case ANEWARRAY:
 			return new InstructionANEWARRAY(in);
 		case ARRAYLENGTH:
-			return new InstructionARRAYLENGTH(in);
+			return new InstructionARRAYLENGTH();
 		case ATHROW:
-			return new InstructionATHROW(in);
+			return new InstructionATHROW();
 		case CHECKCAST:
 			return new InstructionCHECKCAST(in);
 		case INSTANCEOF:
 			return new InstructionINSTANCEOF(in);
 		case MONITORENTER:
-			return new InstructionMONITORENTER(in);
+			return new InstructionMONITORENTER();
 		case MONITOREXIT:
-			return new InstructionMONITOREXIT(in);
+			return new InstructionMONITOREXIT();
 		case WIDE:
 			return new InstructionWIDE(in);
 		case MULTIANEWARRAY:

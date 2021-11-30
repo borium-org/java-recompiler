@@ -1,7 +1,5 @@
 package org.borium.javarecompiler.classfile.constants;
 
-import java.io.*;
-
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -38,7 +36,7 @@ public class ConstantNameAndTypeInfo extends Constant
 	private int descriptorIndex;
 
 	@Override
-	protected void read(ClassInputStream in) throws IOException
+	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_Class;
 		nameIndex = in.u2();

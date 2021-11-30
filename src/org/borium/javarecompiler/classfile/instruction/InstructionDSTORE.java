@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Store double into local variable.
@@ -13,32 +13,30 @@ public class InstructionDSTORE extends Instruction
 	 * the operand stack must be of type double. It is popped from the operand
 	 * stack. The local variables at index and index+1 are set to value.
 	 */
+	@SuppressWarnings("unused")
 	private int index;
-	/**
-	 * False if index was part of instruction code, true if index was provided in
-	 * separate byte.
-	 */
-	private boolean separateIndexConstant;
 
-	public InstructionDSTORE(ByteArrayInputStream in)
+	/**
+	 * Index constant length, 0 for hard-coded index 0...3, 1 for generic one-byte
+	 * index and 2 for wide 2-byte index.
+	 */
+	private int indexConstantLength;
+
+	public InstructionDSTORE(ByteInputStream in, boolean wide)
 	{
-		separateIndexConstant = true;
-		index = in.read();
-		if (index == -1)
-		{
-			throw new ClassFormatError("DSTORE index error");
-		}
+		indexConstantLength = wide ? 2 : 1;
+		index = wide ? in.u2() : in.u1();
 	}
 
-	public InstructionDSTORE(ByteArrayInputStream in, int index)
+	public InstructionDSTORE(int index)
 	{
-		separateIndexConstant = false;
+		indexConstantLength = 0;
 		this.index = index;
 	}
 
 	@Override
 	public int length()
 	{
-		return separateIndexConstant ? 2 : 1;
+		return 1 + indexConstantLength;
 	}
 }

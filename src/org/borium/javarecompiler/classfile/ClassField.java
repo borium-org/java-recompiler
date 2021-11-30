@@ -1,6 +1,5 @@
 package org.borium.javarecompiler.classfile;
 
-import java.io.*;
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.constants.*;
@@ -123,7 +122,7 @@ public class ClassField
 
 	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
-	public void read(ClassInputStream in, ConstantPool cp) throws IOException
+	public void read(ByteInputStream in, ConstantPool cp)
 	{
 		accessFlags = in.u2();
 		nameIndex = in.u2();

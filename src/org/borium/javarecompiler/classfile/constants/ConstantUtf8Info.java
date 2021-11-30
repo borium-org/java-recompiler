@@ -1,7 +1,5 @@
 package org.borium.javarecompiler.classfile.constants;
 
-import java.io.*;
-
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -35,9 +33,9 @@ public class ConstantUtf8Info extends Constant
 	}
 
 	@Override
-	protected void read(ClassInputStream in) throws IOException
+	protected void read(ByteInputStream in)
 	{
-		utf8 = in.readUtf8();
+		utf8 = in.utf8();
 	}
 
 	@Override

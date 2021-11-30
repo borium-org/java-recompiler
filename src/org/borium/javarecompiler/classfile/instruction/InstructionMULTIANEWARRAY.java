@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Create new multidimensional array.
@@ -23,10 +23,10 @@ public class InstructionMULTIANEWARRAY extends Instruction
 	@SuppressWarnings("unused")
 	private int dimensions;
 
-	public InstructionMULTIANEWARRAY(ByteArrayInputStream in)
+	public InstructionMULTIANEWARRAY(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
-		dimensions = in.read();
+		index = in.u2();
+		dimensions = in.u1();
 	}
 
 	@Override

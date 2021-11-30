@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 public class InstructionINVOKEDYNAMIC extends Instruction
 {
@@ -19,10 +19,10 @@ public class InstructionINVOKEDYNAMIC extends Instruction
 	 */
 	private int zero;
 
-	public InstructionINVOKEDYNAMIC(ByteArrayInputStream in)
+	public InstructionINVOKEDYNAMIC(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
-		zero = in.read() << 8 | in.read();
+		index = in.u2();
+		zero = in.u2();
 		if (zero != 0)
 		{
 			throw new ClassFormatError("INVOKEDYNAMIC non-zero");

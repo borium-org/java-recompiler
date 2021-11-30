@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 public class InstructionIF_ICMPLT extends Instruction
 {
@@ -12,15 +12,12 @@ public class InstructionIF_ICMPLT extends Instruction
 	 * address must be that of an opcode of an instruction within the method that
 	 * contains this if_acmp&lt;cond&gt; instruction.
 	 */
+	@SuppressWarnings("unused")
 	private int offset;
 
-	public InstructionIF_ICMPLT(ByteArrayInputStream in)
+	public InstructionIF_ICMPLT(ByteInputStream in)
 	{
-		offset = in.read() << 8 | in.read();
-		if (offset >= 0x8000)
-		{
-			offset -= 0x10000;
-		}
+		offset = in.s2();
 	}
 
 	@Override

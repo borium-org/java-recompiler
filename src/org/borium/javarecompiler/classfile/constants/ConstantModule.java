@@ -1,7 +1,5 @@
 package org.borium.javarecompiler.classfile.constants;
 
-import java.io.*;
-
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -33,7 +31,7 @@ public class ConstantModule extends Constant
 	private int nameIndex;
 
 	@Override
-	protected void read(ClassInputStream in) throws IOException
+	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_Module;
 		nameIndex = in.u2();

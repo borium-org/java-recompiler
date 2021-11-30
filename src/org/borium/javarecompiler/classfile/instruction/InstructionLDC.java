@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Push item from run-time constant pool.
@@ -10,9 +10,9 @@ public class InstructionLDC extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionLDC(ByteArrayInputStream in)
+	public InstructionLDC(ByteInputStream in)
 	{
-		index = in.read();
+		index = in.u1();
 	}
 
 	@Override

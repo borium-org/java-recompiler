@@ -7,7 +7,7 @@ import org.borium.javarecompiler.classfile.constants.*;
 
 public class ClassFile
 {
-	private ClassInputStream in = new ClassInputStream();
+	private ByteInputStream in;
 
 	/**
 	 * Major version number, 45..61
@@ -184,7 +184,12 @@ public class ClassFile
 
 	public void read(String fileName) throws IOException, ClassFormatError
 	{
-		in.open(fileName);
+		DataInputStream dataIn = new DataInputStream(new FileInputStream(fileName));
+		byte[] data = new byte[dataIn.available()];
+		dataIn.read(data);
+		dataIn.close();
+		in = new ByteInputStream(data);
+
 		readID();
 		readVersion();
 		readConstants();
@@ -193,6 +198,7 @@ public class ClassFile
 		readFields();
 		readMethods();
 		readAttributes();
+
 		in.close();
 	}
 

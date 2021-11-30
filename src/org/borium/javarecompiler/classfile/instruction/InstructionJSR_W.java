@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Jump subroutine (wide index).
@@ -20,9 +20,9 @@ public class InstructionJSR_W extends Instruction
 	@SuppressWarnings("unused")
 	private int offset;
 
-	public InstructionJSR_W(ByteArrayInputStream in)
+	public InstructionJSR_W(ByteInputStream in)
 	{
-		offset = in.read() << 24 | in.read() << 16 | in.read() << 8 | in.read();
+		offset = in.s4();
 	}
 
 	@Override

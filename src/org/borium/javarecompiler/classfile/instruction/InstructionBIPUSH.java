@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Push byte.
@@ -11,14 +11,11 @@ public class InstructionBIPUSH extends Instruction
 	 * The immediate byte is sign-extended to an int value. That value is pushed
 	 * onto the operand stack.
 	 */
+	@SuppressWarnings("unused")
 	private int value;
 
-	public InstructionBIPUSH(ByteArrayInputStream in)
+	public InstructionBIPUSH(ByteInputStream in)
 	{
-		value = in.read();
-		if (value >= 0x80)
-		{
-			value = value - 0x100;
-		}
+		value = in.s1();
 	}
 }

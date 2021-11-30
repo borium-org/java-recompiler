@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Create new array of reference.
@@ -16,9 +16,9 @@ public class InstructionANEWARRAY extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionANEWARRAY(ByteArrayInputStream in)
+	public InstructionANEWARRAY(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 public class InstructionLDC_W extends Instruction
 {
@@ -13,9 +13,9 @@ public class InstructionLDC_W extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionLDC_W(ByteArrayInputStream in)
+	public InstructionLDC_W(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

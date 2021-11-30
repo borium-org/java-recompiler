@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Set field in object.
@@ -15,9 +15,9 @@ public class InstructionPUTFIELD extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionPUTFIELD(ByteArrayInputStream in)
+	public InstructionPUTFIELD(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

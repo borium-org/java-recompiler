@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Create new array.
@@ -51,9 +51,9 @@ public class InstructionNEWARRAY extends Instruction
 	@SuppressWarnings("unused")
 	private int atype;
 
-	public InstructionNEWARRAY(ByteArrayInputStream in)
+	public InstructionNEWARRAY(ByteInputStream in)
 	{
-		atype = in.read();
+		atype = in.u1();
 	}
 
 	@Override

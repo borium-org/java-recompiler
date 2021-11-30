@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Jump subroutine.
@@ -14,15 +14,12 @@ public class InstructionJSR extends Instruction
 	 * a signed 16-bit offset, where the offset is (branchbyte1 << 8) | branchbyte2.
 	 * Execution proceeds at that offset from the address of this jsr instruction.
 	 */
+	@SuppressWarnings("unused")
 	private int offset;
 
-	public InstructionJSR(ByteArrayInputStream in)
+	public InstructionJSR(ByteInputStream in)
 	{
-		offset = in.read() << 8 | in.read();
-		if (offset >= 0x8000)
-		{
-			offset -= 0x10000;
-		}
+		offset = in.s2();
 	}
 
 	@Override

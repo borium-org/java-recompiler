@@ -1,6 +1,5 @@
 package org.borium.javarecompiler.classfile.constants;
 
-import java.io.*;
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.*;
@@ -28,7 +27,7 @@ public class ConstantPool
 		throw new ClassFormatError("Index " + index + " is not a string but " + constant.getClass().getSimpleName());
 	}
 
-	public void read(ClassInputStream in) throws IOException
+	public void read(ByteInputStream in)
 	{
 		int count = in.u2();
 		constants.add(null);

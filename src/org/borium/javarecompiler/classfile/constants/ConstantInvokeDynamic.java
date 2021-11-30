@@ -1,7 +1,5 @@
 package org.borium.javarecompiler.classfile.constants;
 
-import java.io.*;
-
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -46,7 +44,7 @@ public class ConstantInvokeDynamic extends Constant
 	private int nameAndTypeIndex;
 
 	@Override
-	protected void read(ClassInputStream in) throws IOException
+	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_InvokeDynamic;
 		bootstrapMethodAttrIndex = in.u2();

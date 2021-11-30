@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Branch always.
@@ -14,15 +14,12 @@ public class InstructionGOTO extends Instruction
 	 * instruction. The target address must be that of an opcode of an instruction
 	 * within the method that contains this goto instruction.
 	 */
+	@SuppressWarnings("unused")
 	private int offset;
 
-	public InstructionGOTO(ByteArrayInputStream in)
+	public InstructionGOTO(ByteInputStream in)
 	{
-		offset = in.read() << 8 | in.read();
-		if (offset >= 0x8000)
-		{
-			offset -= 0x10000;
-		}
+		offset = in.s2();
 	}
 
 	@Override

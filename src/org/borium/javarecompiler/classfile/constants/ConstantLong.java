@@ -1,7 +1,5 @@
 package org.borium.javarecompiler.classfile.constants;
 
-import java.io.*;
-
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -31,7 +29,7 @@ public class ConstantLong extends Constant
 	private long value;
 
 	@Override
-	protected void read(ClassInputStream in) throws IOException
+	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_Long;
 		value = in.u8();

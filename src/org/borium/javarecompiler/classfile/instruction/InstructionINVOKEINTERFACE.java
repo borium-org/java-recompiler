@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 public class InstructionINVOKEINTERFACE extends Instruction
 {
@@ -25,15 +25,15 @@ public class InstructionINVOKEINTERFACE extends Instruction
 	 */
 	private int zero;
 
-	public InstructionINVOKEINTERFACE(ByteArrayInputStream in)
+	public InstructionINVOKEINTERFACE(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
-		count = in.read();
+		index = in.u2();
+		count = in.u1();
 		if (count == 0)
 		{
 			throw new ClassFormatError("INVOKEINTERFACE count-zero");
 		}
-		zero = in.read();
+		zero = in.u1();
 		if (zero != 0)
 		{
 			throw new ClassFormatError("INVOKEINTERFACE non-zero");

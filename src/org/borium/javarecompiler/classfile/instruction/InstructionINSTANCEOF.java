@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 public class InstructionINSTANCEOF extends Instruction
 {
@@ -13,9 +13,9 @@ public class InstructionINSTANCEOF extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionINSTANCEOF(ByteArrayInputStream in)
+	public InstructionINSTANCEOF(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

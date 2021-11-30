@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Store long into local variable.
@@ -12,35 +12,32 @@ public class InstructionLSTORE extends Instruction
 	 * the local variable array of the current frame (2.6). The value on the top of
 	 * the operand stack must be of type long. It is popped from the operand stack,
 	 * and the local variables at index and index+1 are set to value.
-	 * 
+	 *
 	 */
+	@SuppressWarnings("unused")
 	private int index;
 
 	/**
-	 * False if index was part of instruction code, true if index was provided in
-	 * separate byte.
+	 * Index constant length, 0 for hard-coded index 0...3, 1 for generic one-byte
+	 * index and 2 for wide 2-byte index.
 	 */
-	private boolean separateIndexConstant;
+	private int indexConstantLength;
 
-	public InstructionLSTORE(ByteArrayInputStream in)
+	public InstructionLSTORE(ByteInputStream in, boolean wide)
 	{
-		separateIndexConstant = true;
-		index = in.read();
-		if (index == -1)
-		{
-			throw new ClassFormatError("ALOAD index error");
-		}
+		indexConstantLength = wide ? 2 : 1;
+		index = wide ? in.u2() : in.u1();
 	}
 
-	public InstructionLSTORE(ByteArrayInputStream in, int index)
+	public InstructionLSTORE(int index)
 	{
-		separateIndexConstant = false;
+		indexConstantLength = 0;
 		this.index = index;
 	}
 
 	@Override
 	public int length()
 	{
-		return separateIndexConstant ? 2 : 1;
+		return 1 + indexConstantLength;
 	}
 }

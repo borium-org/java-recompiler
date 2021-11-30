@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Load reference from local variable.
@@ -13,33 +13,30 @@ public class InstructionALOAD extends Instruction
 	 * reference. The objectref in the local variable at index is pushed onto the
 	 * operand stack.
 	 */
+	@SuppressWarnings("unused")
 	private int index;
 
 	/**
-	 * False if index was part of instruction code, true if index was provided in
-	 * separate byte.
+	 * Index constant length, 0 for hard-coded index 0...3, 1 for generic one-byte
+	 * index and 2 for wide 2-byte index.
 	 */
-	private boolean separateIndexConstant;
+	private int indexConstantLength;
 
-	public InstructionALOAD(ByteArrayInputStream in)
+	public InstructionALOAD(ByteInputStream in, boolean wide)
 	{
-		separateIndexConstant = true;
-		index = in.read();
-		if (index == -1)
-		{
-			throw new ClassFormatError("ALOAD index error");
-		}
+		indexConstantLength = wide ? 2 : 1;
+		index = wide ? in.u2() : in.u1();
 	}
 
-	public InstructionALOAD(ByteArrayInputStream in, int index)
+	public InstructionALOAD(int index)
 	{
-		separateIndexConstant = false;
+		indexConstantLength = 0;
 		this.index = index;
 	}
 
 	@Override
 	public int length()
 	{
-		return separateIndexConstant ? 2 : 1;
+		return 1 + indexConstantLength;
 	}
 }

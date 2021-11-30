@@ -1,7 +1,5 @@
 package org.borium.javarecompiler.classfile.constants;
 
-import java.io.*;
-
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -29,7 +27,7 @@ public class ConstantInteger extends Constant
 	private int value;
 
 	@Override
-	protected void read(ClassInputStream in) throws IOException
+	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_Integer;
 		value = in.u4();

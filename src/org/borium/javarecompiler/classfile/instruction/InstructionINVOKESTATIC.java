@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 public class InstructionINVOKESTATIC extends Instruction
 {
@@ -16,9 +16,9 @@ public class InstructionINVOKESTATIC extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionINVOKESTATIC(ByteArrayInputStream in)
+	public InstructionINVOKESTATIC(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

@@ -1,6 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.io.*;
+import org.borium.javarecompiler.classfile.*;
 
 /**
  * Push long or double from run-time constant pool (wide index).
@@ -16,9 +16,9 @@ public class InstructionLDC2_W extends Instruction
 	@SuppressWarnings("unused")
 	private int index;
 
-	public InstructionLDC2_W(ByteArrayInputStream in)
+	public InstructionLDC2_W(ByteInputStream in)
 	{
-		index = in.read() << 8 | in.read();
+		index = in.u2();
 	}
 
 	@Override

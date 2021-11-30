@@ -1,7 +1,5 @@
 package org.borium.javarecompiler.classfile.constants;
 
-import java.io.*;
-
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -49,7 +47,7 @@ public class ConstantMethodrefInfo extends Constant
 	private int nameAndTypeIndex;
 
 	@Override
-	protected void read(ClassInputStream in) throws IOException
+	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_Methodref;
 		classIndex = in.u2();
