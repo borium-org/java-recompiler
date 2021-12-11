@@ -29,6 +29,12 @@ public class ConstantDouble extends Constant
 	private double value;
 
 	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("Double: " + value);
+	}
+
+	@Override
 	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_Double;

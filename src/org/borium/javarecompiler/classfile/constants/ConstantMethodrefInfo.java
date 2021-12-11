@@ -47,6 +47,13 @@ public class ConstantMethodrefInfo extends Constant
 	private int nameAndTypeIndex;
 
 	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("MethodRef: " + "constantPool.getString(classIndex)" + " "
+				+ "constantPool.getString(nameAndTypeIndex)");
+	}
+
+	@Override
 	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_Methodref;

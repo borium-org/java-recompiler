@@ -27,6 +27,12 @@ public class ConstantInteger extends Constant
 	private int value;
 
 	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("Integer: " + value);
+	}
+
+	@Override
 	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_Integer;

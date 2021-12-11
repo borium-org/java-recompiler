@@ -29,6 +29,12 @@ public class ConstantLong extends Constant
 	private long value;
 
 	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("Long: " + value);
+	}
+
+	@Override
 	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_Long;

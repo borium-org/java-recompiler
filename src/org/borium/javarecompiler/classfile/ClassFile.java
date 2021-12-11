@@ -182,8 +182,20 @@ public class ClassFile
 
 	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
+	/** Fully qualified class name. */
+	private String className;
+
+	public void dump(IndentedOutputStream stream)
+	{
+		stream.println("Class: " + className);
+		stream.println("Major Version: " + majorVersion);
+		stream.println("Minor Version: " + minorVersion);
+		cp.dump(stream);
+	}
+
 	public void read(String fileName) throws IOException, ClassFormatError
 	{
+		className = fileName.substring(4, fileName.length() - 6).replace('/', '.');
 		DataInputStream dataIn = new DataInputStream(new FileInputStream(fileName));
 		byte[] data = new byte[dataIn.available()];
 		dataIn.read(data);

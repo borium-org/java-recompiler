@@ -27,6 +27,12 @@ public class ConstantStringInfo extends Constant
 	private int stringIndex;
 
 	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("String: '" + constantPool.getString(stringIndex) + "'");
+	}
+
+	@Override
 	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_String;

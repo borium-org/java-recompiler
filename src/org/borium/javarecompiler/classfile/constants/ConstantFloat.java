@@ -27,6 +27,12 @@ public class ConstantFloat extends Constant
 	private double value;
 
 	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("Float: " + value);
+	}
+
+	@Override
 	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_Float;

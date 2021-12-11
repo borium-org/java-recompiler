@@ -28,6 +28,12 @@ public class ConstantClassInfo extends Constant
 	private int nameIndex;
 
 	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("ClassInfo: " + constantPool.getString(nameIndex));
+	}
+
+	@Override
 	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_Class;

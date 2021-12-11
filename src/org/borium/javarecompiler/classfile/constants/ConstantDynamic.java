@@ -34,7 +34,6 @@ public class ConstantDynamic extends Constant
 	 * potentially expensive check), we permit cycles initially but mandate a
 	 * failure at resolution (5.4.3.6).
 	 */
-	@SuppressWarnings("unused")
 	private int bootstrapMethodAttrIndex;
 
 	/**
@@ -46,8 +45,14 @@ public class ConstantDynamic extends Constant
 	 * In a CONSTANT_Dynamic_info structure, the indicated descriptor must be a
 	 * field descriptor (4.3.2).
 	 */
-	@SuppressWarnings("unused")
 	private int nameAndTypeIndex;
+
+	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("Dynamic: Bootstrap " + constantPool.getString(bootstrapMethodAttrIndex) + " Name and type "
+				+ constantPool.getString(nameAndTypeIndex));
+	}
 
 	@Override
 	protected void read(ByteInputStream in)

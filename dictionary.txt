@@ -16,3 +16,5 @@ cond
 const
 jsr
 atype
+iprint
+iprintln

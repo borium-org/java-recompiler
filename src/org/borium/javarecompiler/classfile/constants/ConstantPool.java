@@ -8,6 +8,18 @@ public class ConstantPool
 {
 	private ArrayList<Constant> constants = new ArrayList<>();
 
+	public void dump(IndentedOutputStream stream)
+	{
+		stream.println("Constants:");
+		stream.indent(1);
+		for (int i = 1; i < constants.size(); i++)
+		{
+			stream.iprint(i + ": ");
+			constants.get(i).dump(stream, this);
+		}
+		stream.indent(-1);
+	}
+
 	public Constant get(int index)
 	{
 		if (index < 0 || index >= constants.size())
