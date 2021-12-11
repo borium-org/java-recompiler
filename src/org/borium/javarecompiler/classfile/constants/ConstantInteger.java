@@ -23,7 +23,6 @@ public class ConstantInteger extends Constant
 	 * the int constant. The bytes of the value are stored in big-endian (high byte
 	 * first) order.
 	 */
-	@SuppressWarnings("unused")
 	private int value;
 
 	@Override

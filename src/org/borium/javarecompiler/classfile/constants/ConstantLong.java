@@ -25,7 +25,6 @@ public class ConstantLong extends Constant
 	 * high_bytes << 32) + low_bytes where the bytes of each of high_bytes and
 	 * low_bytes are stored in big-endian (high byte first) order.
 	 */
-	@SuppressWarnings("unused")
 	private long value;
 
 	@Override
