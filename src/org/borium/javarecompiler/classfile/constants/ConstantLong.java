@@ -30,7 +30,7 @@ public class ConstantLong extends Constant
 	@Override
 	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
 	{
-		stream.println("Long: " + value);
+		stream.print("Long: " + value);
 	}
 
 	@Override

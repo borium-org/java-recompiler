@@ -30,7 +30,7 @@ public class ConstantClassInfo extends Constant
 	@Override
 	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
 	{
-		stream.println("ClassInfo: " + constantPool.getString(nameIndex));
+		stream.print("ClassInfo: " + nameIndex + " " + constantPool.getString(nameIndex));
 	}
 
 	@Override

@@ -28,7 +28,7 @@ public class ConstantFloat extends Constant
 	@Override
 	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
 	{
-		stream.println("Float: " + value);
+		stream.print("Float: " + value);
 	}
 
 	@Override

@@ -35,7 +35,7 @@ public class ConstantUtf8Info extends Constant
 	@Override
 	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
 	{
-		stream.println("UTF8: '" + utf8 + "'");
+		stream.print("UTF8: '" + utf8 + "'");
 	}
 
 	@Override

@@ -49,8 +49,12 @@ public class ConstantMethodrefInfo extends Constant
 	@Override
 	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
 	{
-		stream.println("MethodRef: " + "constantPool.getString(classIndex)" + " "
-				+ "constantPool.getString(nameAndTypeIndex)");
+		stream.print("MethodRef: Class " + classIndex + " ");
+		ConstantClassInfo classInfo = constantPool.get(classIndex, ConstantClassInfo.class);
+		classInfo.dump(stream, constantPool);
+		stream.print(" NameType " + nameAndTypeIndex + " ");
+		ConstantNameAndTypeInfo nameTypeInfo = constantPool.get(nameAndTypeIndex, ConstantNameAndTypeInfo.class);
+		nameTypeInfo.dump(stream, constantPool);
 	}
 
 	@Override

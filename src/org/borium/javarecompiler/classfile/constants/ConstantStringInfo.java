@@ -29,7 +29,7 @@ public class ConstantStringInfo extends Constant
 	@Override
 	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
 	{
-		stream.println("String: '" + constantPool.getString(stringIndex) + "'");
+		stream.print("String: " + stringIndex + " '" + constantPool.getString(stringIndex) + "'");
 	}
 
 	@Override

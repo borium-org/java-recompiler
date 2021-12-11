@@ -16,6 +16,7 @@ public class ConstantPool
 		{
 			stream.iprint(i + ": ");
 			constants.get(i).dump(stream, this);
+			stream.println();
 		}
 		stream.indent(-1);
 	}
@@ -27,6 +28,26 @@ public class ConstantPool
 			throw new ClassFormatError("Constant index " + index + " is out of range 0.." + constants.size());
 		}
 		return constants.get(index);
+	}
+
+	/**
+	 * Get a constant, verify that it is of correct type.
+	 *
+	 * @param <T>   Constant-derived class to match the constant type.
+	 * @param index Constant index in the pool.
+	 * @param clazz Expected class of the constant.
+	 * @return Constant that is converted to expected type.
+	 * @throws ClassFormatError Constant is not of expected type.
+	 */
+	@SuppressWarnings("unchecked")
+	public <T extends Constant> T get(int index, Class<T> clazz) throws ClassFormatError
+	{
+		Constant c = get(index);
+		if (clazz.isInstance(c))
+		{
+			return (T) c;
+		}
+		throw new ClassFormatError("Constant " + index + " is not " + clazz.getSimpleName());
 	}
 
 	public String getString(int index)

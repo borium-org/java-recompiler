@@ -30,7 +30,7 @@ public class ConstantDouble extends Constant
 	@Override
 	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
 	{
-		stream.println("Double: " + value);
+		stream.print("Double: " + value);
 	}
 
 	@Override
