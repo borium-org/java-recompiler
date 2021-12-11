@@ -7,6 +7,16 @@ import org.borium.javarecompiler.classfile.constants.*;
 
 public class ClassFile
 {
+	public static int printAccessFlag(IndentedOutputStream stream, int flags, int bit, String string)
+	{
+		if ((flags & bit) != 0)
+		{
+			stream.print(string);
+		}
+		flags &= ~bit;
+		return flags;
+	}
+
 	private ByteInputStream in;
 
 	/**
@@ -134,7 +144,6 @@ public class ClassFile
 	 * for future use. They should be set to zero in generated class files and
 	 * should be ignored by Java Virtual Machine implementations.
 	 */
-	@SuppressWarnings("unused")
 	private int accessFlags;
 
 	/**
@@ -143,7 +152,6 @@ public class ClassFile
 	 * structure (4.4.1) representing the class or interface defined by this class
 	 * file.
 	 */
-	@SuppressWarnings("unused")
 	private int thisClass;
 
 	/**
@@ -163,7 +171,6 @@ public class ClassFile
 	 * index into the constant_pool table. The constant_pool entry at that index
 	 * must be a CONSTANT_Class_info structure representing the class Object.
 	 */
-	@SuppressWarnings("unused")
 	private int superClass;
 
 	/**
@@ -220,41 +227,20 @@ public class ClassFile
 	{
 		stream.print("Access Flags: ");
 		stream.printHex(accessFlags, 4);
-		if ((accessFlags & 0x8000) != 0)
+		int flags = accessFlags;
+		flags = printAccessFlag(stream, flags, 0x8000, " Module");
+		flags = printAccessFlag(stream, flags, 0x4000, " Enum");
+		flags = printAccessFlag(stream, flags, 0x2000, " Annotation");
+		flags = printAccessFlag(stream, flags, 0x1000, " Synthetic");
+		flags = printAccessFlag(stream, flags, 0x0400, " Abstract");
+		flags = printAccessFlag(stream, flags, 0x0200, " Interface");
+		flags = printAccessFlag(stream, flags, 0x0020, " Super");
+		flags = printAccessFlag(stream, flags, 0x0010, " Final");
+		flags = printAccessFlag(stream, flags, 0x0001, " Public");
+		if (flags != 0)
 		{
-			stream.print(" Module");
-		}
-		if ((accessFlags & 0x4000) != 0)
-		{
-			stream.print(" Enum");
-		}
-		if ((accessFlags & 0x2000) != 0)
-		{
-			stream.print(" Annotation");
-		}
-		if ((accessFlags & 0x1000) != 0)
-		{
-			stream.print(" Synthetic");
-		}
-		if ((accessFlags & 0x0400) != 0)
-		{
-			stream.print(" Abstract");
-		}
-		if ((accessFlags & 0x0200) != 0)
-		{
-			stream.print(" Interface");
-		}
-		if ((accessFlags & 0x0020) != 0)
-		{
-			stream.print(" Super");
-		}
-		if ((accessFlags & 0x0010) != 0)
-		{
-			stream.print(" Final");
-		}
-		if ((accessFlags & 0x0001) != 0)
-		{
-			stream.print(" Public");
+			stream.print(" Invalid");
+			stream.printHex(flags, 4);
 		}
 		stream.println();
 
