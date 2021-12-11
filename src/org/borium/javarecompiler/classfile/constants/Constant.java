@@ -83,6 +83,17 @@ public abstract class Constant
 		return constantType == tag;
 	}
 
+	/**
+	 * A pointless method to throw an exception so that Eclipse will not go nuts
+	 * while optimizing the code that throws up.
+	 *
+	 * @param errorMessage The class format error message.
+	 */
+	protected void classFormatError(String errorMessage)
+	{
+		throw new ClassFormatError(errorMessage);
+	}
+
 	protected abstract void dump(IndentedOutputStream stream, ConstantPool constantPool);
 
 	/**

@@ -46,7 +46,7 @@
         <setting id="cleanup.use_this_for_non_static_method_access" value="true"/>
         <setting id="cleanup.use_this_for_non_static_method_access_only_if_necessary" value="true"/>
         <setting id="cleanup.single_used_field" value="false"/>
-        <setting id="cleanup.reduce_indentation" value="true"/>
+        <setting id="cleanup.reduce_indentation" value="false"/>
         <setting id="cleanup.primitive_parsing" value="true"/>
         <setting id="cleanup.make_local_variable_final" value="true"/>
         <setting id="cleanup.add_missing_methods" value="false"/>
@@ -97,7 +97,7 @@
         <setting id="cleanup.remove_unused_private_fields" value="true"/>
         <setting id="cleanup.never_use_blocks" value="false"/>
         <setting id="cleanup.remove_redundant_modifiers" value="true"/>
-        <setting id="cleanup.unreachable_block" value="true"/>
+        <setting id="cleanup.unreachable_block" value="false"/>
         <setting id="cleanup.redundant_falling_through_block_end" value="false"/>
         <setting id="cleanup.switch" value="false"/>
         <setting id="cleanup.number_suffix" value="true"/>
@@ -125,8 +125,8 @@
         <setting id="cleanup.remove_unused_private_members" value="false"/>
         <setting id="cleanup.strictly_equal_or_different" value="true"/>
         <setting id="cleanup.never_use_parentheses_in_expressions" value="true"/>
-        <setting id="cleanup.push_down_negation" value="true"/>
-        <setting id="cleanup.evaluate_nullable" value="true"/>
+        <setting id="cleanup.push_down_negation" value="false"/>
+        <setting id="cleanup.evaluate_nullable" value="false"/>
         <setting id="cleanup.use_parentheses_in_expressions" value="true"/>
         <setting id="cleanup.hash" value="true"/>
         <setting id="cleanup.double_negation" value="true"/>
