@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.classfile;
 
+import static org.borium.javarecompiler.classfile.ClassFile.*;
+
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.constants.*;
@@ -191,6 +193,45 @@ public class ClassMethod
 
 	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
+	private ArrayList<ClassAttribute> attributeList = new ArrayList<>();
+
+	public void dump(IndentedOutputStream stream, ConstantPool cp)
+	{
+		stream.println("Method: " + cp.getString(nameIndex) + " " + cp.getString(descriptorIndex));
+		stream.indent(1);
+
+		stream.iprint("Access Flags: ");
+		stream.printHex(accessFlags, 4);
+		int flags = accessFlags;
+		flags = printAccessFlag(stream, flags, 0x1000, " Synthetic");
+		flags = printAccessFlag(stream, flags, 0x0800, " Strict");
+		flags = printAccessFlag(stream, flags, 0x0400, " Abstract");
+		flags = printAccessFlag(stream, flags, 0x0100, " Native");
+		flags = printAccessFlag(stream, flags, 0x0080, " VarArgs");
+		flags = printAccessFlag(stream, flags, 0x0040, " Bridge");
+		flags = printAccessFlag(stream, flags, 0x0020, " Synchronized");
+		flags = printAccessFlag(stream, flags, 0x0010, " Final");
+		flags = printAccessFlag(stream, flags, 0x0008, " Static");
+		flags = printAccessFlag(stream, flags, 0x0004, " Protected");
+		flags = printAccessFlag(stream, flags, 0x0002, " Private");
+		flags = printAccessFlag(stream, flags, 0x0001, " Public");
+		if (flags != 0)
+		{
+			stream.print(" Invalid ");
+			stream.printHex(flags, 4);
+		}
+		stream.println();
+
+		stream.iprintln("Attributes: " + attributes.size());
+		stream.indent(1);
+		for (int i = 0; i < attributes.size(); i++)
+		{
+			ClassAttribute attribute = attributeList.get(i);
+			attribute.dump(stream, cp);
+		}
+		stream.indent(-2);
+	}
+
 	public void read(ByteInputStream in, ConstantPool cp)
 	{
 		accessFlags = in.u2();
@@ -201,6 +242,7 @@ public class ClassMethod
 		{
 			ClassAttribute attribute = ClassAttribute.readAttribute(in, cp);
 			attributes.put(attribute.getName(), attribute);
+			attributeList.add(attribute);
 		}
 		// TODO validation
 	}

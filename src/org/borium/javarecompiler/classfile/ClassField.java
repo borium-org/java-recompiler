@@ -143,7 +143,7 @@ public class ClassField
 		flags = printAccessFlag(stream, flags, 0x0001, " Public");
 		if (flags != 0)
 		{
-			stream.print(" Invalid");
+			stream.print(" Invalid ");
 			stream.printHex(flags, 4);
 		}
 		stream.println();

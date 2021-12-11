@@ -201,6 +201,7 @@ public class ClassFile
 		dumpClassInfo(stream);
 		dumpInterfaces(stream);
 		dumpFields(stream);
+		dumpMethods(stream);
 	}
 
 	public void read(String fileName) throws IOException, ClassFormatError
@@ -240,7 +241,7 @@ public class ClassFile
 		flags = printAccessFlag(stream, flags, 0x0001, " Public");
 		if (flags != 0)
 		{
-			stream.print(" Invalid");
+			stream.print(" Invalid ");
 			stream.printHex(flags, 4);
 		}
 		stream.println();
@@ -286,6 +287,19 @@ public class ClassFile
 			ConstantClassInfo classInfo = cp.get(interfaces[i], ConstantClassInfo.class);
 			classInfo.dump(stream, cp);
 			stream.println();
+		}
+		stream.indent(-1);
+	}
+
+	private void dumpMethods(IndentedOutputStream stream)
+	{
+		stream.println("Methods: " + methods.size());
+		stream.indent(1);
+		for (int i = 0; i < methods.size(); i++)
+		{
+			stream.iprint(i + ": ");
+			ClassMethod method = methods.get(i);
+			method.dump(stream, cp);
 		}
 		stream.indent(-1);
 	}
