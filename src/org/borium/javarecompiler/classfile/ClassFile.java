@@ -200,6 +200,7 @@ public class ClassFile
 		cp.dump(stream);
 		dumpClassInfo(stream);
 		dumpInterfaces(stream);
+		dumpFields(stream);
 	}
 
 	public void read(String fileName) throws IOException, ClassFormatError
@@ -260,6 +261,19 @@ public class ClassFile
 			superClassInfo.dump(stream, cp);
 		}
 		stream.println();
+	}
+
+	private void dumpFields(IndentedOutputStream stream)
+	{
+		stream.println("Fields: " + fields.size());
+		stream.indent(1);
+		for (int i = 0; i < fields.size(); i++)
+		{
+			stream.iprint(i + ": ");
+			ClassField field = fields.get(i);
+			field.dump(stream, cp);
+		}
+		stream.indent(-1);
 	}
 
 	private void dumpInterfaces(IndentedOutputStream stream)

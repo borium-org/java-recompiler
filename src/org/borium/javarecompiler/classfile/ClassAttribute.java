@@ -91,6 +91,11 @@ public class ClassAttribute
 	{
 	}
 
+	public void dump(IndentedOutputStream stream, ConstantPool cp)
+	{
+		// TODO Auto-generated method stub
+	}
+
 	public String getName()
 	{
 		return attributeName;

@@ -32,6 +32,12 @@ public class IndentedOutputStream
 		stream.print(string);
 	}
 
+	public void iprintln(String string)
+	{
+		iprint(string);
+		println();
+	}
+
 	public void print(String string)
 	{
 		stream.print(string);
