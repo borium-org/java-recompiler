@@ -558,7 +558,7 @@ public abstract class Instruction
 		case JSR:
 			return new InstructionJSR(in);
 		case RET:
-			return new InstructionRET(in);
+			return new InstructionRET(in, false);
 		case TABLESWITCH:
 			return new InstructionTABLESWITCH(in);
 		case LOOKUPSWITCH:
