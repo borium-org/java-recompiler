@@ -191,6 +191,7 @@ public class ClassFile
 		stream.println("Major Version: " + majorVersion);
 		stream.println("Minor Version: " + minorVersion);
 		cp.dump(stream);
+		dumpClassInfo(stream);
 	}
 
 	public void read(String fileName) throws IOException, ClassFormatError
@@ -212,6 +213,66 @@ public class ClassFile
 		readAttributes();
 
 		in.close();
+	}
+
+	private void dumpClassInfo(IndentedOutputStream stream)
+	{
+		stream.print("Access Flags: ");
+		stream.printHex(accessFlags, 4);
+		if ((accessFlags & 0x8000) != 0)
+		{
+			stream.print(" Module");
+		}
+		if ((accessFlags & 0x4000) != 0)
+		{
+			stream.print(" Enum");
+		}
+		if ((accessFlags & 0x2000) != 0)
+		{
+			stream.print(" Annotation");
+		}
+		if ((accessFlags & 0x1000) != 0)
+		{
+			stream.print(" Synthetic");
+		}
+		if ((accessFlags & 0x0400) != 0)
+		{
+			stream.print(" Abstract");
+		}
+		if ((accessFlags & 0x0200) != 0)
+		{
+			stream.print(" Interface");
+		}
+		if ((accessFlags & 0x0020) != 0)
+		{
+			stream.print(" Super");
+		}
+		if ((accessFlags & 0x0010) != 0)
+		{
+			stream.print(" Final");
+		}
+		if ((accessFlags & 0x0001) != 0)
+		{
+			stream.print(" Public");
+		}
+		stream.println();
+
+		stream.print("This Class: " + thisClass + " ");
+		ConstantClassInfo thisClassInfo = cp.get(thisClass, ConstantClassInfo.class);
+		thisClassInfo.dump(stream, cp);
+		stream.println();
+
+		stream.print("Super Class: " + superClass + " ");
+		if (superClass == 0)
+		{
+			stream.print("<None>");
+		}
+		else
+		{
+			ConstantClassInfo superClassInfo = cp.get(superClass, ConstantClassInfo.class);
+			superClassInfo.dump(stream, cp);
+		}
+		stream.println();
 	}
 
 	private void readAttributes() throws IOException

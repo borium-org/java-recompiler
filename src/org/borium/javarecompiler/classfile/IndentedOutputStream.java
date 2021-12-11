@@ -37,6 +37,17 @@ public class IndentedOutputStream
 		stream.print(string);
 	}
 
+	public void printHex(int value, int length)
+	{
+		String hex = Integer.toHexString(value);
+		while (hex.length() < length)
+		{
+			hex = "0" + hex;
+		}
+		hex = hex.substring(0, length).toUpperCase();
+		stream.print(hex);
+	}
+
 	public void println()
 	{
 		stream.println();
