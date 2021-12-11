@@ -192,6 +192,7 @@ public class ClassFile
 		stream.println("Minor Version: " + minorVersion);
 		cp.dump(stream);
 		dumpClassInfo(stream);
+		dumpInterfaces(stream);
 	}
 
 	public void read(String fileName) throws IOException, ClassFormatError
@@ -273,6 +274,20 @@ public class ClassFile
 			superClassInfo.dump(stream, cp);
 		}
 		stream.println();
+	}
+
+	private void dumpInterfaces(IndentedOutputStream stream)
+	{
+		stream.println("Interfaces: " + interfaces.length);
+		stream.indent(1);
+		for (int i = 0; i < interfaces.length; i++)
+		{
+			stream.iprint(i + ": ");
+			ConstantClassInfo classInfo = cp.get(interfaces[i], ConstantClassInfo.class);
+			classInfo.dump(stream, cp);
+			stream.println();
+		}
+		stream.indent(-1);
 	}
 
 	private void readAttributes() throws IOException
