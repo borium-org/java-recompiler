@@ -38,6 +38,10 @@ public class ClassAttribute
 		{
 		case "Code":
 			return new AttributeCode(attribute, constants);
+		case "Exceptions":
+			return new AttributeExceptions(attribute, constants);
+		case "Signature":
+			return new AttributeSignature(attribute, constants);
 		}
 		return attribute;
 	}
@@ -98,12 +102,19 @@ public class ClassAttribute
 		stream.iprintln("Data Length: " + attributeLength);
 		stream.indent(1);
 		stream.iprintln(info);
-		stream.indent(-2);
+		stream.indent(-1);
+		detailedDump(stream, cp);
+		stream.indent(-1);
 	}
 
 	public String getName()
 	{
 		return attributeName;
+	}
+
+	protected void detailedDump(IndentedOutputStream stream, ConstantPool cp)
+	{
+		stream.iprintln("Attribute " + attributeName + ": Detailed dump not implemented");
 	}
 
 	private void read(ByteInputStream in, ConstantPool constants)

@@ -33,6 +33,10 @@ public class ByteInputStream
 	{
 		try
 		{
+			if (available() > 0)
+			{
+				throw new ClassFormatError("Closing with " + available() + " bytes available");
+			}
 			in.close();
 		}
 		catch (IOException e)
