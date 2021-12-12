@@ -32,6 +32,36 @@ public class IndentedOutputStream
 		stream.print(string);
 	}
 
+	/**
+	 * Indented print of binary data, 16 bytes with delimiters per line.
+	 *
+	 * @param info
+	 */
+	public void iprintln(byte[] info)
+	{
+		for (int start = 0; start < info.length; start += 16)
+		{
+			iprint("");
+			for (int offset = 0; offset < 16; offset++)
+			{
+				if (start + offset >= info.length)
+				{
+					break;
+				}
+				printHex(info[start + offset], 2);
+				if (offset == 7)
+				{
+					print(" | ");
+				}
+				else if (offset != 15)
+				{
+					print(" ");
+				}
+			}
+			println();
+		}
+	}
+
 	public void iprintln(String string)
 	{
 		iprint(string);

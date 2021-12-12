@@ -101,7 +101,6 @@ public class ClassField
 	 * for future use. They should be set to zero in generated class files and
 	 * should be ignored by Java Virtual Machine implementations.
 	 */
-	@SuppressWarnings("unused")
 	private int accessFlags;
 
 	/**
@@ -152,6 +151,7 @@ public class ClassField
 		stream.indent(1);
 		for (int i = 0; i < attributes.size(); i++)
 		{
+			stream.iprint(i + ": ");
 			ClassAttribute attribute = attributeList.get(i);
 			attribute.dump(stream, cp);
 		}

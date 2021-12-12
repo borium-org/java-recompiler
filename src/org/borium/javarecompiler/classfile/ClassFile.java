@@ -189,6 +189,8 @@ public class ClassFile
 
 	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
+	private ArrayList<ClassAttribute> attributeList = new ArrayList<>();
+
 	/** Fully qualified class name. */
 	private String className;
 
@@ -202,6 +204,7 @@ public class ClassFile
 		dumpInterfaces(stream);
 		dumpFields(stream);
 		dumpMethods(stream);
+		dumpAttributes(stream);
 	}
 
 	public void read(String fileName) throws IOException, ClassFormatError
@@ -223,6 +226,19 @@ public class ClassFile
 		readAttributes();
 
 		in.close();
+	}
+
+	private void dumpAttributes(IndentedOutputStream stream)
+	{
+		stream.println("Attributes: " + attributeList.size());
+		stream.indent(1);
+		for (int i = 0; i < attributeList.size(); i++)
+		{
+			stream.iprint(i + ": ");
+			ClassAttribute attribute = attributeList.get(i);
+			attribute.dump(stream, cp);
+		}
+		stream.indent(-1);
 	}
 
 	private void dumpClassInfo(IndentedOutputStream stream)
@@ -311,6 +327,7 @@ public class ClassFile
 		{
 			ClassAttribute attribute = ClassAttribute.readAttribute(in, cp);
 			attributes.put(attribute.getName(), attribute);
+			attributeList.add(attribute);
 		}
 		// TODO validation
 	}

@@ -93,7 +93,12 @@ public class ClassAttribute
 
 	public void dump(IndentedOutputStream stream, ConstantPool cp)
 	{
-		// TODO Auto-generated method stub
+		stream.println("Attribute: " + attributeName);
+		stream.indent(1);
+		stream.iprintln("Data Length: " + attributeLength);
+		stream.indent(1);
+		stream.iprintln(info);
+		stream.indent(-2);
 	}
 
 	public String getName()

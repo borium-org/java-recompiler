@@ -160,7 +160,6 @@ public class ClassMethod
 	 * should be set to zero in generated class files and should be ignored by Java
 	 * Virtual Machine implementations.
 	 */
-	@SuppressWarnings("unused")
 	private int accessFlags;
 
 	/**
@@ -171,7 +170,6 @@ public class ClassMethod
 	 * the special method name &lt;init&gt;, or the special method name
 	 * &lt;clinit&gt;.
 	 */
-	@SuppressWarnings("unused")
 	private int nameIndex;
 
 	/**
@@ -188,7 +186,6 @@ public class ClassMethod
 	 * above, a method that takes no arguments.</li>
 	 * </ul>
 	 */
-	@SuppressWarnings("unused")
 	private int descriptorIndex;
 
 	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
@@ -226,6 +223,7 @@ public class ClassMethod
 		stream.indent(1);
 		for (int i = 0; i < attributes.size(); i++)
 		{
+			stream.iprint(i + ": ");
 			ClassAttribute attribute = attributeList.get(i);
 			attribute.dump(stream, cp);
 		}
