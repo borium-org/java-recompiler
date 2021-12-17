@@ -633,6 +633,17 @@ public abstract class Instruction
 		return null;
 	}
 
+	/**
+	 * Add a label flag into the labels array if instruction has a target to
+	 * transfer control to. Default implementation does not add a label.
+	 *
+	 * @param address Address of this instruction.
+	 * @param labels  Labels array to modify if instruction jumps to a label.
+	 */
+	public void addLabel(int address, boolean[] labels)
+	{
+	}
+
 	public int length()
 	{
 		return 1;

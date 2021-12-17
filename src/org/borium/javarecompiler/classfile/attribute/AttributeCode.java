@@ -112,6 +112,35 @@ public class AttributeCode extends ClassAttribute
 		decode(cp);
 	}
 
+	@Override
+	protected void detailedDump(IndentedOutputStream stream, ConstantPool cp)
+	{
+		stream.indent(1);
+		boolean[] labels = new boolean[code.length];
+		// First instruction - create a label for start of the method
+		labels[0] = true;
+		for (int address = 0; address < code.length; address++)
+		{
+			Instruction insn = instructions[address];
+			if (insn != null)
+			{
+				insn.addLabel(address, labels);
+			}
+		}
+		for (int address = 0; address < code.length; address++)
+		{
+			if (labels[address])
+			{
+				stream.iprintln("L" + address + ":");
+			}
+			if (instructions[address] != null)
+			{
+				stream.iprintln("\t" + instructions[address].toString());
+			}
+		}
+		stream.indent(-1);
+	}
+
 	private void decode(ConstantPool cp)
 	{
 		ByteInputStream in = new ByteInputStream(info);

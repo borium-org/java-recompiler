@@ -95,7 +95,7 @@ public class ClassAttribute
 	{
 	}
 
-	public void dump(IndentedOutputStream stream, ConstantPool cp)
+	public final void dump(IndentedOutputStream stream, ConstantPool cp)
 	{
 		stream.println("Attribute: " + attributeName);
 		stream.indent(1);

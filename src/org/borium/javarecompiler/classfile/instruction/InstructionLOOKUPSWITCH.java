@@ -12,4 +12,11 @@ public class InstructionLOOKUPSWITCH extends Instruction
 		// TODO Auto-generated constructor stub
 		throw new RuntimeException("LOOKUPSWITCH not yet supported");
 	}
+
+	@Override
+	public void addLabel(int address, boolean[] labels)
+	{
+//		labels[address+offset]=true;
+		throw new RuntimeException("LOOKUPSWITCH not yet supported");
+	}
 }
