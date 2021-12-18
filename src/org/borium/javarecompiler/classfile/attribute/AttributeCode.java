@@ -136,7 +136,7 @@ public class AttributeCode extends ClassAttribute
 			if (instructions[address] != null)
 			{
 				stream.indent(1);
-				instructions[address].detailedDump(stream, address);
+				instructions[address].detailedDump(stream, address, cp);
 				stream.indent(-1);
 			}
 		}

@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Access jump table by key match and jump.
@@ -21,7 +22,7 @@ public class InstructionLOOKUPSWITCH extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address)
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
 	{
 		// TODO Auto-generated method stub
 		throw new RuntimeException("LOOKUPSWITCH not yet supported");
