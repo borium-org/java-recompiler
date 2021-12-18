@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Increment local variable by constant.
@@ -12,7 +13,6 @@ public class InstructionIINC extends Instruction
 	 * array of the current frame (2.6). The local variable at index must contain an
 	 * int.
 	 */
-	@SuppressWarnings("unused")
 	private int index;
 
 	/**
@@ -20,7 +20,6 @@ public class InstructionIINC extends Instruction
 	 * to an int, and then the local variable at index is incremented by that
 	 * amount.
 	 */
-	@SuppressWarnings("unused")
 	private int constant;
 
 	private boolean wide;
@@ -30,6 +29,15 @@ public class InstructionIINC extends Instruction
 		this.wide = wide;
 		index = wide ? in.u2() : in.u1();
 		constant = wide ? in.s2() : in.s1();
+	}
+
+	@Override
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+//		Constant classRef = cp.get(index);
+		stream.iprintln(className + " " + index + " " + constant);
+		throw new RuntimeException(className + ": Dump not implemented");
 	}
 
 	@Override

@@ -5,7 +5,7 @@ import org.borium.javarecompiler.classfile.*;
 /**
  * Set field in object.
  */
-public class InstructionPUTFIELD extends InstructionWithField
+public class InstructionPUTFIELD extends InstructionWithFieldIndex
 {
 	public InstructionPUTFIELD(ByteInputStream in)
 	{

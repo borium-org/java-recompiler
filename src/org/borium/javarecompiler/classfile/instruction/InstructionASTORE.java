@@ -5,7 +5,7 @@ import org.borium.javarecompiler.classfile.*;
 /**
  * Store reference into local variable.
  */
-public class InstructionASTORE extends InstructionWithIndex
+public class InstructionASTORE extends InstructionWithLocalVariableIndex
 {
 	public InstructionASTORE(ByteInputStream in, boolean wide)
 	{

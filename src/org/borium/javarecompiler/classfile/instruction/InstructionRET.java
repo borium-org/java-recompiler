@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Return from subroutine.
@@ -21,6 +22,15 @@ public class InstructionRET extends Instruction
 	{
 		this.wide = wide;
 		index = wide ? in.u2() : in.u1();
+	}
+
+	@Override
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+//		Constant classRef = cp.get(index);
+		stream.iprintln(className + " " + index);
+		throw new RuntimeException(className + ": Dump not implemented");
 	}
 
 	@Override

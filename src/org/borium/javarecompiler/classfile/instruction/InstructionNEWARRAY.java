@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Create new array.
@@ -48,12 +49,20 @@ public class InstructionNEWARRAY extends Instruction
 	 * </tr>
 	 * </table>
 	 */
-	@SuppressWarnings("unused")
 	private int atype;
 
 	public InstructionNEWARRAY(ByteInputStream in)
 	{
 		atype = in.u1();
+	}
+
+	@Override
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+//		Constant classRef = cp.get(index);
+		stream.iprintln(className + " " + atype);
+		throw new RuntimeException(className + ": Dump not implemented");
 	}
 
 	@Override

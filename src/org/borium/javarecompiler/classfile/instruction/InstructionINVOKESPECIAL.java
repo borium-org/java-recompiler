@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 public class InstructionINVOKESPECIAL extends Instruction
 {
@@ -19,6 +20,15 @@ public class InstructionINVOKESPECIAL extends Instruction
 	public InstructionINVOKESPECIAL(ByteInputStream in)
 	{
 		index = in.u2();
+	}
+
+	@Override
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+//		Constant classRef = cp.get(index);
+		stream.iprintln(className + " " + index);
+		throw new RuntimeException(className + ": Dump not implemented");
 	}
 
 	@Override

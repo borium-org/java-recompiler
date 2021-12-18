@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Base class for instructions that branch to a single target label. All
@@ -28,6 +29,13 @@ abstract class InstructionWithLabel extends Instruction
 	public void addLabel(int address, boolean[] labels)
 	{
 		labels[address + offset] = true;
+	}
+
+	@Override
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+		stream.iprintln(className + " L" + (address + offset));
 	}
 
 	@Override

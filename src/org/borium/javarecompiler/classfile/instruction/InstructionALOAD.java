@@ -5,7 +5,7 @@ import org.borium.javarecompiler.classfile.*;
 /**
  * Load reference from local variable.
  */
-public class InstructionALOAD extends InstructionWithIndex
+public class InstructionALOAD extends InstructionWithLocalVariableIndex
 {
 	public InstructionALOAD(ByteInputStream in, boolean wide)
 	{

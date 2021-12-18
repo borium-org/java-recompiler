@@ -5,7 +5,7 @@ import org.borium.javarecompiler.classfile.*;
 /**
  * Fetch field from object.
  */
-public class InstructionGETFIELD extends InstructionWithField
+public class InstructionGETFIELD extends InstructionWithFieldIndex
 {
 	public InstructionGETFIELD(ByteInputStream in)
 	{

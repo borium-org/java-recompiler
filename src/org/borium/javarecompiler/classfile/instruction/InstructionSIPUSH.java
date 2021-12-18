@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Push short.
@@ -13,12 +14,18 @@ public class InstructionSIPUSH extends Instruction
 	 * intermediate value is then sign-extended to an int value. That value is
 	 * pushed onto the operand stack.
 	 */
-	@SuppressWarnings("unused")
 	private int value;
 
 	public InstructionSIPUSH(ByteInputStream in)
 	{
 		value = in.s2();
+	}
+
+	@Override
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+		stream.iprintln(className + " " + value);
 	}
 
 	@Override

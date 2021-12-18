@@ -3,7 +3,7 @@ package org.borium.javarecompiler.classfile.instruction;
 import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.constants.*;
 
-abstract class InstructionWithIndex extends Instruction
+abstract class InstructionWithLocalVariableIndex extends Instruction
 {
 	/**
 	 * The index is an unsigned byte that must be an index into the local variable
@@ -19,13 +19,13 @@ abstract class InstructionWithIndex extends Instruction
 	 */
 	private int indexConstantLength;
 
-	public InstructionWithIndex(ByteInputStream in, boolean wide)
+	public InstructionWithLocalVariableIndex(ByteInputStream in, boolean wide)
 	{
 		indexConstantLength = wide ? 2 : 1;
 		index = wide ? in.u2() : in.u1();
 	}
 
-	public InstructionWithIndex(int index)
+	public InstructionWithLocalVariableIndex(int index)
 	{
 		indexConstantLength = 0;
 		this.index = index;
