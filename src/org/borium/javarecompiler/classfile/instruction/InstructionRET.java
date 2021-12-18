@@ -13,7 +13,6 @@ public class InstructionRET extends Instruction
 	 * variable at index in the current frame (2.6) must contain a value of type
 	 * returnAddress.
 	 */
-	@SuppressWarnings("unused")
 	private int index;
 
 	private boolean wide;

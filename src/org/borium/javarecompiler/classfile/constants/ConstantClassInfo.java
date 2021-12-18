@@ -23,9 +23,8 @@ public class ConstantClassInfo extends Constant
 	 * table. The constant_pool entry at that index must be a CONSTANT_Utf8_info
 	 * structure (4.4.7) representing a valid binary class or interface name encoded
 	 * in internal form (4.2.1).
-	 *
 	 */
-	private int nameIndex;
+	public int nameIndex;
 
 	@Override
 	public void dump(IndentedOutputStream stream, ConstantPool constantPool)

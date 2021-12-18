@@ -13,7 +13,6 @@ public class InstructionINVOKEVIRTUAL extends Instruction
 	 * name and descriptor (4.3.3) of the method as well as a symbolic reference to
 	 * the class in which the method is to be found.
 	 */
-	@SuppressWarnings("unused")
 	private int index;
 
 	public InstructionINVOKEVIRTUAL(ByteInputStream in)

@@ -28,7 +28,7 @@ public class ConstantMethodrefInfo extends Constant
 	 * In a CONSTANT_Methodref_info structure, the class_index item must be a class
 	 * type, not an interface type.
 	 */
-	private int classIndex;
+	public int classIndex;
 
 	/**
 	 * The value of the name_and_type_index item must be a valid index into the
@@ -44,7 +44,7 @@ public class ConstantMethodrefInfo extends Constant
 	 * an instance initialization method (2.9.1). The return type of such a method
 	 * must be void.
 	 */
-	private int nameAndTypeIndex;
+	public int nameAndTypeIndex;
 
 	@Override
 	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)

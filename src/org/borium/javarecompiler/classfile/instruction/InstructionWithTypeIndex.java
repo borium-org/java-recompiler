@@ -22,9 +22,9 @@ abstract class InstructionWithTypeIndex extends Instruction
 	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-//		Constant classRef = cp.get(index);
-		stream.iprintln(className + " " + index);
-		throw new RuntimeException(className + ": Dump not implemented");
+		ConstantClassInfo classInfo = cp.get(index, ConstantClassInfo.class);
+		String methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
+		stream.iprintln(className + " " + methodClassName);
 	}
 
 	@Override

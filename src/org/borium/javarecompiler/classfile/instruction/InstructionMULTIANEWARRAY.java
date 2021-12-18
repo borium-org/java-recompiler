@@ -14,7 +14,6 @@ public class InstructionMULTIANEWARRAY extends Instruction
 	 * index is (indexbyte1 << 8) | indexbyte2. The runtime constant pool entry at
 	 * the index must be a symbolic reference to a class, array, or interface type.
 	 */
-	@SuppressWarnings("unused")
 	private int index;
 
 	/**

@@ -14,7 +14,6 @@ public class InstructionINVOKEINTERFACE extends Instruction
 	 * symbolic reference to the interface in which the interface method is to be
 	 * found.
 	 */
-	@SuppressWarnings("unused")
 	private int index;
 
 	/**

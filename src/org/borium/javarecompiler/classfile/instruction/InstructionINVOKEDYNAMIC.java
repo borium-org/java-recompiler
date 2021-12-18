@@ -12,7 +12,6 @@ public class InstructionINVOKEDYNAMIC extends Instruction
 	 * the index must be a symbolic reference to a dynamically-computed call site
 	 * (5.1).
 	 */
-	@SuppressWarnings("unused")
 	private int index;
 
 	/**

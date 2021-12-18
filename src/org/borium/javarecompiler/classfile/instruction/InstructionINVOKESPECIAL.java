@@ -14,7 +14,6 @@ public class InstructionINVOKESPECIAL extends Instruction
 	 * method as well as a symbolic reference to the class or interface in which the
 	 * method or interface method is to be found.
 	 */
-	@SuppressWarnings("unused")
 	private int index;
 
 	public InstructionINVOKESPECIAL(ByteInputStream in)
@@ -26,9 +25,12 @@ public class InstructionINVOKESPECIAL extends Instruction
 	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-//		Constant classRef = cp.get(index);
-		stream.iprintln(className + " " + index);
-		throw new RuntimeException(className + ": Dump not implemented");
+		ConstantMethodrefInfo methodref = cp.get(index, ConstantMethodrefInfo.class);
+		ConstantClassInfo classInfo = cp.get(methodref.classIndex, ConstantClassInfo.class);
+		ConstantNameAndTypeInfo nameType = cp.get(methodref.nameAndTypeIndex, ConstantNameAndTypeInfo.class);
+		String methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
+		String methodName = cp.getString(nameType.nameIndex);
+		stream.iprintln(className + " " + methodClassName + "." + methodName);
 	}
 
 	@Override

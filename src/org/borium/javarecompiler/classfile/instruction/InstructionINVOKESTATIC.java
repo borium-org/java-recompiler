@@ -14,7 +14,6 @@ public class InstructionINVOKESTATIC extends Instruction
 	 * method as well as a symbolic reference to the class or interface in which the
 	 * method or interface method is to be found.
 	 */
-	@SuppressWarnings("unused")
 	private int index;
 
 	public InstructionINVOKESTATIC(ByteInputStream in)
