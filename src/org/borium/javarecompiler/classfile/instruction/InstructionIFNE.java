@@ -2,7 +2,7 @@ package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
 
-public class InstructionIFNE extends InstructionBranch
+public class InstructionIFNE extends InstructionWithLabel
 {
 	public InstructionIFNE(ByteInputStream in)
 	{

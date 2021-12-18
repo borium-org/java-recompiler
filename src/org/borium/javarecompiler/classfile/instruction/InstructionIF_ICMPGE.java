@@ -2,7 +2,7 @@ package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
 
-public class InstructionIF_ICMPGE extends InstructionBranch
+public class InstructionIF_ICMPGE extends InstructionWithLabel
 {
 	public InstructionIF_ICMPGE(ByteInputStream in)
 	{

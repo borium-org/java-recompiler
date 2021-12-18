@@ -2,7 +2,7 @@ package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
 
-public class InstructionIFNONNULL extends InstructionBranch
+public class InstructionIFNONNULL extends InstructionWithLabel
 {
 	public InstructionIFNONNULL(ByteInputStream in)
 	{

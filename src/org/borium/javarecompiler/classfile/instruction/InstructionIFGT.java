@@ -2,7 +2,7 @@ package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
 
-public class InstructionIFGT extends InstructionBranch
+public class InstructionIFGT extends InstructionWithLabel
 {
 	public InstructionIFGT(ByteInputStream in)
 	{

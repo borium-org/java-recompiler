@@ -2,7 +2,7 @@ package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
 
-public class InstructionIFEQ extends InstructionBranch
+public class InstructionIFEQ extends InstructionWithLabel
 {
 	public InstructionIFEQ(ByteInputStream in)
 	{
