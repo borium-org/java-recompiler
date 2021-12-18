@@ -26,6 +26,11 @@ public class ConstantStringInfo extends Constant
 	 */
 	private int stringIndex;
 
+	public String getValue(ConstantPool constantPool)
+	{
+		return constantPool.getString(stringIndex);
+	}
+
 	@Override
 	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
 	{

@@ -25,6 +25,11 @@ public class ConstantInteger extends Constant
 	 */
 	private int value;
 
+	public int getValue()
+	{
+		return value;
+	}
+
 	@Override
 	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
 	{

@@ -35,9 +35,7 @@ public class InstructionIINC extends Instruction
 	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-//		Constant classRef = cp.get(index);
 		stream.iprintln(className + " " + index + " " + constant);
-		throw new RuntimeException(className + ": Dump not implemented");
 	}
 
 	@Override

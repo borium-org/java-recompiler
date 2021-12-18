@@ -32,6 +32,11 @@ public class ConstantClassInfo extends Constant
 		stream.print("ClassInfo: " + nameIndex + " " + constantPool.getString(nameIndex));
 	}
 
+	public String getName(ConstantPool constantPool)
+	{
+		return constantPool.getString(nameIndex);
+	}
+
 	@Override
 	protected void read(ByteInputStream in)
 	{

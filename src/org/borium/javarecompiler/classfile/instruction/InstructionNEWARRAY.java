@@ -60,9 +60,8 @@ public class InstructionNEWARRAY extends Instruction
 	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-//		Constant classRef = cp.get(index);
-		stream.iprintln(className + " " + atype);
-		throw new RuntimeException(className + ": Dump not implemented");
+		String[] types = { "0", "1", "2", "3", "boolean", "char", "float", "double", "byte", "short", "int", "long" };
+		stream.iprintln(className + " " + types[atype]);
 	}
 
 	@Override
