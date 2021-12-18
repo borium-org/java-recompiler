@@ -644,6 +644,12 @@ public abstract class Instruction
 	{
 	}
 
+	public void detailedDump(IndentedOutputStream stream, int address)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+		stream.iprintln(className);
+	}
+
 	public int length()
 	{
 		return 1;

@@ -19,4 +19,11 @@ public class InstructionTABLESWITCH extends Instruction
 //		labels[address+offset]=true;
 		throw new RuntimeException("TABLESWITCH not yet supported");
 	}
+
+	@Override
+	public void detailedDump(IndentedOutputStream stream, int address)
+	{
+		// TODO Auto-generated method stub
+		throw new RuntimeException("TABLESWITCH not yet supported");
+	}
 }

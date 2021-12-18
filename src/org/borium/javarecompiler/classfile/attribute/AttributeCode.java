@@ -135,7 +135,9 @@ public class AttributeCode extends ClassAttribute
 			}
 			if (instructions[address] != null)
 			{
-				stream.iprintln("\t" + instructions[address].toString());
+				stream.indent(1);
+				instructions[address].detailedDump(stream, address);
+				stream.indent(-1);
 			}
 		}
 		stream.indent(-1);
