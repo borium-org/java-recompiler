@@ -42,6 +42,8 @@ public class ClassAttribute
 			return new AttributeExceptions(attribute, constants);
 		case "Signature":
 			return new AttributeSignature(attribute, constants);
+		case "SourceFile":
+			return new AttributeSourceFile(attribute, constants);
 		}
 		return attribute;
 	}
