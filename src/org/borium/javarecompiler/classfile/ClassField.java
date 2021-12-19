@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.classfile;
 
+import static org.borium.javarecompiler.classfile.ClassFile.*;
+
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.constants.*;
@@ -99,7 +101,6 @@ public class ClassField
 	 * for future use. They should be set to zero in generated class files and
 	 * should be ignored by Java Virtual Machine implementations.
 	 */
-	@SuppressWarnings("unused")
 	private int accessFlags;
 
 	/**
@@ -108,7 +109,6 @@ public class ClassField
 	 * structure (4.4.7) which represents a valid unqualified name denoting a field
 	 * (4.2.2).
 	 */
-	@SuppressWarnings("unused")
 	private int nameIndex;
 
 	/**
@@ -117,10 +117,46 @@ public class ClassField
 	 * CONSTANT_Utf8_info structure (4.4.7) which represents a valid field
 	 * descriptor (4.3.2).
 	 */
-	@SuppressWarnings("unused")
 	private int descriptorIndex;
 
 	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
+
+	private ArrayList<ClassAttribute> attributeList = new ArrayList<>();
+
+	public void dump(IndentedOutputStream stream, ConstantPool cp)
+	{
+		stream.println("Field: " + cp.getString(nameIndex) + " " + cp.getString(descriptorIndex));
+		stream.indent(1);
+
+		stream.iprint("Access Flags: ");
+		stream.printHex(accessFlags, 4);
+		int flags = accessFlags;
+		flags = printAccessFlag(stream, flags, 0x4000, " Enum");
+		flags = printAccessFlag(stream, flags, 0x1000, " Synthetic");
+		flags = printAccessFlag(stream, flags, 0x0080, " Transient");
+		flags = printAccessFlag(stream, flags, 0x0040, " Volatile");
+		flags = printAccessFlag(stream, flags, 0x0010, " Final");
+		flags = printAccessFlag(stream, flags, 0x0008, " Static");
+		flags = printAccessFlag(stream, flags, 0x0004, " Protected");
+		flags = printAccessFlag(stream, flags, 0x0002, " Private");
+		flags = printAccessFlag(stream, flags, 0x0001, " Public");
+		if (flags != 0)
+		{
+			stream.print(" Invalid ");
+			stream.printHex(flags, 4);
+		}
+		stream.println();
+
+		stream.iprintln("Attributes: " + attributes.size());
+		stream.indent(1);
+		for (int i = 0; i < attributes.size(); i++)
+		{
+			stream.iprint(i + ": ");
+			ClassAttribute attribute = attributeList.get(i);
+			attribute.dump(stream, cp);
+		}
+		stream.indent(-2);
+	}
 
 	public void read(ByteInputStream in, ConstantPool cp)
 	{
@@ -132,6 +168,7 @@ public class ClassField
 		{
 			ClassAttribute attribute = ClassAttribute.readAttribute(in, cp);
 			attributes.put(attribute.getName(), attribute);
+			attributeList.add(attribute);
 		}
 		// TODO validation
 	}

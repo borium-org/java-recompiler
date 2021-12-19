@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 public class InstructionLDC_W extends Instruction
 {
@@ -10,12 +11,37 @@ public class InstructionLDC_W extends Instruction
 	 * value of the index is calculated as (indexbyte1 << 8) | indexbyte2. The index
 	 * must be a valid index into the run-time constant pool of the current class.
 	 */
-	@SuppressWarnings("unused")
 	private int index;
 
 	public InstructionLDC_W(ByteInputStream in)
 	{
 		index = in.u2();
+	}
+
+	@Override
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+		Constant c = cp.get(index);
+		if (c instanceof ConstantStringInfo stringValue)
+		{
+			stream.iprintln(className + " \"" + stringValue.getValue(cp) + "\"");
+
+		}
+		else if (c instanceof ConstantInteger intValue)
+		{
+			stream.iprintln(className + " " + intValue.getValue());
+		}
+		else if (c instanceof ConstantClassInfo classInfo)
+		{
+			stream.iprintln(className + " " + classInfo.getName(cp) + ".class");
+		}
+		else
+		{
+//		Constant classRef = cp.get(index);
+			stream.iprintln(className + " " + index);
+			throw new RuntimeException(className + ": Dump not implemented");
+		}
 	}
 
 	@Override

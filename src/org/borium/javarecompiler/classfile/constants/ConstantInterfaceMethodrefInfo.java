@@ -39,6 +39,17 @@ public class ConstantInterfaceMethodrefInfo extends Constant
 	private int nameAndTypeIndex;
 
 	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.print("InterfaceMethodRef:  Class " + classIndex + " ");
+		ConstantClassInfo classInfo = constantPool.get(classIndex, ConstantClassInfo.class);
+		classInfo.dump(stream, constantPool);
+		stream.print(" NameType " + nameAndTypeIndex + " ");
+		ConstantNameAndTypeInfo nameTypeInfo = constantPool.get(nameAndTypeIndex, ConstantNameAndTypeInfo.class);
+		nameTypeInfo.dump(stream, constantPool);
+	}
+
+	@Override
 	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_InterfaceMethodref;

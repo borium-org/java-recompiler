@@ -39,7 +39,18 @@ public class ConstantFieldrefInfo extends Constant
 	 * In a CONSTANT_Fieldref_info structure, the indicated descriptor must be a
 	 * field descriptor (4.3.2).
 	 */
-	private int nameAndTypeIndex;
+	public int nameAndTypeIndex;
+
+	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.print("FieldRef:  Class " + classIndex + " ");
+		ConstantClassInfo classInfo = constantPool.get(classIndex, ConstantClassInfo.class);
+		classInfo.dump(stream, constantPool);
+		stream.print(" NameType " + nameAndTypeIndex + " ");
+		ConstantNameAndTypeInfo nameTypeInfo = constantPool.get(nameAndTypeIndex, ConstantNameAndTypeInfo.class);
+		nameTypeInfo.dump(stream, constantPool);
+	}
 
 	@Override
 	protected void read(ByteInputStream in)

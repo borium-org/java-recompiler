@@ -28,7 +28,6 @@ public class ConstantInvokeDynamic extends Constant
 	 * the bootstrap_methods array of the bootstrap method table of this class file
 	 * (4.7.23).
 	 */
-	@SuppressWarnings("unused")
 	private int bootstrapMethodAttrIndex;
 
 	/**
@@ -40,8 +39,14 @@ public class ConstantInvokeDynamic extends Constant
 	 * In a CONSTANT_InvokeDynamic_info structure, the indicated descriptor must be
 	 * a method descriptor (4.3.3).
 	 */
-	@SuppressWarnings("unused")
 	private int nameAndTypeIndex;
+
+	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("InvokeDynamic: Bootstrap " + constantPool.getString(bootstrapMethodAttrIndex)
+				+ " Name and type " + constantPool.getString(nameAndTypeIndex));
+	}
 
 	@Override
 	protected void read(ByteInputStream in)

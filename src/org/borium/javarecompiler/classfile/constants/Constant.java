@@ -83,6 +83,8 @@ public abstract class Constant
 		return constantType == tag;
 	}
 
+	protected abstract void dump(IndentedOutputStream stream, ConstantPool constantPool);
+
 	/**
 	 * Read a constant object from the class input stream.
 	 *

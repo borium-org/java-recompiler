@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Jump subroutine (wide index).
@@ -17,12 +18,24 @@ public class InstructionJSR_W extends Instruction
 	 * The target address must be that of an opcode of an instruction within the
 	 * method that contains this jsr_w instruction.
 	 */
-	@SuppressWarnings("unused")
 	private int offset;
 
 	public InstructionJSR_W(ByteInputStream in)
 	{
 		offset = in.s4();
+	}
+
+	@Override
+	public void addLabel(int address, boolean[] labels)
+	{
+		labels[address + offset] = true;
+	}
+
+	@Override
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+		stream.iprintln(className + " L" + (address + offset));
 	}
 
 	@Override

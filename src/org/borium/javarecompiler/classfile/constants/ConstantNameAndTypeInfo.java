@@ -25,7 +25,7 @@ public class ConstantNameAndTypeInfo extends Constant
 	 * structure (4.4.7) representing either a valid unqualified name denoting a
 	 * field or method (4.2.2), or the special method name <init> (2.9.1).
 	 */
-	private int nameIndex;
+	public int nameIndex;
 
 	/**
 	 * The value of the descriptor_index item must be a valid index into the
@@ -34,6 +34,13 @@ public class ConstantNameAndTypeInfo extends Constant
 	 * method descriptor (4.3.2, 4.3.3).
 	 */
 	private int descriptorIndex;
+
+	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.print("NameType: Name " + nameIndex + " " + constantPool.getString(nameIndex) + " Descriptor "
+				+ descriptorIndex + " " + constantPool.getString(descriptorIndex));
+	}
 
 	@Override
 	protected void read(ByteInputStream in)

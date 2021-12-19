@@ -7,6 +7,16 @@ import org.borium.javarecompiler.classfile.constants.*;
 
 public class ClassFile
 {
+	public static int printAccessFlag(IndentedOutputStream stream, int flags, int bit, String string)
+	{
+		if ((flags & bit) != 0)
+		{
+			stream.print(string);
+		}
+		flags &= ~bit;
+		return flags;
+	}
+
 	private ByteInputStream in;
 
 	/**
@@ -134,7 +144,6 @@ public class ClassFile
 	 * for future use. They should be set to zero in generated class files and
 	 * should be ignored by Java Virtual Machine implementations.
 	 */
-	@SuppressWarnings("unused")
 	private int accessFlags;
 
 	/**
@@ -143,7 +152,6 @@ public class ClassFile
 	 * structure (4.4.1) representing the class or interface defined by this class
 	 * file.
 	 */
-	@SuppressWarnings("unused")
 	private int thisClass;
 
 	/**
@@ -163,7 +171,6 @@ public class ClassFile
 	 * index into the constant_pool table. The constant_pool entry at that index
 	 * must be a CONSTANT_Class_info structure representing the class Object.
 	 */
-	@SuppressWarnings("unused")
 	private int superClass;
 
 	/**
@@ -182,8 +189,27 @@ public class ClassFile
 
 	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
+	private ArrayList<ClassAttribute> attributeList = new ArrayList<>();
+
+	/** Fully qualified class name. */
+	private String className;
+
+	public void dump(IndentedOutputStream stream)
+	{
+		stream.println("Class: " + className);
+		stream.println("Major Version: " + majorVersion);
+		stream.println("Minor Version: " + minorVersion);
+		cp.dump(stream);
+		dumpClassInfo(stream);
+		dumpInterfaces(stream);
+		dumpFields(stream);
+		dumpMethods(stream);
+		dumpAttributes(stream);
+	}
+
 	public void read(String fileName) throws IOException, ClassFormatError
 	{
+		className = fileName.substring(4, fileName.length() - 6).replace('/', '.');
 		DataInputStream dataIn = new DataInputStream(new FileInputStream(fileName));
 		byte[] data = new byte[dataIn.available()];
 		dataIn.read(data);
@@ -202,6 +228,98 @@ public class ClassFile
 		in.close();
 	}
 
+	private void dumpAttributes(IndentedOutputStream stream)
+	{
+		stream.println("Attributes: " + attributeList.size());
+		stream.indent(1);
+		for (int i = 0; i < attributeList.size(); i++)
+		{
+			stream.iprint(i + ": ");
+			ClassAttribute attribute = attributeList.get(i);
+			attribute.dump(stream, cp);
+		}
+		stream.indent(-1);
+	}
+
+	private void dumpClassInfo(IndentedOutputStream stream)
+	{
+		stream.print("Access Flags: ");
+		stream.printHex(accessFlags, 4);
+		int flags = accessFlags;
+		flags = printAccessFlag(stream, flags, 0x8000, " Module");
+		flags = printAccessFlag(stream, flags, 0x4000, " Enum");
+		flags = printAccessFlag(stream, flags, 0x2000, " Annotation");
+		flags = printAccessFlag(stream, flags, 0x1000, " Synthetic");
+		flags = printAccessFlag(stream, flags, 0x0400, " Abstract");
+		flags = printAccessFlag(stream, flags, 0x0200, " Interface");
+		flags = printAccessFlag(stream, flags, 0x0020, " Super");
+		flags = printAccessFlag(stream, flags, 0x0010, " Final");
+		flags = printAccessFlag(stream, flags, 0x0001, " Public");
+		if (flags != 0)
+		{
+			stream.print(" Invalid ");
+			stream.printHex(flags, 4);
+		}
+		stream.println();
+
+		stream.print("This Class: " + thisClass + " ");
+		ConstantClassInfo thisClassInfo = cp.get(thisClass, ConstantClassInfo.class);
+		thisClassInfo.dump(stream, cp);
+		stream.println();
+
+		stream.print("Super Class: " + superClass + " ");
+		if (superClass == 0)
+		{
+			stream.print("<None>");
+		}
+		else
+		{
+			ConstantClassInfo superClassInfo = cp.get(superClass, ConstantClassInfo.class);
+			superClassInfo.dump(stream, cp);
+		}
+		stream.println();
+	}
+
+	private void dumpFields(IndentedOutputStream stream)
+	{
+		stream.println("Fields: " + fields.size());
+		stream.indent(1);
+		for (int i = 0; i < fields.size(); i++)
+		{
+			stream.iprint(i + ": ");
+			ClassField field = fields.get(i);
+			field.dump(stream, cp);
+		}
+		stream.indent(-1);
+	}
+
+	private void dumpInterfaces(IndentedOutputStream stream)
+	{
+		stream.println("Interfaces: " + interfaces.length);
+		stream.indent(1);
+		for (int i = 0; i < interfaces.length; i++)
+		{
+			stream.iprint(i + ": ");
+			ConstantClassInfo classInfo = cp.get(interfaces[i], ConstantClassInfo.class);
+			classInfo.dump(stream, cp);
+			stream.println();
+		}
+		stream.indent(-1);
+	}
+
+	private void dumpMethods(IndentedOutputStream stream)
+	{
+		stream.println("Methods: " + methods.size());
+		stream.indent(1);
+		for (int i = 0; i < methods.size(); i++)
+		{
+			stream.iprint(i + ": ");
+			ClassMethod method = methods.get(i);
+			method.dump(stream, cp);
+		}
+		stream.indent(-1);
+	}
+
 	private void readAttributes() throws IOException
 	{
 		int attributeCount = in.u2();
@@ -209,6 +327,7 @@ public class ClassFile
 		{
 			ClassAttribute attribute = ClassAttribute.readAttribute(in, cp);
 			attributes.put(attribute.getName(), attribute);
+			attributeList.add(attribute);
 		}
 		// TODO validation
 	}

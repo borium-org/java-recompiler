@@ -23,8 +23,13 @@ public class ConstantFloat extends Constant
 	 * the float constant in IEEE 754 binary32 floating-point format (2.3.2). The
 	 * bytes of the item are stored in big-endian (high byte first) order.
 	 */
-	@SuppressWarnings("unused")
 	private double value;
+
+	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.print("Float: " + value);
+	}
 
 	@Override
 	protected void read(ByteInputStream in)

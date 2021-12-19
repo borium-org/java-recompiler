@@ -23,8 +23,18 @@ public class ConstantInteger extends Constant
 	 * the int constant. The bytes of the value are stored in big-endian (high byte
 	 * first) order.
 	 */
-	@SuppressWarnings("unused")
 	private int value;
+
+	public int getValue()
+	{
+		return value;
+	}
+
+	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.print("Integer: " + value);
+	}
 
 	@Override
 	protected void read(ByteInputStream in)

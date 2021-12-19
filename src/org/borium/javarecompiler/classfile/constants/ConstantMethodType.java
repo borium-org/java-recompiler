@@ -26,6 +26,12 @@ public class ConstantMethodType extends Constant
 	private int descriptorIndex;
 
 	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("MethodType: " + constantPool.getString(descriptorIndex));
+	}
+
+	@Override
 	protected void read(ByteInputStream in)
 	{
 		tag = CONSTANT_MethodType;

@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 public abstract class Instruction
 {
@@ -558,7 +559,7 @@ public abstract class Instruction
 		case JSR:
 			return new InstructionJSR(in);
 		case RET:
-			return new InstructionRET(in);
+			return new InstructionRET(in, false);
 		case TABLESWITCH:
 			return new InstructionTABLESWITCH(in);
 		case LOOKUPSWITCH:
@@ -631,6 +632,23 @@ public abstract class Instruction
 //			return new InstructionIMPDEP2(in);
 		}
 		return null;
+	}
+
+	/**
+	 * Add a label flag into the labels array if instruction has a target to
+	 * transfer control to. Default implementation does not add a label.
+	 *
+	 * @param address Address of this instruction.
+	 * @param labels  Labels array to modify if instruction jumps to a label.
+	 */
+	public void addLabel(int address, boolean[] labels)
+	{
+	}
+
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+		stream.iprintln(className);
 	}
 
 	public int length()

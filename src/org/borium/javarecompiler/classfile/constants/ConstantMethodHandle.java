@@ -24,7 +24,6 @@ public class ConstantMethodHandle extends Constant
 	 * denotes the kind of this method handle, which characterizes its bytecode
 	 * behavior (5.4.3.5).
 	 */
-	@SuppressWarnings("unused")
 	private int referenceKind;
 
 	/**
@@ -62,8 +61,13 @@ public class ConstantMethodHandle extends Constant
 	 * If the value is 8 (REF_newInvokeSpecial), the name of the method represented
 	 * by a CONSTANT_Methodref_info structure must be &lt;init&gt;.
 	 */
-	@SuppressWarnings("unused")
 	private int referenceIndex;
+
+	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("MethodHandle: Kind " + referenceKind + " Index " + referenceIndex);
+	}
 
 	@Override
 	protected void read(ByteInputStream in)

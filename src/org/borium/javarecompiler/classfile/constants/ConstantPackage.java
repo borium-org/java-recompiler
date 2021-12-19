@@ -29,8 +29,13 @@ public class ConstantPackage extends Constant
 	 * structure (4.4.7) representing a valid package name encoded in internal form
 	 * (4.2.3).
 	 */
-	@SuppressWarnings("unused")
 	private int nameIndex;
+
+	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("Package: " + constantPool.getString(nameIndex));
+	}
 
 	@Override
 	protected void read(ByteInputStream in)

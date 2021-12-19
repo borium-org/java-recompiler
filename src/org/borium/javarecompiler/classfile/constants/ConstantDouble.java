@@ -25,8 +25,13 @@ public class ConstantDouble extends Constant
 	 * format (2.3.2). The bytes of each item are stored in big-endian (high byte
 	 * first) order.
 	 */
-	@SuppressWarnings("unused")
 	private double value;
+
+	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.print("Double: " + value);
+	}
 
 	@Override
 	protected void read(ByteInputStream in)

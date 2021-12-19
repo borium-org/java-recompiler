@@ -12,6 +12,8 @@ public class Recompiler
 		try
 		{
 			classFile.read("bin/org/borium/javarecompiler/classfile/ClassFile.class");
+			IndentedOutputStream stream = new IndentedOutputStream("ClassFile.txt");
+			classFile.dump(stream);
 		}
 		catch (ClassFormatError | IOException e)
 		{

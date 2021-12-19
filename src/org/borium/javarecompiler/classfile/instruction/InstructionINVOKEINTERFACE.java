@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 public class InstructionINVOKEINTERFACE extends Instruction
 {
@@ -13,7 +14,6 @@ public class InstructionINVOKEINTERFACE extends Instruction
 	 * symbolic reference to the interface in which the interface method is to be
 	 * found.
 	 */
-	@SuppressWarnings("unused")
 	private int index;
 
 	/**
@@ -38,6 +38,15 @@ public class InstructionINVOKEINTERFACE extends Instruction
 		{
 			throw new ClassFormatError("INVOKEINTERFACE non-zero");
 		}
+	}
+
+	@Override
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+//		Constant classRef = cp.get(index);
+		stream.iprintln(className + " " + index);
+		throw new RuntimeException(className + ": Dump not implemented");
 	}
 
 	@Override

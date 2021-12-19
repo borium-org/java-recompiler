@@ -27,8 +27,13 @@ public class ConstantModule extends Constant
 	 * table. The constant_pool entry at that index must be a CONSTANT_Utf8_info
 	 * structure (4.4.7) representing a valid module name (4.2.3).
 	 */
-	@SuppressWarnings("unused")
 	private int nameIndex;
+
+	@Override
+	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	{
+		stream.println("Module: " + constantPool.getString(nameIndex));
+	}
 
 	@Override
 	protected void read(ByteInputStream in)

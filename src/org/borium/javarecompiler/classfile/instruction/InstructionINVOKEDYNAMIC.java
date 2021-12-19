@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 public class InstructionINVOKEDYNAMIC extends Instruction
 {
@@ -11,7 +12,6 @@ public class InstructionINVOKEDYNAMIC extends Instruction
 	 * the index must be a symbolic reference to a dynamically-computed call site
 	 * (5.1).
 	 */
-	@SuppressWarnings("unused")
 	private int index;
 
 	/**
@@ -27,6 +27,15 @@ public class InstructionINVOKEDYNAMIC extends Instruction
 		{
 			throw new ClassFormatError("INVOKEDYNAMIC non-zero");
 		}
+	}
+
+	@Override
+	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+//		Constant classRef = cp.get(index);
+		stream.iprintln(className + " " + index);
+		throw new RuntimeException(className + ": Dump not implemented");
 	}
 
 	@Override
