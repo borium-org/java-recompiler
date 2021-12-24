@@ -1,22 +1,9 @@
 package org.borium.javarecompiler.classfile;
 
 import java.io.*;
-import java.nio.*;
 
 public class ByteInputStream
 {
-	private static double convertToDouble(byte[] array)
-	{
-		ByteBuffer buffer = ByteBuffer.wrap(array);
-		return buffer.getDouble();
-	}
-
-	private static double convertToFloat(byte[] array)
-	{
-		ByteBuffer buffer = ByteBuffer.wrap(array);
-		return buffer.getFloat();
-	}
-
 	private ByteArrayInputStream in;
 	private int length;
 
@@ -53,8 +40,8 @@ public class ByteInputStream
 		{
 			throw new ClassFormatError("Not enough data available to read a float");
 		}
-		byte[] data = read(4);
-		double value = convertToFloat(data);
+		int data = s4();
+		double value = Float.intBitsToFloat(data);
 		return value;
 	}
 
@@ -64,8 +51,8 @@ public class ByteInputStream
 		{
 			throw new ClassFormatError("Not enough data available to read a double");
 		}
-		byte[] data = read(8);
-		double value = convertToDouble(data);
+		long data = u8();
+		double value = Double.longBitsToDouble(data);
 		return value;
 	}
 

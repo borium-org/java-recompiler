@@ -149,11 +149,18 @@ public class Recompiler
 		try
 		{
 			classFile.read(fileName);
+		}
+		catch (ClassFormatError | IOException e)
+		{
+			e.printStackTrace();
+		}
+		try
+		{
 			IndentedOutputStream stream = new IndentedOutputStream(
 					fileName.substring(0, fileName.length() - 5) + "txt");
 			classFile.dump(stream);
 		}
-		catch (ClassFormatError | IOException e)
+		catch (IOException e)
 		{
 			e.printStackTrace();
 		}
