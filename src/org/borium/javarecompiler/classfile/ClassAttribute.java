@@ -40,6 +40,8 @@ public class ClassAttribute
 			return new AttributeCode(attribute, constants);
 		case "Exceptions":
 			return new AttributeExceptions(attribute, constants);
+		case "InnerClasses":
+			return new AttributeInnerClasses(attribute, constants);
 		case "Signature":
 			return new AttributeSignature(attribute, constants);
 		case "SourceFile":
