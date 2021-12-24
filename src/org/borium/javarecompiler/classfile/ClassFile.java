@@ -207,6 +207,17 @@ public class ClassFile
 		dumpAttributes(stream);
 	}
 
+	public String getClassName()
+	{
+		return className.replace('/', '.');
+	}
+
+	public List<String> getReferencedClasses()
+	{
+		ArrayList<String> referencedClasses = cp.getReferencedClasses();
+		return referencedClasses;
+	}
+
 	public void read(String fileName) throws IOException, ClassFormatError
 	{
 		className = fileName.substring(4, fileName.length() - 6).replace('/', '.');

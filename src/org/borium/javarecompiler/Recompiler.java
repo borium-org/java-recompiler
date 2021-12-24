@@ -55,6 +55,8 @@ public class Recompiler
 	/** Visual Studio version for generated project. There can be only one. */
 	private String visualStudio;
 
+	private HashMap<String, ClassFile> processedClasses = new HashMap<>();
+
 	public void addClassPath(String classPath)
 	{
 		classPaths.add(classPath);
@@ -62,7 +64,17 @@ public class Recompiler
 
 	public void run()
 	{
-		processClassFile(mainClass);
+		ClassFile classFile = processClassFile(mainClass);
+		processedClasses.put(classFile.getClassName(), classFile);
+		List<String> newClassNames = new ArrayList<>();
+		addReferencedClasses(newClassNames, classFile);
+		while (newClassNames.size() > 0)
+		{
+			String newClassName = newClassNames.remove(0);
+			classFile = processClassFile(newClassName);
+			processedClasses.put(classFile.getClassName(), classFile);
+			addReferencedClasses(newClassNames, classFile);
+		}
 	}
 
 	public void setMainClass(String mainClass)
@@ -93,6 +105,23 @@ public class Recompiler
 					+ visualStudio + "'");
 		}
 		this.visualStudio = visualStudio;
+	}
+
+	private void addReferencedClasses(List<String> newClassNames, ClassFile classFile)
+	{
+		List<String> allReferences = classFile.getReferencedClasses();
+
+		for (String reference : allReferences)
+		{
+			if (!reference.startsWith("java.") && !reference.startsWith("["))
+			{
+				if (!processedClasses.containsKey(reference) && !newClassNames.contains(reference))
+				{
+					System.out.println("New: " + reference);
+					newClassNames.add(reference);
+				}
+			}
+		}
 	}
 
 	private ClassFile processClassFile(String classFileName)

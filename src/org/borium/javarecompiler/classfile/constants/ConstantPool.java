@@ -50,6 +50,19 @@ public class ConstantPool
 		throw new ClassFormatError("Constant " + index + " is not " + clazz.getSimpleName());
 	}
 
+	public ArrayList<String> getReferencedClasses()
+	{
+		ArrayList<String> referencedClasses = new ArrayList<>();
+		for (Constant c : constants)
+		{
+			if (c instanceof ConstantClassInfo ci)
+			{
+				referencedClasses.add(getString(ci.nameIndex).replace('/', '.'));
+			}
+		}
+		return referencedClasses;
+	}
+
 	public String getString(int index)
 	{
 		Constant constant = get(index);
