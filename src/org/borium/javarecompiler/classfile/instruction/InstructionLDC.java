@@ -29,6 +29,10 @@ public class InstructionLDC extends Instruction
 		{
 			stream.iprintln(className + " " + intValue.getValue());
 		}
+		else if (c instanceof ConstantClassInfo classValue)
+		{
+			stream.iprintln(className + " " + cp.getString(classValue.nameIndex));
+		}
 		else
 		{
 			stream.iprintln(className + " " + index);
