@@ -25,9 +25,19 @@ public class InstructionLDC2_W extends Instruction
 	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-//		Constant classRef = cp.get(index);
-		stream.iprintln(className + " " + index);
-		throw new RuntimeException(className + ": Dump not implemented");
+		Constant constant = cp.get(index);
+		if (constant instanceof ConstantLong constantLong)
+		{
+			stream.iprintln(className + " " + index + " " + constantLong.value);
+		}
+		else if (constant instanceof ConstantDouble constantDouble)
+		{
+			stream.iprintln(className + " " + index + " " + constantDouble.value);
+		}
+		else
+		{
+			stream.iprintln(className + " " + index + " " + constant.getClass().getSimpleName());
+		}
 	}
 
 	@Override

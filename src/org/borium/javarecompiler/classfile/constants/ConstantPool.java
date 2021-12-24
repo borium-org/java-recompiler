@@ -1,33 +1,38 @@
 package org.borium.javarecompiler.classfile.constants;
 
+import static org.borium.javarecompiler.classfile.constants.Constant.*;
+
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.*;
 
 public class ConstantPool
 {
-	private ArrayList<Constant> constants = new ArrayList<>();
+	private Constant[] constants;
 
 	public void dump(IndentedOutputStream stream)
 	{
 		stream.println("Constants:");
 		stream.indent(1);
-		for (int i = 1; i < constants.size(); i++)
+		for (int i = 1; i < constants.length; i++)
 		{
-			stream.iprint(i + ": ");
-			constants.get(i).dump(stream, this);
-			stream.println();
+			if (constants[i] != null)
+			{
+				stream.iprint(i + ": ");
+				constants[i].dump(stream, this);
+				stream.println();
+			}
 		}
 		stream.indent(-1);
 	}
 
 	public Constant get(int index)
 	{
-		if (index < 0 || index >= constants.size())
+		if (index < 0 || index >= constants.length)
 		{
-			throw new ClassFormatError("Constant index " + index + " is out of range 0.." + constants.size());
+			throw new ClassFormatError("Constant index " + index + " is out of range 0.." + (constants.length - 1));
 		}
-		return constants.get(index);
+		return constants[index];
 	}
 
 	/**
@@ -50,6 +55,19 @@ public class ConstantPool
 		throw new ClassFormatError("Constant " + index + " is not " + clazz.getSimpleName());
 	}
 
+	public ArrayList<String> getReferencedClasses()
+	{
+		ArrayList<String> referencedClasses = new ArrayList<>();
+		for (Constant c : constants)
+		{
+			if (c instanceof ConstantClassInfo ci)
+			{
+				referencedClasses.add(getString(ci.nameIndex).replace('/', '.'));
+			}
+		}
+		return referencedClasses;
+	}
+
 	public String getString(int index)
 	{
 		Constant constant = get(index);
@@ -63,21 +81,25 @@ public class ConstantPool
 	public void read(ByteInputStream in)
 	{
 		int count = in.u2();
-		constants.add(null);
+		constants = new Constant[count];
 		for (int i = 1; i < count; i++)
 		{
 			int tag = in.u1();
 			Constant constant = Constant.create(tag);
 			constant.read(in);
-			constants.add(constant);
+			constants[i] = constant;
+			if (constant.is(CONSTANT_Long) || constant.is(CONSTANT_Double))
+			{
+				i++;
+			}
 		}
 	}
 
 	public void verify(int majorVersion, int minorVersion)
 	{
-		for (int i = 0; i < constants.size(); i++)
+		for (int i = 0; i < constants.length; i++)
 		{
-			Constant constant = constants.get(i);
+			Constant constant = constants[i];
 			if (constant != null)
 			{
 				constant.verify(majorVersion, minorVersion, this, i);

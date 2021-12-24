@@ -18,3 +18,5 @@ jsr
 atype
 iprint
 iprintln
+lookupswitch
+tableswitch

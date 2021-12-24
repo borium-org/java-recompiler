@@ -62,6 +62,12 @@ public class IndentedOutputStream
 		}
 	}
 
+	public void iprintln(byte[] info, int start, int length)
+	{
+		iprint("");
+		println(info, start, length);
+	}
+
 	public void iprintln(String string)
 	{
 		iprint(string);
@@ -80,13 +86,23 @@ public class IndentedOutputStream
 		{
 			hex = "0" + hex;
 		}
-		hex = hex.substring(0, length).toUpperCase();
+		hex = hex.substring(hex.length() - length).toUpperCase();
 		stream.print(hex);
 	}
 
 	public void println()
 	{
 		stream.println();
+	}
+
+	public void println(byte[] info, int start, int length)
+	{
+		for (int offset = start; offset < start + length; offset++)
+		{
+			printHex(info[offset], 2);
+			print(" ");
+		}
+		println();
 	}
 
 	public void println(String string)
