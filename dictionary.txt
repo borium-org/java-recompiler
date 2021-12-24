@@ -19,3 +19,4 @@ atype
 iprint
 iprintln
 lookupswitch
+tableswitch

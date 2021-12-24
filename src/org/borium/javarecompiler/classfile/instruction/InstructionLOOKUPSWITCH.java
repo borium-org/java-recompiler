@@ -9,19 +9,17 @@ import org.borium.javarecompiler.classfile.constants.*;
 public class InstructionLOOKUPSWITCH extends Instruction
 {
 	/**
-	 * n. Immediately after the lookupswitch opcode, between zero and three bytes
-	 * must act as padding, such that defaultbyte1 begins at an address that is a
+	 * Immediately after the lookupswitch opcode, between zero and three bytes must
+	 * act as padding, such that defaultbyte1 begins at an address that is a
 	 * multiple of four bytes from the start of the current method (the opcode of
 	 * its first instruction).
 	 */
-	@SuppressWarnings("unused")
 	private int padding;
 
 	/**
 	 * Address of the default label. If default case is not present in the switch
 	 * then the label is right past the switch block.
 	 */
-	@SuppressWarnings("unused")
 	private int defaultLabel;
 
 	/** Match values for each case, in incrementing order. */
@@ -55,7 +53,7 @@ public class InstructionLOOKUPSWITCH extends Instruction
 	{
 		for (int offs : offset)
 		{
-			labels[offs] = true;
+			labels[address + offs] = true;
 		}
 	}
 
@@ -64,11 +62,17 @@ public class InstructionLOOKUPSWITCH extends Instruction
 	{
 		stream.iprintln("lookupswitch");
 		stream.indent(1);
+		stream.iprintln("padding: " + padding);
 		stream.iprintln("cases: " + match.length);
-		stream.iprintln("default: " + defaultLabel);
+		stream.iprint("default: L");
+		stream.printHex(address + defaultLabel, 4);
+		stream.println();
+
 		for (int i = 0; i < match.length; i++)
 		{
-			stream.iprintln("case " + match[i] + ": goto L" + (address + offset[i]));
+			stream.iprint("case " + match[i] + ": goto L");
+			stream.printHex(address + offset[i], 4);
+			stream.println();
 		}
 		stream.indent(-1);
 	}
