@@ -116,6 +116,14 @@ public class AttributeCode extends ClassAttribute
 	protected void detailedDump(IndentedOutputStream stream, ConstantPool cp)
 	{
 		stream.indent(1);
+
+		stream.iprintln("Stack: " + maxStack);
+		stream.iprintln("Locals: " + maxLocals);
+		stream.iprintln("Code length: " + code.length);
+		stream.indent(1);
+		stream.iprintln(code);
+		stream.indent(-1);
+
 		boolean[] labels = new boolean[code.length];
 		// First instruction - create a label for start of the method
 		labels[0] = true;
@@ -131,10 +139,20 @@ public class AttributeCode extends ClassAttribute
 		{
 			if (labels[address])
 			{
-				stream.iprintln("L" + address + ":");
+				stream.iprint("L");
+				stream.printHex(address, 4);
+				stream.println(":");
 			}
 			if (instructions[address] != null)
 			{
+				int length = instructions[address].length();
+				if (length <= 8)
+				{
+					stream.iprint("");
+					stream.printHex(address, 4);
+					stream.print(": ");
+					stream.println(code, address, length);
+				}
 				stream.indent(1);
 				instructions[address].detailedDump(stream, address, cp);
 				stream.indent(-1);
