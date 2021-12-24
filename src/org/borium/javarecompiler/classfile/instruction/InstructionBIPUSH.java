@@ -25,4 +25,10 @@ public class InstructionBIPUSH extends Instruction
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		stream.iprintln(className + " " + value);
 	}
+
+	@Override
+	public int length()
+	{
+		return 2;
+	}
 }

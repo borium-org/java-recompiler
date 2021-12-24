@@ -18,3 +18,4 @@ jsr
 atype
 iprint
 iprintln
+lookupswitch

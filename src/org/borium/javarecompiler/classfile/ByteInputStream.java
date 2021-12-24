@@ -18,10 +18,12 @@ public class ByteInputStream
 	}
 
 	private ByteArrayInputStream in;
+	private int length;
 
 	public ByteInputStream(byte[] data)
 	{
 		in = new ByteArrayInputStream(data);
+		length = data.length;
 	}
 
 	public int available()
@@ -65,6 +67,11 @@ public class ByteInputStream
 		byte[] data = read(8);
 		double value = convertToDouble(data);
 		return value;
+	}
+
+	public int getPosition()
+	{
+		return length - in.available();
 	}
 
 	public byte[] read(int length)

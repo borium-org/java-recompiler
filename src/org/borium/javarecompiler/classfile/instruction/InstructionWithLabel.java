@@ -35,7 +35,9 @@ abstract class InstructionWithLabel extends Instruction
 	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		stream.iprintln(className + " L" + (address + offset));
+		stream.iprint(className + " L");
+		stream.printHex(address + offset, 4);
+		stream.println();
 	}
 
 	@Override
