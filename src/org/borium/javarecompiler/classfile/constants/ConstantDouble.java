@@ -25,7 +25,7 @@ public class ConstantDouble extends Constant
 	 * format (2.3.2). The bytes of each item are stored in big-endian (high byte
 	 * first) order.
 	 */
-	private double value;
+	public double value;
 
 	@Override
 	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)

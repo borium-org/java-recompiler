@@ -130,6 +130,7 @@ public class Recompiler
 		{
 			return null;
 		}
+		System.out.println("Enter: " + classFileName);
 		String classPathFileName = classFileName.replace('.', '/') + ".class";
 		String fileName = null;
 		for (String classPath : classPaths)
@@ -143,6 +144,7 @@ public class Recompiler
 		}
 		if (fileName == null)
 		{
+			System.out.println("Error: " + classFileName);
 			throw new RuntimeException("Class " + classFileName + " not found");
 		}
 		ClassFile classFile = new ClassFile();
@@ -164,6 +166,7 @@ public class Recompiler
 		{
 			e.printStackTrace();
 		}
+		System.out.println("Leave: " + classFileName);
 		return classFile;
 	}
 }
