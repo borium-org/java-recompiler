@@ -183,7 +183,7 @@ public class ClassFile
 	 */
 	private int[] interfaces;
 
-	private ArrayList<ClassField> fields = new ArrayList<>();
+	private ClassField[] fields;
 
 	private ArrayList<ClassMethod> methods = new ArrayList<>();
 
@@ -210,6 +210,11 @@ public class ClassFile
 	public String getClassName()
 	{
 		return className.replace('/', '.');
+	}
+
+	public ClassField[] getFields()
+	{
+		return fields;
 	}
 
 	public List<String> getReferencedClasses()
@@ -293,12 +298,12 @@ public class ClassFile
 
 	private void dumpFields(IndentedOutputStream stream)
 	{
-		stream.println("Fields: " + fields.size());
+		stream.println("Fields: " + fields.length);
 		stream.indent(1);
-		for (int i = 0; i < fields.size(); i++)
+		for (int i = 0; i < fields.length; i++)
 		{
 			stream.iprint(i + ": ");
-			ClassField field = fields.get(i);
+			ClassField field = fields[i];
 			field.dump(stream, cp);
 		}
 		stream.indent(-1);
@@ -361,11 +366,12 @@ public class ClassFile
 	private void readFields() throws IOException
 	{
 		int count = in.u2();
+		fields = new ClassField[count];
 		for (int i = 0; i < count; i++)
 		{
 			ClassField field = new ClassField();
 			field.read(in, cp);
-			fields.add(field);
+			fields[i] = field;
 		}
 		// TODO extended validation
 		// throw new ClassFormatError("Feature is not supported yet");

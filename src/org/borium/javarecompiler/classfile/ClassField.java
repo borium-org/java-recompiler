@@ -4,6 +4,7 @@ import static org.borium.javarecompiler.classfile.ClassFile.*;
 
 import java.util.*;
 
+import org.borium.javarecompiler.classfile.attribute.*;
 import org.borium.javarecompiler.classfile.constants.*;
 
 /**
@@ -123,6 +124,10 @@ public class ClassField
 
 	private ArrayList<ClassAttribute> attributeList = new ArrayList<>();
 
+	private String nameString;
+
+	private String descriptorString;
+
 	public void dump(IndentedOutputStream stream, ConstantPool cp)
 	{
 		stream.println("Field: " + cp.getString(nameIndex) + " " + cp.getString(descriptorIndex));
@@ -158,11 +163,28 @@ public class ClassField
 		stream.indent(-2);
 	}
 
+	public String getName()
+	{
+		return nameString;
+	}
+
+	public String getType()
+	{
+		if (attributes.containsKey("Signature"))
+		{
+			AttributeSignature sig = (AttributeSignature) attributes.get("Signature");
+			return sig.getSignature();
+		}
+		return descriptorString;
+	}
+
 	public void read(ByteInputStream in, ConstantPool cp)
 	{
 		accessFlags = in.u2();
 		nameIndex = in.u2();
+		nameString = cp.getString(nameIndex);
 		descriptorIndex = in.u2();
+		descriptorString = cp.getString(descriptorIndex);
 		int attributeCount = in.u2();
 		for (int i = 0; i < attributeCount; i++)
 		{

@@ -12,6 +12,8 @@ public class CppClass
 	@SuppressWarnings("unused")
 	private String namespace;
 
+	private CppField[] fields;
+
 	/**
 	 * Create the C++ class file given the Java class vile.
 	 *
@@ -20,6 +22,7 @@ public class CppClass
 	public CppClass(ClassFile classFile)
 	{
 		extractCppClassName(classFile);
+		extractFields(classFile);
 		// TODO Auto-generated constructor stub
 	}
 
@@ -51,5 +54,17 @@ public class CppClass
 		}
 		className = cppName.substring(pos + 1);
 		namespace = cppName.substring(0, pos - 1);
+	}
+
+	private void extractFields(ClassFile classFile)
+	{
+		ClassField[] javaFields = classFile.getFields();
+		fields = new CppField[javaFields.length];
+		for (int i = 0; i < javaFields.length; i++)
+		{
+			ClassField javaField = javaFields[i];
+			CppField field = new CppField(javaField);
+			fields[i] = field;
+		}
 	}
 }
