@@ -4,6 +4,7 @@ import java.io.*;
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.cplusplus.*;
 
 public class Recompiler
 {
@@ -57,6 +58,8 @@ public class Recompiler
 
 	private HashMap<String, ClassFile> processedClasses = new HashMap<>();
 
+	private ArrayList<CppClass> generatedClasses = new ArrayList<>();
+
 	public void addClassPath(String classPath)
 	{
 		classPaths.add(classPath);
@@ -75,6 +78,8 @@ public class Recompiler
 			processedClasses.put(classFile.getClassName(), classFile);
 			addReferencedClasses(newClassNames, classFile);
 		}
+		generateClasses();
+		writeClasses();
 	}
 
 	public void setMainClass(String mainClass)
@@ -124,6 +129,18 @@ public class Recompiler
 		}
 	}
 
+	private void generateClass(String className)
+	{
+		CppClass cppClass = new CppClass(processedClasses.get(className));
+		generatedClasses.add(cppClass);
+	}
+
+	private void generateClasses()
+	{
+		// TODO Auto-generated method stub
+		generateClass(mainClass);
+	}
+
 	private ClassFile processClassFile(String classFileName)
 	{
 		if (classFileName.startsWith("java."))
@@ -168,5 +185,13 @@ public class Recompiler
 		}
 		System.out.println("Leave: " + classFileName);
 		return classFile;
+	}
+
+	private void writeClasses()
+	{
+		for (CppClass cppClass : generatedClasses)
+		{
+			cppClass.writeClass(outputPath);
+		}
 	}
 }

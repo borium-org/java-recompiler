@@ -66,7 +66,6 @@ public class AttributeCode extends ClassAttribute
 	 * The value of the max_stack item gives the maximum depth of the operand stack
 	 * of this method (2.6.2) at any point during execution of the method.
 	 */
-	@SuppressWarnings("unused")
 	private int maxStack;
 
 	/**
@@ -79,7 +78,6 @@ public class AttributeCode extends ClassAttribute
 	 * max_locals - 2. The greatest local variable index for a value of any other
 	 * type is max_locals - 1.
 	 */
-	@SuppressWarnings("unused")
 	private int maxLocals;
 
 	/**
