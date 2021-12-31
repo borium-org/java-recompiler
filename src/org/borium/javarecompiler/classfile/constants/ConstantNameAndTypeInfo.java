@@ -35,11 +35,21 @@ public class ConstantNameAndTypeInfo extends Constant
 	 */
 	private int descriptorIndex;
 
+	private String name;
+
+	private String descriptor;
+
 	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	protected void dump(IndentedOutputStream stream)
 	{
-		stream.print("NameType: Name " + nameIndex + " " + constantPool.getString(nameIndex) + " Descriptor "
-				+ descriptorIndex + " " + constantPool.getString(descriptorIndex));
+		stream.print("NameType: Name " + nameIndex + " " + name + " Descriptor " + descriptorIndex + " " + descriptor);
+	}
+
+	@Override
+	protected void fixup(ConstantPool constantPool)
+	{
+		name = constantPool.getString(nameIndex);
+		descriptor = constantPool.getString(descriptorIndex);
 	}
 
 	@Override

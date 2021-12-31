@@ -25,10 +25,18 @@ public class ConstantMethodType extends Constant
 	 */
 	private int descriptorIndex;
 
+	private String descriptor;
+
 	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	protected void dump(IndentedOutputStream stream)
 	{
-		stream.println("MethodType: " + constantPool.getString(descriptorIndex));
+		stream.println("MethodType: " + descriptor);
+	}
+
+	@Override
+	protected void fixup(ConstantPool constantPool)
+	{
+		descriptor = constantPool.getString(descriptorIndex);
 	}
 
 	@Override

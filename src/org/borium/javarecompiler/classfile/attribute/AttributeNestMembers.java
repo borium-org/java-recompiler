@@ -14,22 +14,28 @@ public class AttributeNestMembers extends ClassAttribute
 	 */
 	private int[] classTable;
 
+	private ConstantClassInfo[] classInfo;
+
 	public AttributeNestMembers(ClassAttribute attribute, ConstantPool cp)
 	{
 		super(attribute);
 		decode(cp);
+		classInfo = new ConstantClassInfo[classTable.length];
+		for (int i = 0; i < classInfo.length; i++)
+		{
+			classInfo[i] = cp.get(classTable[i], ConstantClassInfo.class);
+		}
 	}
 
 	@Override
-	protected void detailedDump(IndentedOutputStream stream, ConstantPool cp)
+	protected void detailedDump(IndentedOutputStream stream)
 	{
 		stream.iprintln("Nest members: " + classTable.length);
 		stream.indent(1);
 		for (int i = 0; i < classTable.length; i++)
 		{
 			stream.iprint(i + ": " + classTable[i] + " ");
-			ConstantClassInfo classInfo = cp.get(classTable[i], ConstantClassInfo.class);
-			classInfo.dump(stream, cp);
+			classInfo[i].dump(stream);
 			stream.println();
 		}
 		stream.indent(-1);

@@ -83,7 +83,16 @@ public abstract class Constant
 		return constantType == tag;
 	}
 
-	protected abstract void dump(IndentedOutputStream stream, ConstantPool constantPool);
+	protected abstract void dump(IndentedOutputStream stream);
+
+	/**
+	 * Fix up references to other constants from this constant.
+	 *
+	 * @param constantPool Constant pool for accessing referenced constants.
+	 */
+	protected void fixup(ConstantPool constantPool)
+	{
+	}
 
 	/**
 	 * Read a constant object from the class input stream.

@@ -252,7 +252,7 @@ public class ClassFile
 		{
 			stream.iprint(i + ": ");
 			ClassAttribute attribute = attributeList.get(i);
-			attribute.dump(stream, cp);
+			attribute.dump(stream);
 		}
 		stream.indent(-1);
 	}
@@ -280,7 +280,7 @@ public class ClassFile
 
 		stream.print("This Class: " + thisClass + " ");
 		ConstantClassInfo thisClassInfo = cp.get(thisClass, ConstantClassInfo.class);
-		thisClassInfo.dump(stream, cp);
+		thisClassInfo.dump(stream);
 		stream.println();
 
 		stream.print("Super Class: " + superClass + " ");
@@ -291,7 +291,7 @@ public class ClassFile
 		else
 		{
 			ConstantClassInfo superClassInfo = cp.get(superClass, ConstantClassInfo.class);
-			superClassInfo.dump(stream, cp);
+			superClassInfo.dump(stream);
 		}
 		stream.println();
 	}
@@ -304,7 +304,7 @@ public class ClassFile
 		{
 			stream.iprint(i + ": ");
 			ClassField field = fields[i];
-			field.dump(stream, cp);
+			field.dump(stream);
 		}
 		stream.indent(-1);
 	}
@@ -317,7 +317,7 @@ public class ClassFile
 		{
 			stream.iprint(i + ": ");
 			ConstantClassInfo classInfo = cp.get(interfaces[i], ConstantClassInfo.class);
-			classInfo.dump(stream, cp);
+			classInfo.dump(stream);
 			stream.println();
 		}
 		stream.indent(-1);

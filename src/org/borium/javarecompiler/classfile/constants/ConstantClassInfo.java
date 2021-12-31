@@ -26,15 +26,23 @@ public class ConstantClassInfo extends Constant
 	 */
 	public int nameIndex;
 
+	private String name;
+
 	@Override
-	public void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	public void dump(IndentedOutputStream stream)
 	{
-		stream.print("ClassInfo: " + nameIndex + " " + constantPool.getString(nameIndex));
+		stream.print("ClassInfo: " + nameIndex + " " + name);
 	}
 
 	public String getName(ConstantPool constantPool)
 	{
 		return constantPool.getString(nameIndex);
+	}
+
+	@Override
+	protected void fixup(ConstantPool constantPool)
+	{
+		name = constantPool.getString(nameIndex);
 	}
 
 	@Override

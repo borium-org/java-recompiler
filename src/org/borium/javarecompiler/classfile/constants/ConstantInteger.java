@@ -31,7 +31,7 @@ public class ConstantInteger extends Constant
 	}
 
 	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	protected void dump(IndentedOutputStream stream)
 	{
 		stream.print("Integer: " + value);
 	}

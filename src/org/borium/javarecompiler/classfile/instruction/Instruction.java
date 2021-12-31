@@ -211,7 +211,7 @@ public abstract class Instruction
 	public static final int IMPDEP1 = 254;
 	public static final int IMPDEP2 = 255;
 
-	public static Instruction read(ByteInputStream in)
+	public static Instruction read(ByteInputStream in, ConstantPool cp)
 	{
 		int code = in.u1();
 		if (code == -1)
@@ -257,11 +257,11 @@ public abstract class Instruction
 		case SIPUSH:
 			return new InstructionSIPUSH(in);
 		case LDC:
-			return new InstructionLDC(in);
+			return new InstructionLDC(in, cp);
 		case LDC_W:
-			return new InstructionLDC_W(in);
+			return new InstructionLDC_W(in, cp);
 		case LDC2_W:
-			return new InstructionLDC2_W(in);
+			return new InstructionLDC2_W(in, cp);
 		case ILOAD:
 			return new InstructionILOAD(in, false);
 		case LLOAD:
@@ -577,37 +577,37 @@ public abstract class Instruction
 		case RETURN:
 			return new InstructionRETURN();
 		case GETSTATIC:
-			return new InstructionGETSTATIC(in);
+			return new InstructionGETSTATIC(in, cp);
 		case PUTSTATIC:
-			return new InstructionPUTSTATIC(in);
+			return new InstructionPUTSTATIC(in, cp);
 		case GETFIELD:
-			return new InstructionGETFIELD(in);
+			return new InstructionGETFIELD(in, cp);
 		case PUTFIELD:
-			return new InstructionPUTFIELD(in);
+			return new InstructionPUTFIELD(in, cp);
 		case INVOKEVIRTUAL:
-			return new InstructionINVOKEVIRTUAL(in);
+			return new InstructionINVOKEVIRTUAL(in, cp);
 		case INVOKESPECIAL:
-			return new InstructionINVOKESPECIAL(in);
+			return new InstructionINVOKESPECIAL(in, cp);
 		case INVOKESTATIC:
-			return new InstructionINVOKESTATIC(in);
+			return new InstructionINVOKESTATIC(in, cp);
 		case INVOKEINTERFACE:
 			return new InstructionINVOKEINTERFACE(in);
 		case INVOKEDYNAMIC:
 			return new InstructionINVOKEDYNAMIC(in);
 		case NEW:
-			return new InstructionNEW(in);
+			return new InstructionNEW(in, cp);
 		case NEWARRAY:
 			return new InstructionNEWARRAY(in);
 		case ANEWARRAY:
-			return new InstructionANEWARRAY(in);
+			return new InstructionANEWARRAY(in, cp);
 		case ARRAYLENGTH:
 			return new InstructionARRAYLENGTH();
 		case ATHROW:
 			return new InstructionATHROW();
 		case CHECKCAST:
-			return new InstructionCHECKCAST(in);
+			return new InstructionCHECKCAST(in, cp);
 		case INSTANCEOF:
-			return new InstructionINSTANCEOF(in);
+			return new InstructionINSTANCEOF(in, cp);
 		case MONITORENTER:
 			return new InstructionMONITORENTER();
 		case MONITOREXIT:
@@ -645,7 +645,7 @@ public abstract class Instruction
 	{
 	}
 
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream, int address)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		stream.iprintln(className);

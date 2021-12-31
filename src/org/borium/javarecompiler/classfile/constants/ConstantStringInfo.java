@@ -26,15 +26,23 @@ public class ConstantStringInfo extends Constant
 	 */
 	private int stringIndex;
 
+	private String string;
+
 	public String getValue(ConstantPool constantPool)
 	{
 		return constantPool.getString(stringIndex);
 	}
 
 	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	protected void dump(IndentedOutputStream stream)
 	{
-		stream.print("String: " + stringIndex + " '" + constantPool.getString(stringIndex) + "'");
+		stream.print("String: " + stringIndex + " '" + string + "'");
+	}
+
+	@Override
+	protected void fixup(ConstantPool constantPool)
+	{
+		string = constantPool.getString(stringIndex);
 	}
 
 	@Override

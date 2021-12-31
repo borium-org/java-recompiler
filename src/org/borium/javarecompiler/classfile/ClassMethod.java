@@ -225,7 +225,7 @@ public class ClassMethod
 		{
 			stream.iprint(i + ": ");
 			ClassAttribute attribute = attributeList.get(i);
-			attribute.dump(stream, cp);
+			attribute.dump(stream);
 		}
 		stream.indent(-2);
 	}

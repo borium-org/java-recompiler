@@ -124,13 +124,13 @@ public class ClassField
 
 	private ArrayList<ClassAttribute> attributeList = new ArrayList<>();
 
-	private String nameString;
+	private String name;
 
-	private String descriptorString;
+	private String descriptor;
 
-	public void dump(IndentedOutputStream stream, ConstantPool cp)
+	public void dump(IndentedOutputStream stream)
 	{
-		stream.println("Field: " + cp.getString(nameIndex) + " " + cp.getString(descriptorIndex));
+		stream.println("Field: " + name + " " + descriptor);
 		stream.indent(1);
 
 		stream.iprint("Access Flags: ");
@@ -158,14 +158,14 @@ public class ClassField
 		{
 			stream.iprint(i + ": ");
 			ClassAttribute attribute = attributeList.get(i);
-			attribute.dump(stream, cp);
+			attribute.dump(stream);
 		}
 		stream.indent(-2);
 	}
 
 	public String getName()
 	{
-		return nameString;
+		return name;
 	}
 
 	public String getType()
@@ -175,16 +175,16 @@ public class ClassField
 			AttributeSignature sig = (AttributeSignature) attributes.get("Signature");
 			return sig.getSignature();
 		}
-		return descriptorString;
+		return descriptor;
 	}
 
 	public void read(ByteInputStream in, ConstantPool cp)
 	{
 		accessFlags = in.u2();
 		nameIndex = in.u2();
-		nameString = cp.getString(nameIndex);
+		name = cp.getString(nameIndex);
 		descriptorIndex = in.u2();
-		descriptorString = cp.getString(descriptorIndex);
+		descriptor = cp.getString(descriptorIndex);
 		int attributeCount = in.u2();
 		for (int i = 0; i < attributeCount; i++)
 		{

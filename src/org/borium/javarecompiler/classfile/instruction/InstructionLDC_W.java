@@ -13,20 +13,31 @@ public class InstructionLDC_W extends Instruction
 	 */
 	private int index;
 
-	public InstructionLDC_W(ByteInputStream in)
+	private Constant c;
+
+	private String value;
+
+	public InstructionLDC_W(ByteInputStream in, ConstantPool cp)
 	{
 		index = in.u2();
+		c = cp.get(index);
+		if (c instanceof ConstantStringInfo stringValue)
+		{
+			value = stringValue.getValue(cp);
+		}
+		else if (c instanceof ConstantClassInfo classInfo)
+		{
+			value = classInfo.getName(cp);
+		}
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream, int address)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		Constant c = cp.get(index);
 		if (c instanceof ConstantStringInfo stringValue)
 		{
-			stream.iprintln(className + " \"" + stringValue.getValue(cp) + "\"");
-
+			stream.iprintln(className + " \"" + value + "\"");
 		}
 		else if (c instanceof ConstantInteger intValue)
 		{
@@ -34,7 +45,7 @@ public class InstructionLDC_W extends Instruction
 		}
 		else if (c instanceof ConstantClassInfo classInfo)
 		{
-			stream.iprintln(className + " " + classInfo.getName(cp) + ".class");
+			stream.iprintln(className + " " + value + ".class");
 		}
 		else
 		{

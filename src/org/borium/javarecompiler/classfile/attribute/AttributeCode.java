@@ -111,7 +111,7 @@ public class AttributeCode extends ClassAttribute
 	}
 
 	@Override
-	protected void detailedDump(IndentedOutputStream stream, ConstantPool cp)
+	protected void detailedDump(IndentedOutputStream stream)
 	{
 		stream.indent(1);
 
@@ -152,7 +152,7 @@ public class AttributeCode extends ClassAttribute
 					stream.println(code, address, length);
 				}
 				stream.indent(1);
-				instructions[address].detailedDump(stream, address, cp);
+				instructions[address].detailedDump(stream, address);
 				stream.indent(-1);
 			}
 		}
@@ -185,7 +185,7 @@ public class AttributeCode extends ClassAttribute
 		int index = 0;
 		while (inCode.available() > 0)
 		{
-			instructions[index] = Instruction.read(inCode);
+			instructions[index] = Instruction.read(inCode, cp);
 //			System.out.println(instructions[index].getClass().getSimpleName());
 			index += instructions[index].length();
 		}

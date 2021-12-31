@@ -47,11 +47,21 @@ public class ConstantDynamic extends Constant
 	 */
 	private int nameAndTypeIndex;
 
+	private String nameAndType;
+
+	private String bootstrap;
+
 	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	protected void dump(IndentedOutputStream stream)
 	{
-		stream.println("Dynamic: Bootstrap " + constantPool.getString(bootstrapMethodAttrIndex) + " Name and type "
-				+ constantPool.getString(nameAndTypeIndex));
+		stream.println("Dynamic: Bootstrap " + bootstrap + " Name and type " + nameAndType);
+	}
+
+	@Override
+	protected void fixup(ConstantPool constantPool)
+	{
+		bootstrap = constantPool.getString(bootstrapMethodAttrIndex);
+		nameAndType = constantPool.getString(nameAndTypeIndex);
 	}
 
 	@Override

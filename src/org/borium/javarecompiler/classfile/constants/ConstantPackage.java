@@ -31,10 +31,18 @@ public class ConstantPackage extends Constant
 	 */
 	private int nameIndex;
 
+	private String name;
+
 	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	protected void dump(IndentedOutputStream stream)
 	{
-		stream.println("Package: " + constantPool.getString(nameIndex));
+		stream.println("Package: " + name);
+	}
+
+	@Override
+	protected void fixup(ConstantPool constantPool)
+	{
+		name = constantPool.getString(nameIndex);
 	}
 
 	@Override

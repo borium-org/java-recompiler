@@ -22,6 +22,7 @@ public class AttributeSignature extends ClassAttribute
 	{
 		super(attribute);
 		decode(cp);
+		signature = cp.getString(signatureIndex);
 	}
 
 	public String getSignature()
@@ -30,16 +31,15 @@ public class AttributeSignature extends ClassAttribute
 	}
 
 	@Override
-	protected void detailedDump(IndentedOutputStream stream, ConstantPool cp)
+	protected void detailedDump(IndentedOutputStream stream)
 	{
-		stream.iprintln("Signature: " + signatureIndex + " " + cp.getString(signatureIndex));
+		stream.iprintln("Signature: " + signatureIndex + " " + signature);
 	}
 
 	private void decode(ConstantPool cp)
 	{
 		ByteInputStream in = new ByteInputStream(info);
 		signatureIndex = in.u2();
-		signature = cp.getString(signatureIndex);
 		in.close();
 	}
 }

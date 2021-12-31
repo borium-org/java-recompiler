@@ -15,20 +15,30 @@ public class InstructionINVOKEVIRTUAL extends Instruction
 	 */
 	private int index;
 
-	public InstructionINVOKEVIRTUAL(ByteInputStream in)
+	private ConstantMethodrefInfo methodref;
+
+	private ConstantClassInfo classInfo;
+
+	private ConstantNameAndTypeInfo nameType;
+
+	private String methodClassName;
+
+	private String methodName;
+
+	public InstructionINVOKEVIRTUAL(ByteInputStream in, ConstantPool cp)
 	{
 		index = in.u2();
+		methodref = cp.get(index, ConstantMethodrefInfo.class);
+		classInfo = cp.get(methodref.classIndex, ConstantClassInfo.class);
+		nameType = cp.get(methodref.nameAndTypeIndex, ConstantNameAndTypeInfo.class);
+		methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
+		methodName = cp.getString(nameType.nameIndex);
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream, int address)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		ConstantMethodrefInfo methodref = cp.get(index, ConstantMethodrefInfo.class);
-		ConstantClassInfo classInfo = cp.get(methodref.classIndex, ConstantClassInfo.class);
-		ConstantNameAndTypeInfo nameType = cp.get(methodref.nameAndTypeIndex, ConstantNameAndTypeInfo.class);
-		String methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
-		String methodName = cp.getString(nameType.nameIndex);
 		stream.iprintln(className + " " + methodClassName + "." + methodName);
 	}
 

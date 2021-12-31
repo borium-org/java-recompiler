@@ -1,11 +1,12 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 public class InstructionINSTANCEOF extends InstructionWithTypeIndex
 {
-	public InstructionINSTANCEOF(ByteInputStream in)
+	public InstructionINSTANCEOF(ByteInputStream in, ConstantPool cp)
 	{
-		super(in);
+		super(in, cp);
 	}
 }
