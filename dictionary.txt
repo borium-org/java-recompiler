@@ -21,3 +21,4 @@ iprintln
 lookupswitch
 tableswitch
 namespace
+namespaces
