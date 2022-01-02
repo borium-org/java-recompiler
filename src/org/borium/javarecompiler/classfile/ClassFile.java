@@ -212,6 +212,11 @@ public class ClassFile
 		return className.replace('/', '.');
 	}
 
+	public String getClassSimpleName()
+	{
+		return className.substring(className.lastIndexOf('.') + 1);
+	}
+
 	public ClassField[] getFields()
 	{
 		return fields;
