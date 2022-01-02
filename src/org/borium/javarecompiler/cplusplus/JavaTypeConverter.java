@@ -16,60 +16,27 @@ public class JavaTypeConverter
 	/** String index in Java type for parsing. */
 	int index;
 
+	int dimensions;
+
 	public JavaTypeConverter(String javaType)
 	{
 		this.javaType = javaType;
 		cppType = "";
 		index = 0;
+		dimensions = 0;
 	}
 
 	public String getCppType()
 	{
-		parse();
-		return cppType;
-	}
-
-	private void parse()
-	{
-		switch (javaType.charAt(index))
+		if (javaType.startsWith("("))
 		{
-		case 'B':
-			cppType = "byte";
-			index++;
-			break;
-		case 'C':
-			cppType = "char";
-			index++;
-			break;
-		case 'D':
-			cppType = "double";
-			index++;
-			break;
-		case 'F':
-			cppType = "float";
-			index++;
-			break;
-		case 'I':
-			cppType = "int";
-			index++;
-			break;
-		case 'J':
-			cppType = "long";
-			index++;
-			break;
-		case 'S':
-			cppType = "short";
-			index++;
-			break;
-		case 'Z':
-			cppType = "boolean";
-			index++;
-			break;
-		case 'L':
-			index++;
-			parseClass();
-			break;
+			parseMethod();
 		}
+		else
+		{
+			parseSingleType();
+		}
+		return cppType;
 	}
 
 	private void parseClass()
@@ -90,7 +57,7 @@ public class JavaTypeConverter
 				{
 					cppType += ", ";
 				}
-				parse();
+				parseSingleType();
 				count++;
 			}
 			cppType += '>';
@@ -99,6 +66,86 @@ public class JavaTypeConverter
 		if (javaType.charAt(index) == ';')
 		{
 			index++;
+		}
+	}
+
+	/**
+	 * Parse a method type. It is already verified that Java type starts with
+	 * opening parenthesis. Parenthesis is not extracted yet.
+	 */
+	private void parseMethod()
+	{
+		cppType = "(";
+		index++;
+		boolean first = true;
+		while (javaType.charAt(index) != ')')
+		{
+			if (!first)
+			{
+				cppType += ", ";
+			}
+			first = false;
+			parseSingleType();
+		}
+		cppType += ")";
+		index++;
+		parseSingleType();
+	}
+
+	private void parseSingleType()
+	{
+		while (javaType.charAt(index) == '[')
+		{
+			dimensions++;
+			index++;
+		}
+		switch (javaType.charAt(index))
+		{
+		case 'B':
+			cppType += "byte";
+			index++;
+			break;
+		case 'C':
+			cppType += "char";
+			index++;
+			break;
+		case 'D':
+			cppType += "double";
+			index++;
+			break;
+		case 'F':
+			cppType += "float";
+			index++;
+			break;
+		case 'I':
+			cppType += "int";
+			index++;
+			break;
+		case 'J':
+			cppType += "long";
+			index++;
+			break;
+		case 'S':
+			cppType += "short";
+			index++;
+			break;
+		case 'Z':
+			cppType += "boolean";
+			index++;
+			break;
+		case 'L':
+			index++;
+			parseClass();
+			break;
+		case 'V':
+			cppType += "void";
+			index++;
+			break;
+		}
+		while (dimensions > 0)
+		{
+			cppType += "[]";
+			dimensions--;
 		}
 	}
 }

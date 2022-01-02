@@ -19,6 +19,7 @@ public class CppClass
 	/** Namespace where this class is declared. */
 	private String namespace;
 
+	/** This class fields. */
 	private CppField[] fields;
 
 	/** Full set of namespaces for all classes referenced from this class. */
@@ -26,6 +27,9 @@ public class CppClass
 
 	/** Classes whose simple names are referenced from multiple namespaces. */
 	private TreeSet<String> multipleClasses = new TreeSet<>();
+
+	/** This class methods. */
+	private CppMethod[] methods;
 
 	/**
 	 * Create the C++ class file given the Java class file.
@@ -38,7 +42,7 @@ public class CppClass
 		extractCppClassName();
 		extractNamespaces();
 		extractFields();
-		// TODO Auto-generated constructor stub
+		extractMethods();
 	}
 
 	/**
@@ -85,7 +89,7 @@ public class CppClass
 		header.indent(1);
 
 		generateHeaderFields(header);
-		// TODO Auto-generated method stub
+		generateHeaderMethods(header);
 
 		header.indent(-1);
 		header.iprintln("};");
@@ -124,6 +128,18 @@ public class CppClass
 			ClassField javaField = javaFields[i];
 			CppField field = new CppField(javaField);
 			fields[i] = field;
+		}
+	}
+
+	private void extractMethods()
+	{
+		ClassMethod[] javaMethods = classFile.getMethods();
+		methods = new CppMethod[javaMethods.length];
+		for (int i = 0; i < javaMethods.length; i++)
+		{
+			ClassMethod javaMethod = javaMethods[i];
+			CppMethod method = new CppMethod(javaMethod);
+			methods[i] = method;
 		}
 	}
 
@@ -186,6 +202,7 @@ public class CppClass
 			String newType = simplifyType(fieldType);
 			field.generateHeader(header, newType);
 		}
+		header.println();
 	}
 
 	/**
@@ -209,6 +226,25 @@ public class CppClass
 			header.println("using namespace " + namespace + ";");
 		}
 		header.println();
+	}
+
+	private void generateHeaderMethods(IndentedOutputStream header)
+	{
+		for (CppMethod method : methods)
+		{
+			String methodType = method.getType();
+			String newType = simplifyType(methodType);
+			String methodName = method.getName();
+			if (methodName.equals("<init>"))
+			{
+				methodName = className;
+			}
+			else if (methodName.equals("<clinit>"))
+			{
+				methodName = className + "StaticInit";
+			}
+			method.generateHeader(header, methodName, newType);
+		}
 	}
 
 	/**
@@ -236,6 +272,10 @@ public class CppClass
 			{
 				switch (fieldType.charAt(index))
 				{
+				case '(':
+				case ')':
+				case '[':
+				case ']':
 				case '<':
 				case '>':
 				case ',':

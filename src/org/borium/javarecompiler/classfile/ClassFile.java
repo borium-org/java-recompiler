@@ -185,7 +185,7 @@ public class ClassFile
 
 	private ClassField[] fields;
 
-	private ArrayList<ClassMethod> methods = new ArrayList<>();
+	private ClassMethod[] methods;
 
 	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
@@ -220,6 +220,11 @@ public class ClassFile
 	public ClassField[] getFields()
 	{
 		return fields;
+	}
+
+	public ClassMethod[] getMethods()
+	{
+		return methods;
 	}
 
 	public List<String> getReferencedClasses()
@@ -330,12 +335,12 @@ public class ClassFile
 
 	private void dumpMethods(IndentedOutputStream stream)
 	{
-		stream.println("Methods: " + methods.size());
+		stream.println("Methods: " + methods.length);
 		stream.indent(1);
-		for (int i = 0; i < methods.size(); i++)
+		for (int i = 0; i < methods.length; i++)
 		{
 			stream.iprint(i + ": ");
-			ClassMethod method = methods.get(i);
+			ClassMethod method = methods[i];
 			method.dump(stream, cp);
 		}
 		stream.indent(-1);
@@ -406,11 +411,12 @@ public class ClassFile
 	private void readMethods() throws IOException
 	{
 		int count = in.u2();
+		methods = new ClassMethod[count];
 		for (int i = 0; i < count; i++)
 		{
 			ClassMethod method = new ClassMethod();
 			method.read(in, cp);
-			methods.add(method);
+			methods[i] = method;
 		}
 		// TODO validation
 		// throw new ClassFormatError("Feature is not supported yet");

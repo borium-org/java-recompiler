@@ -192,6 +192,12 @@ public class ClassMethod
 
 	private ArrayList<ClassAttribute> attributeList = new ArrayList<>();
 
+	/** This method name. */
+	private String name;
+
+	/** This method descriptor. */
+	private String descriptor;
+
 	public void dump(IndentedOutputStream stream, ConstantPool cp)
 	{
 		stream.println("Method: " + cp.getString(nameIndex) + " " + cp.getString(descriptorIndex));
@@ -230,11 +236,23 @@ public class ClassMethod
 		stream.indent(-2);
 	}
 
+	public String getDescriptor()
+	{
+		return descriptor;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
 	public void read(ByteInputStream in, ConstantPool cp)
 	{
 		accessFlags = in.u2();
 		nameIndex = in.u2();
+		name = cp.getString(nameIndex);
 		descriptorIndex = in.u2();
+		descriptor = cp.getString(descriptorIndex);
 		int attributeCount = in.u2();
 		for (int i = 0; i < attributeCount; i++)
 		{
