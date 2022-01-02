@@ -60,6 +60,7 @@ public class CppClass
 			IndentedOutputStream source = new IndentedOutputStream(outputPath + '/' + fileName + ".cpp");
 
 			generateHeader(header);
+			generateSource(source);
 
 			header.close();
 			source.close();
@@ -98,6 +99,22 @@ public class CppClass
 
 		header.println();
 		header.println("#endif");
+	}
+
+	protected void generateSource(IndentedOutputStream source)
+	{
+		source.println("#include \"" + namespace.replace(':', '_') + "__" + className + ".h\"");
+		source.println();
+		source.println("namespace " + namespace);
+		source.println("{");
+		source.println();
+
+		source.indent(1);
+		// TODO source static fields
+		generateSourceMethods(source);
+		source.indent(-1);
+
+		source.println("}");
 	}
 
 	/**
@@ -244,6 +261,25 @@ public class CppClass
 				methodName = className + "StaticInit";
 			}
 			method.generateHeader(header, methodName, newType);
+		}
+	}
+
+	private void generateSourceMethods(IndentedOutputStream source)
+	{
+		for (CppMethod method : methods)
+		{
+			String methodType = method.getType();
+			String newType = simplifyType(methodType);
+			String methodName = method.getName();
+			if (methodName.equals("<init>"))
+			{
+				methodName = className;
+			}
+			else if (methodName.equals("<clinit>"))
+			{
+				methodName = className + "StaticInit";
+			}
+			method.generateSource(source, className + "::" + methodName, newType);
 		}
 	}
 
