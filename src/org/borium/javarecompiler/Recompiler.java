@@ -50,6 +50,8 @@ public class Recompiler
 	/** List of all class paths to search for the class. */
 	private ArrayList<String> classPaths = new ArrayList<>();
 
+	protected ArrayList<HashMap<String, String>> dummy;
+
 	/** Output path for generated files. There can be only one. */
 	private String outputPath;
 
