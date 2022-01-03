@@ -18,7 +18,6 @@ public class AttributeCode extends ClassAttribute
 		 * opcode of an instruction or must be equal to code_length, the length of the
 		 * code array. The value of start_pc must be less than the value of end_pc.
 		 */
-		@SuppressWarnings("unused")
 		int startPc;
 
 		/**
@@ -29,7 +28,6 @@ public class AttributeCode extends ClassAttribute
 		 * opcode of an instruction or must be equal to code_length, the length of the
 		 * code array. The value of start_pc must be less than the value of end_pc.
 		 */
-		@SuppressWarnings("unused")
 		int endPc;
 
 		/**
@@ -37,7 +35,6 @@ public class AttributeCode extends ClassAttribute
 		 * handler. The value of the item must be a valid index into the code array and
 		 * must be the index of the opcode of an instruction.
 		 */
-		@SuppressWarnings("unused")
 		int handlerPc;
 
 		/**
@@ -48,8 +45,9 @@ public class AttributeCode extends ClassAttribute
 		 * called only if the thrown exception is an instance of the given class or one
 		 * of its subclasses.
 		 */
-		@SuppressWarnings("unused")
 		int catchType;
+
+		ConstantClassInfo catchClass;
 
 		public ExceptionTable(ByteInputStream in)
 		{
@@ -57,6 +55,13 @@ public class AttributeCode extends ClassAttribute
 			endPc = in.u2();
 			handlerPc = in.u2();
 			catchType = in.u2();
+		}
+
+		void addLabels(boolean[] labels)
+		{
+			labels[startPc] = true;
+			labels[endPc] = true;
+			labels[handlerPc] = true;
 		}
 	}
 
@@ -133,6 +138,11 @@ public class AttributeCode extends ClassAttribute
 				insn.addLabel(address, labels);
 			}
 		}
+		for (ExceptionTable exception : exceptionTable)
+		{
+			exception.addLabels(labels);
+		}
+
 		for (int address = 0; address < code.length; address++)
 		{
 			if (labels[address])
@@ -156,6 +166,29 @@ public class AttributeCode extends ClassAttribute
 				stream.indent(-1);
 			}
 		}
+		stream.iprintln("Exceptions: " + exceptionTable.length);
+		for (int i = 0; i < exceptionTable.length; i++)
+		{
+			stream.indent(1);
+			stream.iprint(i + ": L");
+			stream.printHex(exceptionTable[i].startPc, 4);
+			stream.print("...L");
+			stream.printHex(exceptionTable[i].endPc, 4);
+			stream.print(" -> L");
+			stream.printHex(exceptionTable[i].handlerPc, 4);
+			stream.print(", ");
+			if (exceptionTable[i].catchType == 0)
+			{
+				stream.print("null");
+			}
+			else
+			{
+				ConstantClassInfo ci = exceptionTable[i].catchClass;
+				stream.print(ci.getName());
+			}
+			stream.println();
+			stream.indent(-1);
+		}
 		stream.indent(-1);
 	}
 
@@ -171,6 +204,10 @@ public class AttributeCode extends ClassAttribute
 		for (int i = 0; i < exceptionTableLength; i++)
 		{
 			exceptionTable[i] = new ExceptionTable(in);
+			if (exceptionTable[i].catchType != 0)
+			{
+				exceptionTable[i].catchClass = cp.get(exceptionTable[i].catchType, ConstantClassInfo.class);
+			}
 		}
 		int attributeCount = in.u2();
 		for (int i = 0; i < attributeCount; i++)
