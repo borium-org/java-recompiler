@@ -20,7 +20,19 @@ class CppMethod
 		header.iprintln(newType.substring(pos + 1) + " " + newName + newType.substring(0, pos + 1) + ";");
 	}
 
-	public void generateSource(IndentedOutputStream source, String newName, String newType)
+	/**
+	 * Generate the method source code.
+	 *
+	 * @param source  Source output file.
+	 * @param newName New method name, may be different from Java name such as init
+	 *                or clinit.
+	 * @param newType New method type, with redundant namespaces removed.
+	 *                Constructor method type will not have return type component.
+	 * @param fields  List of all fields in the class. Fields are needed for
+	 *                constructor initialization sequence, and may be for other
+	 *                reasons.
+	 */
+	public void generateSource(IndentedOutputStream source, String newName, String newType, CppField[] fields)
 	{
 		int pos = newType.indexOf(')');
 		String returnType = newType.substring(pos + 1);
@@ -30,7 +42,37 @@ class CppMethod
 		{
 			source.print(returnType + " ");
 		}
-		source.println(newName + newType.substring(0, pos + 1));
+		source.print(newName + newType.substring(0, pos + 1));
+		if (isConstructor)
+		{
+			source.indent(2);
+			boolean first = true;
+			for (CppField field : fields)
+			{
+				if (!field.isStatic())
+				{
+					if (first)
+					{
+						source.println(" :");
+						source.iprint("");
+					}
+					else
+					{
+						source.indent(2);
+						source.iprint(", ");
+						source.indent(-2);
+					}
+					first = false;
+					source.print(field.getName() + "(0) //");
+					source.println();
+				}
+			}
+			source.indent(-2);
+		}
+		else
+		{
+			source.println();
+		}
 		source.iprintln("{");
 		source.indent(1);
 		if (!isConstructor && !returnType.equals("void"))

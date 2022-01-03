@@ -280,7 +280,7 @@ public class CppClass
 			{
 				methodName = className + "StaticInit";
 			}
-			method.generateSource(source, className + "::" + methodName, methodType);
+			method.generateSource(source, className + "::" + methodName, methodType, fields);
 		}
 	}
 
@@ -328,13 +328,13 @@ public class CppClass
 					}
 					else if (componentType.contains(":"))
 					{
-						sb.append(" *");
+						sb.append("*");
 					}
 					sb.append(fieldType.charAt(index));
 					if (appendStar > 0 && fieldType.charAt(index) == '>' && componentType.contains(":"))
 					{
 						// Closing of the template parameter list, append a star if it was postponed
-						sb.append(" *");
+						sb.append("*");
 						appendStar--;
 					}
 					break;
@@ -351,12 +351,12 @@ public class CppClass
 			sb.append(simplifyTypeComponent(componentType));
 			if (componentType.contains(":"))
 			{
-				sb.append(" *");
+				sb.append("*");
 			}
 		}
 		while (appendStar > 0)
 		{
-			sb.append(" *");
+			sb.append("*");
 			appendStar--;
 		}
 		return sb.toString();

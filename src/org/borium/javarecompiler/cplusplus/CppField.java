@@ -61,8 +61,19 @@ class CppField
 		header.iprintln(newType + " " + name + ";");
 	}
 
+	public String getName()
+	{
+		return name;
+	}
+
 	public String getType()
 	{
 		return type;
+	}
+
+	public boolean isStatic()
+	{
+		// TODO Auto-generated method stub
+		return false;
 	}
 }
