@@ -24,10 +24,16 @@ class CppMethod
 	{
 		int pos = newType.indexOf(')');
 		String returnType = newType.substring(pos + 1);
-		source.iprintln(returnType + " " + newName + newType.substring(0, pos + 1));
+		boolean isConstructor = returnType.length() == 0;
+		source.iprint("");
+		if (!isConstructor)
+		{
+			source.print(returnType + " ");
+		}
+		source.println(newName + newType.substring(0, pos + 1));
 		source.iprintln("{");
 		source.indent(1);
-		if (!returnType.equals("void"))
+		if (!isConstructor && !returnType.equals("void"))
 		{
 			source.iprintln("return 0;");
 		}

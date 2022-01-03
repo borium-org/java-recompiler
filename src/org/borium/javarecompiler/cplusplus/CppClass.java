@@ -269,17 +269,18 @@ public class CppClass
 		for (CppMethod method : methods)
 		{
 			String methodType = method.getType();
-			String newType = simplifyType(methodType);
+			methodType = simplifyType(methodType);
 			String methodName = method.getName();
 			if (methodName.equals("<init>"))
 			{
 				methodName = className;
+				methodType = methodType.substring(0, methodType.indexOf(')') + 1);
 			}
 			else if (methodName.equals("<clinit>"))
 			{
 				methodName = className + "StaticInit";
 			}
-			method.generateSource(source, className + "::" + methodName, newType);
+			method.generateSource(source, className + "::" + methodName, methodType);
 		}
 	}
 
