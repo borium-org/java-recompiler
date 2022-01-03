@@ -34,9 +34,9 @@ public class ConstantClassInfo extends Constant
 		stream.print("ClassInfo: " + nameIndex + " " + name);
 	}
 
-	public String getName(ConstantPool constantPool)
+	public String getName()
 	{
-		return constantPool.getString(nameIndex);
+		return name;
 	}
 
 	@Override

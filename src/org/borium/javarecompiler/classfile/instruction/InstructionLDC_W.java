@@ -27,7 +27,7 @@ public class InstructionLDC_W extends Instruction
 		}
 		else if (c instanceof ConstantClassInfo classInfo)
 		{
-			value = classInfo.getName(cp);
+			value = classInfo.getName();
 		}
 	}
 
