@@ -65,6 +65,7 @@ public class JavaTypeConverter
 		}
 		if (javaType.charAt(index) == ';')
 		{
+			cppType += '*';
 			index++;
 		}
 	}

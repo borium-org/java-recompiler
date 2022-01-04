@@ -298,7 +298,6 @@ public class CppClass
 		StringBuffer sb = new StringBuffer(fieldType.length());
 		int index = 0;
 		StringBuffer component = new StringBuffer(fieldType.length());
-		int appendStar = 0;
 		while (index < fieldType.length())
 		{
 			if (Character.isJavaIdentifierPart(fieldType.charAt(index)) || fieldType.charAt(index) == ':')
@@ -317,26 +316,11 @@ public class CppClass
 				case '>':
 				case ',':
 				case ' ':
+				case '*':
 					String componentType = component.toString();
 					sb.append(simplifyTypeComponent(componentType));
 					component.setLength(0);
-					if (fieldType.charAt(index) == '<' && componentType.contains(":"))
-					{
-						// If current type is a template, postpone the star until the template parameter
-						// list is completed
-						appendStar++;
-					}
-					else if (componentType.contains(":"))
-					{
-						sb.append("*");
-					}
 					sb.append(fieldType.charAt(index));
-					if (appendStar > 0 && fieldType.charAt(index) == '>' && componentType.contains(":"))
-					{
-						// Closing of the template parameter list, append a star if it was postponed
-						sb.append("*");
-						appendStar--;
-					}
 					break;
 				default:
 					throw new RuntimeException(
@@ -349,15 +333,6 @@ public class CppClass
 		{
 			String componentType = component.toString();
 			sb.append(simplifyTypeComponent(componentType));
-			if (componentType.contains(":"))
-			{
-				sb.append("*");
-			}
-		}
-		while (appendStar > 0)
-		{
-			sb.append("*");
-			appendStar--;
 		}
 		return sb.toString();
 	}
