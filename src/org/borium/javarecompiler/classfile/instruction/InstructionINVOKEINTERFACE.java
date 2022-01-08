@@ -1,6 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 public class InstructionINVOKEINTERFACE extends Instruction
 {
@@ -24,9 +25,15 @@ public class InstructionINVOKEINTERFACE extends Instruction
 	 */
 	private int zero;
 
-	public InstructionINVOKEINTERFACE(ByteInputStream in)
+	private ConstantInterfaceMethodrefInfo methodref;
+
+	private ConstantNameAndTypeInfo nameType;
+
+	public InstructionINVOKEINTERFACE(ByteInputStream in, ConstantPool cp)
 	{
 		index = in.u2();
+		methodref = cp.get(index, ConstantInterfaceMethodrefInfo.class);
+		nameType = cp.get(methodref.nameAndTypeIndex, ConstantNameAndTypeInfo.class);
 		count = in.u1();
 		if (count == 0)
 		{
@@ -50,8 +57,11 @@ public class InstructionINVOKEINTERFACE extends Instruction
 	@Override
 	public int getStackDepthChange()
 	{
-		String name = getClass().getSimpleName().substring(11);
-		throw new RuntimeException(name + " stack depth change not implemented");
+		int stackDepthChange = 0;
+		stackDepthChange--; // INVOKEINTERFACE has 'this' pointer
+		stackDepthChange -= nameType.getParameterCount(); // parameters, if any, are used and removed
+		stackDepthChange += nameType.getReturnTypeCount(); // void (0) or anything else (1)
+		return stackDepthChange;
 	}
 
 	@Override

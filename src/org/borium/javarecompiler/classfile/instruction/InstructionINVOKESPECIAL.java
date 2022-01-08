@@ -46,8 +46,11 @@ public class InstructionINVOKESPECIAL extends Instruction
 	@Override
 	public int getStackDepthChange()
 	{
-		String name = getClass().getSimpleName().substring(11);
-		throw new RuntimeException(name + " stack depth change not implemented");
+		int stackDepthChange = 0;
+		stackDepthChange--; // INVOKESPECIAL has 'this' pointer
+		stackDepthChange -= nameType.getParameterCount(); // parameters, if any, are used and removed
+		stackDepthChange += nameType.getReturnTypeCount(); // void (0) or anything else (1)
+		return stackDepthChange;
 	}
 
 	@Override

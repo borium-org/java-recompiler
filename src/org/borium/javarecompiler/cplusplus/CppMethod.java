@@ -1,5 +1,6 @@
 package org.borium.javarecompiler.cplusplus;
 
+import java.io.*;
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.*;
@@ -104,22 +105,40 @@ class CppMethod
 	private void parseBytecodes(ClassMethod javaMethod)
 	{
 		Instruction[] code = javaMethod.getInstructions();
-		int stackDepth = 0;
-		ArrayList<Instruction> instructions = new ArrayList<>();
-		for (Instruction instruction : code)
+		try
 		{
-			instructions.add(instruction);
-			stackDepth += instruction.getStackDepthChange();
-			if (stackDepth == 0)
+			IndentedOutputStream stream = new IndentedOutputStream("Instructions.txt");
+			int stackDepth = 0;
+			ArrayList<Instruction> instructions = new ArrayList<>();
+			for (int address = 0; address < code.length; address++)
 			{
-				Statement statement = new Statement(instructions);
-				statements.add(statement);
-				instructions.clear();
+				Instruction instruction = code[address];
+				if (instruction != null)
+				{
+					stream.print("L");
+					stream.printHex(address, 4);
+					stream.print(": ");
+					instruction.detailedDump(stream, address);
+					instructions.add(instruction);
+					stackDepth += instruction.getStackDepthChange();
+					stream.println(" // " + stackDepth);
+					if (stackDepth == 0)
+					{
+						Statement statement = new Statement(instructions);
+						statements.add(statement);
+						instructions.clear();
+					}
+				}
 			}
+			if (instructions.size() != 0)
+			{
+				System.err.println("Java stack depth is not 0 at the end of instruction array");
+			}
+			stream.close();
 		}
-		if (instructions.size() != 0)
+		catch (IOException e)
 		{
-			throw new RuntimeException("Java stack depth is not 0 at the end of instruction array");
+			e.printStackTrace();
 		}
 	}
 }

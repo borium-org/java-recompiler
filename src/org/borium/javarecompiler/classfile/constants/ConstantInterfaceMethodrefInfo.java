@@ -36,7 +36,7 @@ public class ConstantInterfaceMethodrefInfo extends Constant
 	 * CONSTANT_NameAndType_info structure (4.4.6). This constant_pool entry
 	 * indicates the name and descriptor of the method.
 	 */
-	private int nameAndTypeIndex;
+	public int nameAndTypeIndex;
 
 	private ConstantClassInfo classInfo;
 

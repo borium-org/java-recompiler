@@ -591,7 +591,7 @@ public abstract class Instruction
 		case INVOKESTATIC:
 			return new InstructionINVOKESTATIC(in, cp);
 		case INVOKEINTERFACE:
-			return new InstructionINVOKEINTERFACE(in);
+			return new InstructionINVOKEINTERFACE(in, cp);
 		case INVOKEDYNAMIC:
 			return new InstructionINVOKEDYNAMIC(in);
 		case NEW:
