@@ -5,4 +5,10 @@ public class InstructionNOP extends Instruction
 	public InstructionNOP()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
+	}
 }

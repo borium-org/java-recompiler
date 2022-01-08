@@ -20,4 +20,10 @@ public class InstructionICONST extends Instruction
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		stream.iprintln(className + " " + value);
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 1;
+	}
 }

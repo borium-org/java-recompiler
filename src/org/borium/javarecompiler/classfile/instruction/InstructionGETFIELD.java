@@ -12,4 +12,10 @@ public class InstructionGETFIELD extends InstructionWithFieldIndex
 	{
 		super(in, cp);
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
+	}
 }

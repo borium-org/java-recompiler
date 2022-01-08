@@ -8,4 +8,10 @@ public class InstructionI2F extends Instruction
 	public InstructionI2F()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
+	}
 }

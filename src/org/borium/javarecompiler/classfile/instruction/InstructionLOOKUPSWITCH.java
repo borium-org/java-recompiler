@@ -77,6 +77,12 @@ public class InstructionLOOKUPSWITCH extends Instruction
 	}
 
 	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
+
+	@Override
 	public int length()
 	{
 		return 1 + padding + 4 + 4 + match.length * 8;

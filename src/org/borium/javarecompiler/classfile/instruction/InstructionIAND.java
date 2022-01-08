@@ -8,4 +8,10 @@ public class InstructionIAND extends Instruction
 	public InstructionIAND()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

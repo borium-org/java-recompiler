@@ -16,4 +16,10 @@ public class InstructionISTORE extends InstructionWithLocalVariableIndex
 	{
 		super(index);
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

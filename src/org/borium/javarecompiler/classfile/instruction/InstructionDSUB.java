@@ -8,4 +8,10 @@ public class InstructionDSUB extends Instruction
 	public InstructionDSUB()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

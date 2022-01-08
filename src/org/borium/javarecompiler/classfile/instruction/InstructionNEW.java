@@ -12,4 +12,10 @@ public class InstructionNEW extends InstructionWithTypeIndex
 	{
 		super(in, cp);
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 1;
+	}
 }

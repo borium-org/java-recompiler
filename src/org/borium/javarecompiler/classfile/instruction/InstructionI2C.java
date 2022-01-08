@@ -8,4 +8,10 @@ public class InstructionI2C extends Instruction
 	public InstructionI2C()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
+	}
 }

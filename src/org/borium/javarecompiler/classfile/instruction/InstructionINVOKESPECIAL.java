@@ -44,6 +44,13 @@ public class InstructionINVOKESPECIAL extends Instruction
 	}
 
 	@Override
+	public int getStackDepthChange()
+	{
+		String name = getClass().getSimpleName().substring(11);
+		throw new RuntimeException(name + " stack depth change not implemented");
+	}
+
+	@Override
 	public int length()
 	{
 		return 3;

@@ -38,6 +38,12 @@ public class InstructionIINC extends Instruction
 	}
 
 	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
+	}
+
+	@Override
 	public int length()
 	{
 		return wide ? 5 : 3;

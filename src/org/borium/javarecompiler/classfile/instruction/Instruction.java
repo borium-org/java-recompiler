@@ -651,6 +651,15 @@ public abstract class Instruction
 		stream.iprintln(className);
 	}
 
+	/**
+	 * Calculate the stack depth change that is caused by executing this current
+	 * instruction. Total stack depth after executing this instruction should not be
+	 * negative, but here we cannot verify if this is the case.
+	 *
+	 * @return Stack depth change, positive or negative as appropriate.
+	 */
+	public abstract int getStackDepthChange();
+
 	public int length()
 	{
 		return 1;

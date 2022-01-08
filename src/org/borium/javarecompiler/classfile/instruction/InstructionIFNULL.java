@@ -8,4 +8,10 @@ public class InstructionIFNULL extends InstructionWithLabel
 	{
 		super(in);
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

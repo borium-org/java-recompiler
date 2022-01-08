@@ -8,4 +8,10 @@ public class InstructionDALOAD extends Instruction
 	public InstructionDALOAD()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

@@ -8,4 +8,10 @@ public class InstructionLXOR extends Instruction
 	public InstructionLXOR()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

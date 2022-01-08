@@ -56,6 +56,12 @@ public class InstructionWIDE extends Instruction
 	}
 
 	@Override
+	public int getStackDepthChange()
+	{
+		return instruction.getStackDepthChange();
+	}
+
+	@Override
 	public int length()
 	{
 		return instruction.length() + 1;

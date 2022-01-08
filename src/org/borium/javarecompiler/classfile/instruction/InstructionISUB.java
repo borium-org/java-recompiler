@@ -8,4 +8,10 @@ public class InstructionISUB extends Instruction
 	public InstructionISUB()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

@@ -8,4 +8,10 @@ public class InstructionLCMP extends Instruction
 	public InstructionLCMP()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

@@ -9,4 +9,10 @@ public class InstructionINSTANCEOF extends InstructionWithTypeIndex
 	{
 		super(in, cp);
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
+	}
 }

@@ -8,4 +8,10 @@ public class InstructionLSHL extends Instruction
 	public InstructionLSHL()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

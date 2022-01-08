@@ -115,6 +115,11 @@ public class AttributeCode extends ClassAttribute
 		decode(cp);
 	}
 
+	public Instruction[] getInstructions()
+	{
+		return instructions;
+	}
+
 	@Override
 	protected void detailedDump(IndentedOutputStream stream)
 	{

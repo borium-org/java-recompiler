@@ -1,17 +1,24 @@
 package org.borium.javarecompiler.cplusplus;
 
+import java.util.*;
+
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.instruction.*;
 
 class CppMethod
 {
 	private String name;
+
 	private String type;
+
+	private ArrayList<Statement> statements = new ArrayList<>();
 
 	public CppMethod(ClassMethod javaMethod)
 	{
 		name = javaMethod.getName();
 		String javaType = javaMethod.getDescriptor();
 		type = new JavaTypeConverter(javaType).getCppType();
+		parseBytecodes(javaMethod);
 	}
 
 	public void generateHeader(IndentedOutputStream header, String newName, String newType)
@@ -92,5 +99,27 @@ class CppMethod
 	public String getType()
 	{
 		return type;
+	}
+
+	private void parseBytecodes(ClassMethod javaMethod)
+	{
+		Instruction[] code = javaMethod.getInstructions();
+		int stackDepth = 0;
+		ArrayList<Instruction> instructions = new ArrayList<>();
+		for (Instruction instruction : code)
+		{
+			instructions.add(instruction);
+			stackDepth += instruction.getStackDepthChange();
+			if (stackDepth == 0)
+			{
+				Statement statement = new Statement(instructions);
+				statements.add(statement);
+				instructions.clear();
+			}
+		}
+		if (instructions.size() != 0)
+		{
+			throw new RuntimeException("Java stack depth is not 0 at the end of instruction array");
+		}
 	}
 }

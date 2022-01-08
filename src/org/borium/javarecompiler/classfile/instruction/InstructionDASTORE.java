@@ -8,4 +8,10 @@ public class InstructionDASTORE extends Instruction
 	public InstructionDASTORE()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -3;
+	}
 }

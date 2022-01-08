@@ -11,4 +11,10 @@ public class InstructionJSR extends InstructionWithLabel
 	{
 		super(in);
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 1;
+	}
 }

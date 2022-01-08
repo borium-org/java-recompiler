@@ -4,7 +4,9 @@ import static org.borium.javarecompiler.classfile.ClassFile.*;
 
 import java.util.*;
 
+import org.borium.javarecompiler.classfile.attribute.*;
 import org.borium.javarecompiler.classfile.constants.*;
+import org.borium.javarecompiler.classfile.instruction.*;
 
 /**
  * Each method, including each instance initialization method (2.9.1) and the
@@ -239,6 +241,12 @@ public class ClassMethod
 	public String getDescriptor()
 	{
 		return descriptor;
+	}
+
+	public Instruction[] getInstructions()
+	{
+		AttributeCode code = (AttributeCode) attributes.get("Code");
+		return code.getInstructions();
 	}
 
 	public String getName()

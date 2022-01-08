@@ -8,4 +8,10 @@ public class InstructionCALOAD extends Instruction
 	public InstructionCALOAD()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

@@ -8,4 +8,10 @@ public class InstructionMONITOREXIT extends Instruction
 	public InstructionMONITOREXIT()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

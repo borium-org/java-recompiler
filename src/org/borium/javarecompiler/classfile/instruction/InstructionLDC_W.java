@@ -56,6 +56,12 @@ public class InstructionLDC_W extends Instruction
 	}
 
 	@Override
+	public int getStackDepthChange()
+	{
+		return 1;
+	}
+
+	@Override
 	public int length()
 	{
 		return 3;

@@ -8,4 +8,10 @@ public class InstructionLAND extends Instruction
 	public InstructionLAND()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

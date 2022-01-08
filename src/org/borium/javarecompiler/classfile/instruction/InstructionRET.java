@@ -32,6 +32,12 @@ public class InstructionRET extends Instruction
 	}
 
 	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
+	}
+
+	@Override
 	public int length()
 	{
 		return wide ? 3 : 2;

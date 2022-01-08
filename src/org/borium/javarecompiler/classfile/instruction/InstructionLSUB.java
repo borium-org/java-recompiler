@@ -8,4 +8,10 @@ public class InstructionLSUB extends Instruction
 	public InstructionLSUB()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

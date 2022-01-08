@@ -8,4 +8,10 @@ public class InstructionSWAP extends Instruction
 	public InstructionSWAP()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
+	}
 }
