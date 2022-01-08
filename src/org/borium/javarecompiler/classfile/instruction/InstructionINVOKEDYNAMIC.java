@@ -29,7 +29,7 @@ public class InstructionINVOKEDYNAMIC extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 //		Constant classRef = cp.get(index);

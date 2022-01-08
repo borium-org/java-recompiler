@@ -57,7 +57,7 @@ public class InstructionLOOKUPSWITCH extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		stream.iprintln("lookupswitch");
 		stream.indent(1);

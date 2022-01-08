@@ -56,7 +56,7 @@ public class InstructionNEWARRAY extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		String[] types = { "0", "1", "2", "3", "boolean", "char", "float", "double", "byte", "short", "int", "long" };

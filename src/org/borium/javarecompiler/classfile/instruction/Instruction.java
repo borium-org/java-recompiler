@@ -634,6 +634,9 @@ public abstract class Instruction
 		return null;
 	}
 
+	/** Address of this instruction in the Code attribute. */
+	public int address;
+
 	/**
 	 * Add a label flag into the labels array if instruction has a target to
 	 * transfer control to. Default implementation does not add a label.
@@ -645,10 +648,15 @@ public abstract class Instruction
 	{
 	}
 
-	public void detailedDump(IndentedOutputStream stream, int address)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		stream.iprintln(className);
+	}
+
+	public int getAddress()
+	{
+		return address;
 	}
 
 	/**

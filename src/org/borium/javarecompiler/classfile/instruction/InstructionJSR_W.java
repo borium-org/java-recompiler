@@ -31,7 +31,7 @@ public class InstructionJSR_W extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		stream.iprintln(className + " L" + (address + offset));

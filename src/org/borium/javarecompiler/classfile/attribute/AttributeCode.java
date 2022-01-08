@@ -167,7 +167,7 @@ public class AttributeCode extends ClassAttribute
 					stream.println(code, address, length);
 				}
 				stream.indent(1);
-				instructions[address].detailedDump(stream, address);
+				instructions[address].detailedDump(stream);
 				stream.indent(-1);
 			}
 		}
@@ -228,7 +228,7 @@ public class AttributeCode extends ClassAttribute
 		while (inCode.available() > 0)
 		{
 			instructions[index] = Instruction.read(inCode, cp);
-//			System.out.println(instructions[index].getClass().getSimpleName());
+			instructions[index].address = index;
 			index += instructions[index].length();
 		}
 		inCode.close();

@@ -118,7 +118,7 @@ class CppMethod
 					stream.print("L");
 					stream.printHex(address, 4);
 					stream.print(": ");
-					instruction.detailedDump(stream, address);
+					instruction.detailedDump(stream);
 					instructions.add(instruction);
 					stackDepth += instruction.getStackDepthChange();
 					stream.println(" // " + stackDepth);

@@ -58,7 +58,7 @@ public class InstructionTABLESWITCH extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		stream.iprintln("tableswitch");
 		stream.indent(1);
