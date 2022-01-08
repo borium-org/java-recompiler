@@ -12,6 +12,6 @@ public class InstructionATHROW extends Instruction
 	@Override
 	public int getStackDepthChange()
 	{
-		return 0;
+		return -1;
 	}
 }
