@@ -2,6 +2,7 @@ package org.borium.javarecompiler.cplusplus;
 
 import java.util.*;
 
+import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.instruction.*;
 
 /**
@@ -16,5 +17,33 @@ class Statement
 	public Statement(ArrayList<Instruction> instructions)
 	{
 		this.instructions.addAll(instructions);
+	}
+
+	public void generateComments(IndentedOutputStream source)
+	{
+		Stack<String> stack = new Stack<>();
+
+		source.iprint("// L");
+		source.printHex(instructions.get(0).getAddress(), 4);
+		source.println(":");
+		for (Instruction instruction : instructions)
+		{
+			source.iprint("/* ");
+			instruction.detailedDump(source);
+			source.iprintln(" */");
+			source.indent(1);
+			instruction.execute(stack);
+			dumpStack(source, stack);
+			source.indent(-1);
+		}
+		// TODO Auto-generated method stub
+	}
+
+	private void dumpStack(IndentedOutputStream source, Stack<String> stack)
+	{
+		for (int i = 0; i < stack.size(); i++)
+		{
+			source.iprintln("stack[" + i + "]=" + stack.elementAt(i));
+		}
 	}
 }

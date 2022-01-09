@@ -238,6 +238,12 @@ public class ClassMethod
 		stream.indent(-2);
 	}
 
+	public AttributeCode getCode()
+	{
+		AttributeCode code = (AttributeCode) attributes.get("Code");
+		return code;
+	}
+
 	public String getDescriptor()
 	{
 		return descriptor;
@@ -249,9 +255,20 @@ public class ClassMethod
 		return code.getInstructions();
 	}
 
+	public int getLocalsCount()
+	{
+		AttributeCode code = (AttributeCode) attributes.get("Code");
+		return code.getLocalsCount();
+	}
+
 	public String getName()
 	{
 		return name;
+	}
+
+	public boolean isStatic()
+	{
+		return (accessFlags & 0x0008) != 0;
 	}
 
 	public void read(ByteInputStream in, ConstantPool cp)

@@ -1,6 +1,5 @@
 package org.borium.javarecompiler.cplusplus;
 
-import java.io.*;
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.*;
@@ -8,18 +7,23 @@ import org.borium.javarecompiler.classfile.instruction.*;
 
 class CppMethod
 {
-	private String name;
-
-	private String type;
-
+	/**
+	 * List of statements in the method. Statements are sequences of instructions
+	 * that have stack depth 0 at the beginning and at the end. Each statement
+	 * contains at least one instruction.
+	 */
 	private ArrayList<Statement> statements = new ArrayList<>();
+
+	/**
+	 * Execution context for the method. Context contains local variables, operand
+	 * stack, and other stuff necessary for emulating instructions.
+	 */
+	private ExecutionContext executionContext;
 
 	public CppMethod(ClassMethod javaMethod)
 	{
-		name = javaMethod.getName();
-		String javaType = javaMethod.getDescriptor();
-		type = new JavaTypeConverter(javaType).getCppType();
-		parseBytecodes(javaMethod);
+		executionContext = new ExecutionContext(javaMethod);
+		parseStatements();
 	}
 
 	public void generateHeader(IndentedOutputStream header, String newName, String newType)
@@ -83,6 +87,8 @@ class CppMethod
 		}
 		source.iprintln("{");
 		source.indent(1);
+		generateInstructionComments(source);
+		// TODO the other stuff
 		if (!isConstructor && !returnType.equals("void"))
 		{
 			source.iprintln("return 0;");
@@ -94,51 +100,46 @@ class CppMethod
 
 	public String getName()
 	{
-		return name;
+		return executionContext.name;
 	}
 
 	public String getType()
 	{
-		return type;
+		return executionContext.type;
 	}
 
-	private void parseBytecodes(ClassMethod javaMethod)
+	private void generateInstructionComments(IndentedOutputStream source)
 	{
-		Instruction[] code = javaMethod.getInstructions();
-		try
+		for (Statement statement : statements)
 		{
-			IndentedOutputStream stream = new IndentedOutputStream("Instructions.txt");
-			int stackDepth = 0;
-			ArrayList<Instruction> instructions = new ArrayList<>();
-			for (int address = 0; address < code.length; address++)
+			statement.generateComments(source);
+		}
+		// TODO Auto-generated method stub
+	}
+
+	private void parseStatements()
+	{
+		Instruction[] code = executionContext.instructions;
+		int stackDepth = 0;
+		ArrayList<Instruction> instructions = new ArrayList<>();
+		for (int address = 0; address < code.length; address++)
+		{
+			Instruction instruction = code[address];
+			if (instruction != null)
 			{
-				Instruction instruction = code[address];
-				if (instruction != null)
+				instructions.add(instruction);
+				stackDepth += instruction.getStackDepthChange();
+				if (stackDepth == 0)
 				{
-					stream.print("L");
-					stream.printHex(address, 4);
-					stream.print(": ");
-					instruction.detailedDump(stream);
-					instructions.add(instruction);
-					stackDepth += instruction.getStackDepthChange();
-					stream.println(" // " + stackDepth);
-					if (stackDepth == 0)
-					{
-						Statement statement = new Statement(instructions);
-						statements.add(statement);
-						instructions.clear();
-					}
+					Statement statement = new Statement(instructions);
+					statements.add(statement);
+					instructions.clear();
 				}
 			}
-			if (instructions.size() != 0)
-			{
-				System.err.println("Java stack depth is not 0 at the end of instruction array");
-			}
-			stream.close();
 		}
-		catch (IOException e)
+		if (instructions.size() != 0)
 		{
-			e.printStackTrace();
+			System.err.println("Java stack depth is not 0 but " + stackDepth + " at the end of instruction array");
 		}
 	}
 }

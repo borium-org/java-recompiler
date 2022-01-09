@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
+import java.util.*;
+
 import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.constants.*;
 
@@ -652,6 +654,12 @@ public abstract class Instruction
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		stream.iprintln(className);
+	}
+
+	public void execute(Stack<String> stack)
+	{
+		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+		System.out.println(className + ".execute() is not implemented");
 	}
 
 	public int getAddress()

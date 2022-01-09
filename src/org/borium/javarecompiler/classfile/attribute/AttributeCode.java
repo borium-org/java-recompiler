@@ -120,6 +120,11 @@ public class AttributeCode extends ClassAttribute
 		return instructions;
 	}
 
+	public int getLocalsCount()
+	{
+		return maxLocals;
+	}
+
 	@Override
 	protected void detailedDump(IndentedOutputStream stream)
 	{
