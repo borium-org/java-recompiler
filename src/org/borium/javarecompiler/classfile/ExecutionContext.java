@@ -10,18 +10,25 @@ import org.borium.javarecompiler.cplusplus.*;
  */
 public class ExecutionContext
 {
+	/** Java method name. */
 	public String name;
 
+	/** Java method type, in Java conventions. */
 	public String type;
 
+	/** All instructions in the method, with nulls after multi-byte instructions. */
 	public Instruction[] instructions;
 
-	public ExecutionContext(ClassMethod javaMethod)
+	/** Maximum number of locals and parameters. */
+	@SuppressWarnings("unused")
+	private int maxLocals;
+
+	protected ExecutionContext(ClassMethod javaMethod)
 	{
 		name = javaMethod.getName();
 		type = new JavaTypeConverter(javaMethod.getDescriptor()).getCppType();
 		AttributeCode code = javaMethod.getCode();
 		instructions = code.getInstructions();
-		// TODO Auto-generated constructor stub
+		maxLocals = code.getLocalsCount();
 	}
 }

@@ -22,7 +22,7 @@ class CppMethod
 
 	public CppMethod(ClassMethod javaMethod)
 	{
-		executionContext = new ExecutionContext(javaMethod);
+		executionContext = new CppExecutionContext(javaMethod);
 		parseStatements();
 	}
 
