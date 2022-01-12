@@ -8,8 +8,7 @@ import org.borium.javarecompiler.classfile.*;
 public class CppExecutionContext extends ExecutionContext
 {
 	/** C++ equivalent of method type. */
-	@SuppressWarnings("unused")
-	private String cppType;
+	String cppType;
 
 	protected CppExecutionContext(ClassMethod javaMethod)
 	{

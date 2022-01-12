@@ -18,7 +18,7 @@ class CppMethod
 	 * Execution context for the method. Context contains local variables, operand
 	 * stack, and other stuff necessary for emulating instructions.
 	 */
-	private ExecutionContext executionContext;
+	private CppExecutionContext executionContext;
 
 	public CppMethod(ClassMethod javaMethod)
 	{
@@ -105,7 +105,7 @@ class CppMethod
 
 	public String getType()
 	{
-		return executionContext.type;
+		return executionContext.cppType;
 	}
 
 	private void generateInstructionComments(IndentedOutputStream source)
