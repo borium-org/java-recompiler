@@ -87,7 +87,7 @@ class CppMethod
 		}
 		source.iprintln("{");
 		source.indent(1);
-		generateInstructionComments(source);
+		generateStatementSource(source);
 		// TODO the other stuff
 		if (!isConstructor && !returnType.equals("void"))
 		{
@@ -108,11 +108,11 @@ class CppMethod
 		return executionContext.cppType;
 	}
 
-	private void generateInstructionComments(IndentedOutputStream source)
+	private void generateStatementSource(IndentedOutputStream source)
 	{
 		for (Statement statement : statements)
 		{
-			statement.generateComments(source);
+			statement.generateSource(source);
 		}
 		// TODO Auto-generated method stub
 	}
@@ -131,7 +131,7 @@ class CppMethod
 				stackDepth += instruction.getStackDepthChange();
 				if (stackDepth == 0)
 				{
-					Statement statement = new Statement(instructions);
+					Statement statement = new Statement(executionContext, instructions);
 					statements.add(statement);
 					instructions.clear();
 				}

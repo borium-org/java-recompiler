@@ -651,7 +651,7 @@ public abstract class Instruction
 	/**
 	 * Detailed dump of an instruction, one line in most cases, multiple lines for
 	 * switch instructions.
-	 * 
+	 *
 	 * @param stream Output stream where to send the dump to.
 	 */
 	public void detailedDump(IndentedOutputStream stream)

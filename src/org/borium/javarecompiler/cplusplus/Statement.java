@@ -14,12 +14,15 @@ class Statement
 {
 	private ArrayList<Instruction> instructions = new ArrayList<>();
 
-	public Statement(ArrayList<Instruction> instructions)
+	private CppExecutionContext executionContext;
+
+	public Statement(CppExecutionContext executionContext, ArrayList<Instruction> instructions)
 	{
 		this.instructions.addAll(instructions);
+		this.executionContext = executionContext;
 	}
 
-	public void generateComments(IndentedOutputStream source)
+	public void generateSource(IndentedOutputStream source)
 	{
 		Stack<String> stack = new Stack<>();
 
@@ -30,6 +33,7 @@ class Statement
 		{
 			source.iprint("// ");
 			instruction.oneLineDump(source);
+			executionContext.execute(instruction);
 			source.indent(1);
 			dumpStack(source, stack);
 			source.indent(-1);
