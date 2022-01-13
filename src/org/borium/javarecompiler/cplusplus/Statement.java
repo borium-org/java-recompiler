@@ -28,11 +28,9 @@ class Statement
 		source.println(":");
 		for (Instruction instruction : instructions)
 		{
-			source.iprint("/* ");
-			instruction.detailedDump(source);
-			source.iprintln(" */");
+			source.iprint("// ");
+			instruction.oneLineDump(source);
 			source.indent(1);
-			instruction.execute(stack);
 			dumpStack(source, stack);
 			source.indent(-1);
 		}

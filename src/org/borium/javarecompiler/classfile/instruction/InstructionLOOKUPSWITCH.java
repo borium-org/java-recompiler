@@ -87,4 +87,10 @@ public class InstructionLOOKUPSWITCH extends Instruction
 	{
 		return 1 + padding + 4 + 4 + match.length * 8;
 	}
+
+	@Override
+	public void oneLineDump(IndentedOutputStream stream)
+	{
+		stream.iprintln("lookupswitch " + match.length + " cases");
+	}
 }

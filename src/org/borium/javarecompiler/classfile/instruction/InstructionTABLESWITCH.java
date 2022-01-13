@@ -90,4 +90,10 @@ public class InstructionTABLESWITCH extends Instruction
 	{
 		return 1 + padding + 4 + 4 + 4 + offset.length * 4;
 	}
+
+	@Override
+	public void oneLineDump(IndentedOutputStream stream)
+	{
+		stream.iprintln("tableswitch " + offset.length + " cases");
+	}
 }

@@ -1,7 +1,5 @@
 package org.borium.javarecompiler.classfile.instruction;
 
-import java.util.*;
-
 import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.constants.*;
 
@@ -650,16 +648,16 @@ public abstract class Instruction
 	{
 	}
 
+	/**
+	 * Detailed dump of an instruction, one line in most cases, multiple lines for
+	 * switch instructions.
+	 * 
+	 * @param stream Output stream where to send the dump to.
+	 */
 	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		stream.iprintln(className);
-	}
-
-	public void execute(Stack<String> stack)
-	{
-		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		System.out.println(className + ".execute() is not implemented");
 	}
 
 	public int getAddress()
@@ -679,5 +677,16 @@ public abstract class Instruction
 	public int length()
 	{
 		return 1;
+	}
+
+	/**
+	 * Helper routine to produce minimal one-line dump for the instruction. Mostly
+	 * output is same as for detailedDump(), except for switch instructions.
+	 *
+	 * @param stream Output stream where to send the dump to.
+	 */
+	public void oneLineDump(IndentedOutputStream stream)
+	{
+		detailedDump(stream);
 	}
 }
