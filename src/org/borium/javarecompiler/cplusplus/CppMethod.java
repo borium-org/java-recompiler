@@ -28,8 +28,15 @@ class CppMethod
 
 	public void generateHeader(IndentedOutputStream header, String newName, String newType)
 	{
-		int pos = newType.indexOf(')');
-		header.iprintln(newType.substring(pos + 1) + " " + newName + newType.substring(0, pos + 1) + ";");
+		if (newType.endsWith(")"))
+		{
+			header.iprintln(newName + newType + ";");
+		}
+		else
+		{
+			int pos = newType.indexOf(')');
+			header.iprintln(newType.substring(pos + 1) + " " + newName + newType.substring(0, pos + 1) + ";");
+		}
 	}
 
 	/**

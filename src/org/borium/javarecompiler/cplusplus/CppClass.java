@@ -255,6 +255,7 @@ public class CppClass
 			if (methodName.equals("<init>"))
 			{
 				methodName = className;
+				newType = newType.substring(0, newType.length() - 4);
 			}
 			else if (methodName.equals("<clinit>"))
 			{
