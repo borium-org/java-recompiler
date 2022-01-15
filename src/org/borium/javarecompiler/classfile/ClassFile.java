@@ -374,7 +374,6 @@ public class ClassFile
 		ConstantClassInfo ci = cp.get(superClass, ConstantClassInfo.class);
 		superClassName = cp.getString(ci.nameIndex).replace('/', '.');
 		// TODO extended validation
-		// throw new ClassFormatError("Feature is not supported yet");
 	}
 
 	private void readConstants() throws IOException
@@ -394,7 +393,6 @@ public class ClassFile
 			fields[i] = field;
 		}
 		// TODO extended validation
-		// throw new ClassFormatError("Feature is not supported yet");
 	}
 
 	private void readID() throws IOException, ClassFormatError
@@ -415,7 +413,6 @@ public class ClassFile
 			interfaces[i] = in.u2();
 		}
 		// TODO validation
-		// throw new ClassFormatError("Feature is not supported yet");
 	}
 
 	private void readMethods() throws IOException
@@ -429,7 +426,6 @@ public class ClassFile
 			methods[i] = method;
 		}
 		// TODO validation
-		// throw new ClassFormatError("Feature is not supported yet");
 	}
 
 	private void readVersion() throws IOException, ClassFormatError

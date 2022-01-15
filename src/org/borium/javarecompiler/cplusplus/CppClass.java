@@ -31,7 +31,6 @@ public class CppClass
 	/** This class methods. */
 	private CppMethod[] methods;
 
-	@SuppressWarnings("unused")
 	private String parentClassName;
 
 	/**
