@@ -194,6 +194,9 @@ public class ClassFile
 	/** Fully qualified class name. */
 	private String className;
 
+	/** Fully qualified super class name. */
+	private String superClassName;
+
 	public void dump(IndentedOutputStream stream)
 	{
 		stream.println("Class: " + className);
@@ -225,6 +228,11 @@ public class ClassFile
 	public ClassMethod[] getMethods()
 	{
 		return methods;
+	}
+
+	public String getParentClassName()
+	{
+		return superClassName;
 	}
 
 	public List<String> getReferencedClasses()
@@ -363,6 +371,8 @@ public class ClassFile
 		accessFlags = in.u2();
 		thisClass = in.u2();
 		superClass = in.u2();
+		ConstantClassInfo ci = cp.get(superClass, ConstantClassInfo.class);
+		superClassName = cp.getString(ci.nameIndex).replace('/', '.');
 		// TODO extended validation
 		// throw new ClassFormatError("Feature is not supported yet");
 	}

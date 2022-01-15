@@ -31,6 +31,9 @@ public class CppClass
 	/** This class methods. */
 	private CppMethod[] methods;
 
+	@SuppressWarnings("unused")
+	private String parentClassName;
+
 	/**
 	 * Create the C++ class file given the Java class file.
 	 *
@@ -40,6 +43,7 @@ public class CppClass
 	{
 		this.classFile = classFile;
 		extractCppClassName();
+		extractParentClassName();
 		extractNamespaces();
 		extractFields();
 		extractMethods();
@@ -84,7 +88,7 @@ public class CppClass
 		generateHeaderIncludesAndNamespaces(header);
 		generateHeaderBeginThisClassNamespace(header);
 		header.println();
-		header.iprintln("class " + classFile.getClassSimpleName());
+		header.iprintln("class " + classFile.getClassSimpleName() + ": public " + simplifyType(parentClassName));
 		header.iprintln("{");
 		header.iprintln("public:");
 		header.indent(1);
@@ -124,7 +128,6 @@ public class CppClass
 	 */
 	private void extractCppClassName()
 	{
-		// TODO Auto-generated method stub
 		String[] split = classFile.getClassName().split("[.]");
 		String cppName = String.join("::", split);
 		int pos = cppName.lastIndexOf(':');
@@ -186,6 +189,12 @@ public class CppClass
 			classes.put(className, referencedClassName);
 		}
 		namespaces.remove(namespace);
+	}
+
+	private void extractParentClassName()
+	{
+		String[] split = classFile.getParentClassName().split("[.]");
+		parentClassName = String.join("::", split);
 	}
 
 	private void generateHeaderBeginThisClassNamespace(IndentedOutputStream header)
