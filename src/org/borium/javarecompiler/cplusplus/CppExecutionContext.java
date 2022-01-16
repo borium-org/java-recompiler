@@ -15,6 +15,10 @@ public class CppExecutionContext extends ExecutionContext
 	{
 		super(javaMethod);
 		cppType = new JavaTypeConverter(type).getCppType();
+		if (!javaMethod.isStatic())
+		{
+			locals[0].set(cppType, "this");
+		}
 		// TODO Auto-generated constructor stub
 	}
 
