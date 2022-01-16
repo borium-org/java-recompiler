@@ -3,6 +3,7 @@ package org.borium.javarecompiler.classfile;
 import static org.borium.javarecompiler.Statics.*;
 
 import java.util.*;
+import java.util.Map.*;
 
 import org.borium.javarecompiler.classfile.attribute.*;
 import org.borium.javarecompiler.classfile.instruction.*;
@@ -30,6 +31,33 @@ public class ExecutionContext
 		/** Map to associate type and name. */
 		private HashMap<String, String> local = new HashMap<>();
 
+		public String getEntry()
+		{
+			String entryString = "";
+			String separator = "";
+			for (Entry<String, String> entry : local.entrySet())
+			{
+				entryString += entry.getKey() + "*" + entry.getValue() + separator;
+				separator = "&";
+			}
+			return entryString;
+		}
+
+		/**
+		 * Push this local (or multiple locals) to the execution stack. Each local has
+		 * type and name separated with '*' ('*' is chosen because it is unlikely to
+		 * appear as part of type or name in any language, and it is somewhat natural to
+		 * C/C++ as in this variable 'name' points to something of type 'type').
+		 * Multiple locals are pushed into same stack slot, separated by '&', as in 'and
+		 * there's more...'.
+		 *
+		 * @param stack Operand stack, multiple locals can be pushed into single slot.
+		 */
+		public void push(Stack<String> stack)
+		{
+			stack.push(getEntry());
+		}
+
 		public void set(String cppType, String variable)
 		{
 			Assert(local.size() == 0, "set(): Locals map must be empty");
@@ -47,9 +75,11 @@ public class ExecutionContext
 	public Instruction[] instructions;
 
 	/** Maximum number of locals and parameters. */
-	private int maxLocals;
+	protected int maxLocals;
 
 	protected LocalVariable[] locals;
+
+	private Stack<String> stack = new Stack<>();
 
 	protected ExecutionContext(ClassMethod javaMethod)
 	{
@@ -59,5 +89,14 @@ public class ExecutionContext
 		instructions = code.getInstructions();
 		maxLocals = code.getLocalsCount();
 		locals = new LocalVariable[maxLocals];
+		for (int i = 0; i < maxLocals; i++)
+		{
+			locals[i] = new LocalVariable();
+		}
+	}
+
+	public Stack<String> getStack()
+	{
+		return stack;
 	}
 }

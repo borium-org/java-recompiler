@@ -10,7 +10,7 @@ abstract class InstructionWithLocalVariableIndex extends Instruction
 	 * reference. The objectref in the local variable at index is pushed onto the
 	 * operand stack.
 	 */
-	private int index;
+	protected int index;
 
 	/**
 	 * Index constant length, 0 for hard-coded index 0...3, 1 for generic one-byte

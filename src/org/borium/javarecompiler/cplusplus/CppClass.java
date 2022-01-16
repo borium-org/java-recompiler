@@ -157,7 +157,7 @@ public class CppClass
 		for (int i = 0; i < javaMethods.length; i++)
 		{
 			ClassMethod javaMethod = javaMethods[i];
-			CppMethod method = new CppMethod(javaMethod);
+			CppMethod method = new CppMethod(namespace, className, javaMethod);
 			methods[i] = method;
 		}
 	}

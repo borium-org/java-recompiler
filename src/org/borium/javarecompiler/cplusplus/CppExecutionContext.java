@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.cplusplus;
 
+import static org.borium.javarecompiler.Statics.*;
+
 import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.instruction.*;
 
@@ -11,14 +13,19 @@ public class CppExecutionContext extends ExecutionContext
 	/** C++ equivalent of method type. */
 	String cppType;
 
-	protected CppExecutionContext(ClassMethod javaMethod)
+	/** C++ equivalent of class type. */
+	String classType;
+
+	protected CppExecutionContext(ClassMethod javaMethod, String namespace, String className)
 	{
 		super(javaMethod);
 		cppType = new JavaTypeConverter(type).getCppType();
+		classType = namespace + "::" + className;
 		if (!javaMethod.isStatic())
 		{
-			locals[0].set(cppType, "this");
+			locals[0].set(classType, "this");
 		}
+		// TODO parameters
 		// TODO Auto-generated constructor stub
 	}
 
@@ -505,7 +512,11 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void executeALOAD(InstructionALOAD instruction)
 	{
-		notSupported(instruction);
+		int index = instruction.getIndex();
+		Assert(index >= 0 && index < maxLocals, "ALOAD index out of range");
+		Assert(locals[index] != null, "Local at " + index + " is null");
+		Assert(locals[index].getEntry().length() > 0, "Local at " + index + " is not available");
+		locals[index].push(getStack());
 	}
 
 	private void executeANEWARRAY(InstructionANEWARRAY instruction)

@@ -5,11 +5,11 @@ package org.borium.javarecompiler;
  */
 public class Statics
 {
-	public static void Assert(boolean condition, String message)
+	public static void Assert(boolean condition, String errorMessage)
 	{
 		if (!condition)
 		{
-			throw new RuntimeException(message);
+			throw new RuntimeException(errorMessage);
 		}
 	}
 }

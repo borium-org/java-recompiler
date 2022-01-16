@@ -20,9 +20,9 @@ class CppMethod
 	 */
 	private CppExecutionContext executionContext;
 
-	public CppMethod(ClassMethod javaMethod)
+	public CppMethod(String namespace, String className, ClassMethod javaMethod)
 	{
-		executionContext = new CppExecutionContext(javaMethod);
+		executionContext = new CppExecutionContext(javaMethod, namespace, className);
 		parseStatements();
 	}
 

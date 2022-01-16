@@ -24,8 +24,6 @@ class Statement
 
 	public void generateSource(IndentedOutputStream source)
 	{
-		Stack<String> stack = new Stack<>();
-
 		source.iprint("// L");
 		source.printHex(instructions.get(0).getAddress(), 4);
 		source.println(":");
@@ -34,18 +32,18 @@ class Statement
 			source.iprint("// ");
 			instruction.oneLineDump(source);
 			executionContext.execute(instruction);
-			source.indent(1);
-			dumpStack(source, stack);
-			source.indent(-1);
+			dumpStack(source, executionContext.getStack());
 		}
 		// TODO Auto-generated method stub
 	}
 
 	private void dumpStack(IndentedOutputStream source, Stack<String> stack)
 	{
+		source.indent(1);
 		for (int i = 0; i < stack.size(); i++)
 		{
-			source.iprintln("stack[" + i + "]=" + stack.elementAt(i));
+			source.iprintln("// stack[" + i + "]=" + stack.elementAt(i));
 		}
+		source.indent(-1);
 	}
 }
