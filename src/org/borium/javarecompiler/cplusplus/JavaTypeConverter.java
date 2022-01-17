@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.cplusplus;
 
+import static org.borium.javarecompiler.Statics.*;
+
 /**
  * Class to convert from Java types to C++ types. All C++ classes are fully
  * qualified in here, and they will have to be converted to simple class names
@@ -18,12 +20,15 @@ public class JavaTypeConverter
 
 	int dimensions;
 
-	public JavaTypeConverter(String javaType)
+	private int parameterIndex;
+
+	public JavaTypeConverter(String javaType, boolean isStatic)
 	{
 		this.javaType = javaType;
 		cppType = "";
 		index = 0;
 		dimensions = 0;
+		parameterIndex = isStatic ? 0 : 1;
 	}
 
 	public String getCppType()
@@ -34,7 +39,7 @@ public class JavaTypeConverter
 		}
 		else
 		{
-			parseSingleType();
+			parseSingleType(false);
 		}
 		return cppType;
 	}
@@ -57,7 +62,7 @@ public class JavaTypeConverter
 				{
 					cppType += ", ";
 				}
-				parseSingleType();
+				parseSingleType(false);
 				count++;
 			}
 			cppType += '>';
@@ -78,22 +83,19 @@ public class JavaTypeConverter
 	{
 		cppType = "(";
 		index++;
-		boolean first = true;
+		String separator = "";
 		while (javaType.charAt(index) != ')')
 		{
-			if (!first)
-			{
-				cppType += ", ";
-			}
-			first = false;
-			parseSingleType();
+			cppType += separator;
+			separator = ", ";
+			parseSingleType(true);
 		}
 		cppType += ")";
 		index++;
-		parseSingleType();
+		parseSingleType(false);
 	}
 
-	private void parseSingleType()
+	private void parseSingleType(boolean addParameter)
 	{
 		while (javaType.charAt(index) == '[')
 		{
@@ -148,6 +150,19 @@ public class JavaTypeConverter
 		{
 			cppType = cppType.substring(0, oldPos) + "JavaArray<" + cppType.substring(oldPos) + ">*";
 			dimensions--;
+		}
+		if (addParameter)
+		{
+			if (cppType.endsWith("*"))
+			{
+				cppType = cppType.substring(0, cppType.length() - 1);
+				cppType += " *param" + parameterIndex;
+				parameterIndex++;
+			}
+			else
+			{
+				Assert(false, "Unhandled non-pointer parameter");
+			}
 		}
 	}
 }

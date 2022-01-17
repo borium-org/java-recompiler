@@ -19,7 +19,7 @@ public class CppExecutionContext extends ExecutionContext
 	protected CppExecutionContext(ClassMethod javaMethod, String namespace, String className)
 	{
 		super(javaMethod);
-		cppType = new JavaTypeConverter(type).getCppType();
+		cppType = new JavaTypeConverter(type, javaMethod.isStatic()).getCppType();
 		classType = namespace + "::" + className;
 		if (!javaMethod.isStatic())
 		{
