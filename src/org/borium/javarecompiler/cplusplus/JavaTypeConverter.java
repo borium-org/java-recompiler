@@ -100,6 +100,7 @@ public class JavaTypeConverter
 			dimensions++;
 			index++;
 		}
+		int oldPos = cppType.length();
 		switch (javaType.charAt(index))
 		{
 		case 'B':
@@ -145,7 +146,7 @@ public class JavaTypeConverter
 		}
 		while (dimensions > 0)
 		{
-			cppType += "[]";
+			cppType = cppType.substring(0, oldPos) + "JavaArray<" + cppType.substring(oldPos) + ">*";
 			dimensions--;
 		}
 	}
