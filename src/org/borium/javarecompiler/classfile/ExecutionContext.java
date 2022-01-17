@@ -37,19 +37,17 @@ public class ExecutionContext
 			String separator = "";
 			for (Entry<String, String> entry : local.entrySet())
 			{
-				entryString += entry.getKey() + "*" + entry.getValue() + separator;
-				separator = "&";
+				entryString += entry.getKey() + typeAndNameSeparator + entry.getValue() + separator;
+				separator = localSeparator;
 			}
 			return entryString;
 		}
 
 		/**
-		 * Push this local (or multiple locals) to the execution stack. Each local has
-		 * type and name separated with '*' ('*' is chosen because it is unlikely to
-		 * appear as part of type or name in any language, and it is somewhat natural to
-		 * C/C++ as in this variable 'name' points to something of type 'type').
-		 * Multiple locals are pushed into same stack slot, separated by '&', as in 'and
-		 * there's more...'.
+		 * Push this local (or multiple locals) to the execution stack. Multiple locals
+		 * are pushed into same stack slot, separated by '&'. The instruction that uses
+		 * the stack entry has an idea of which type the entry should be, so it can
+		 * access the right one by separating options and finding the match.
 		 *
 		 * @param stack Operand stack, multiple locals can be pushed into single slot.
 		 */
@@ -64,6 +62,19 @@ public class ExecutionContext
 			local.put(cppType, variable);
 		}
 	}
+
+	/**
+	 * Type and name separator in the stack entry. It must be different from any
+	 * character that could appear in the type, including commas, templates,
+	 * pointers, etc. We're using '-' here.
+	 */
+	private static final String typeAndNameSeparator = "-";
+
+	/**
+	 * Separator for multiple locals of different types in same slot. Using '&' as
+	 * in 'and there is more...'
+	 */
+	private static final String localSeparator = "&";
 
 	/** Java method name. */
 	public String name;

@@ -25,8 +25,7 @@ public class CppExecutionContext extends ExecutionContext
 		{
 			locals[0].set(classType, "this");
 		}
-		// TODO parameters
-		// TODO Auto-generated constructor stub
+		parseParameters();
 	}
 
 	public void execute(Instruction instruction)
@@ -1263,5 +1262,24 @@ public class CppExecutionContext extends ExecutionContext
 	{
 		String opcode = instruction.getClass().getSimpleName().substring(11);
 		System.out.println("Instruction " + opcode + " execution not supported");
+	}
+
+	private void parseParameters()
+	{
+		// Skip starting '(', we're in the method
+		String parameterList = cppType.substring(1);
+		for (int i = 0; i < maxLocals; i++)
+		{
+			int parameterPos = parameterList.indexOf("param" + i);
+			if (parameterPos != -1)
+			{
+				String parameterType = parameterList.substring(0, parameterPos);
+				if (parameterType.endsWith("*"))
+				{
+					parameterType = parameterType.substring(0, parameterType.length() - 2) + "*";
+				}
+				locals[i].set(parameterType, "param" + i);
+			}
+		}
 	}
 }
