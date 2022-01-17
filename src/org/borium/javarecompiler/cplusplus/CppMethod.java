@@ -20,9 +20,13 @@ class CppMethod
 	 */
 	private CppExecutionContext executionContext;
 
+	/** True if method is static. */
+	private boolean isStatic;
+
 	public CppMethod(String namespace, String className, ClassMethod javaMethod)
 	{
 		executionContext = new CppExecutionContext(javaMethod, namespace, className);
+		isStatic = javaMethod.isStatic();
 		parseStatements();
 	}
 
@@ -34,8 +38,9 @@ class CppMethod
 		}
 		else
 		{
+			header.iprint(isStatic ? "static " : "");
 			int pos = newType.indexOf(')');
-			header.iprintln(newType.substring(pos + 1) + " " + newName + newType.substring(0, pos + 1) + ";");
+			header.println(newType.substring(pos + 1) + " " + newName + newType.substring(0, pos + 1) + ";");
 		}
 	}
 
