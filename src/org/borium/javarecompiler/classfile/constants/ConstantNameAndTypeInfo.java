@@ -39,6 +39,11 @@ public class ConstantNameAndTypeInfo extends Constant
 
 	private String descriptor;
 
+	public String getDescriptor()
+	{
+		return descriptor;
+	}
+
 	public String getName()
 	{
 		return name;

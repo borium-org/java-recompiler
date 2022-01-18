@@ -16,11 +16,24 @@ public class CppExecutionContext extends ExecutionContext
 	/** C++ equivalent of class type. */
 	String classType;
 
-	protected CppExecutionContext(ClassMethod javaMethod, String namespace, String className)
+	/**
+	 * C++ object that is implementing the class containing the method that is using
+	 * this execution context.
+	 */
+	@SuppressWarnings("unused")
+	private CppClass cppClass;
+
+	/** C++ method that this using this execution context. */
+	@SuppressWarnings("unused")
+	private CppMethod cppMethod;
+
+	protected CppExecutionContext(CppMethod cppMethod, CppClass cppClass, ClassMethod javaMethod)
 	{
 		super(javaMethod);
+		this.cppClass = cppClass;
+		this.cppMethod = cppMethod;
 		cppType = new JavaTypeConverter(type, javaMethod.isStatic()).getCppType();
-		classType = namespace + "::" + className;
+		classType = cppClass.namespace + "::" + cppClass.className;
 		if (!javaMethod.isStatic())
 		{
 			locals[0].set(classType, "this");
@@ -28,488 +41,488 @@ public class CppExecutionContext extends ExecutionContext
 		parseParameters();
 	}
 
-	public void execute(Instruction instruction)
+	public void generate(IndentedOutputStream source, Instruction instruction)
 	{
 		String opcode = instruction.getClass().getSimpleName().substring(11);
 		switch (opcode)
 		{
 		case "NOP":
-			executeNOP((InstructionNOP) instruction);
+			generateNOP(source, (InstructionNOP) instruction);
 			break;
 		case "ACONST_NULL":
-			executeACONST_NULL((InstructionACONST_NULL) instruction);
+			generateACONST_NULL(source, (InstructionACONST_NULL) instruction);
 			break;
 		case "ICONST":
-			executeICONST((InstructionICONST) instruction);
+			generateICONST(source, (InstructionICONST) instruction);
 			break;
 		case "LCONST":
-			executeLCONST((InstructionLCONST) instruction);
+			generateLCONST(source, (InstructionLCONST) instruction);
 			break;
 		case "FCONST":
-			executeFCONST((InstructionFCONST) instruction);
+			generateFCONST(source, (InstructionFCONST) instruction);
 			break;
 		case "DCONST":
-			executeDCONST((InstructionDCONST) instruction);
+			generateDCONST(source, (InstructionDCONST) instruction);
 			break;
 		case "BIPUSH":
-			executeBIPUSH((InstructionBIPUSH) instruction);
+			generateBIPUSH(source, (InstructionBIPUSH) instruction);
 			break;
 		case "SIPUSH":
-			executeSIPUSH((InstructionSIPUSH) instruction);
+			generateSIPUSH(source, (InstructionSIPUSH) instruction);
 			break;
 		case "LDC":
-			executeLDC((InstructionLDC) instruction);
+			generateLDC(source, (InstructionLDC) instruction);
 			break;
 		case "LDC_W":
-			executeLDC_W((InstructionLDC_W) instruction);
+			generateLDC_W(source, (InstructionLDC_W) instruction);
 			break;
 		case "LDC2_W":
-			executeLDC2_W((InstructionLDC2_W) instruction);
+			generateLDC2_W(source, (InstructionLDC2_W) instruction);
 			break;
 		case "ILOAD":
-			executeILOAD((InstructionILOAD) instruction);
+			generateILOAD(source, (InstructionILOAD) instruction);
 			break;
 		case "LLOAD":
-			executeLLOAD((InstructionLLOAD) instruction);
+			generateLLOAD(source, (InstructionLLOAD) instruction);
 			break;
 		case "FLOAD":
-			executeFLOAD((InstructionFLOAD) instruction);
+			generateFLOAD(source, (InstructionFLOAD) instruction);
 			break;
 		case "DLOAD":
-			executeDLOAD((InstructionDLOAD) instruction);
+			generateDLOAD(source, (InstructionDLOAD) instruction);
 			break;
 		case "ALOAD":
-			executeALOAD((InstructionALOAD) instruction);
+			generateALOAD(source, (InstructionALOAD) instruction);
 			break;
 		case "IALOAD":
-			executeIALOAD((InstructionIALOAD) instruction);
+			generateIALOAD(source, (InstructionIALOAD) instruction);
 			break;
 		case "LALOAD":
-			executeLALOAD((InstructionLALOAD) instruction);
+			generateLALOAD(source, (InstructionLALOAD) instruction);
 			break;
 		case "FALOAD":
-			executeFALOAD((InstructionFALOAD) instruction);
+			generateFALOAD(source, (InstructionFALOAD) instruction);
 			break;
 		case "DALOAD":
-			executeDALOAD((InstructionDALOAD) instruction);
+			generateDALOAD(source, (InstructionDALOAD) instruction);
 			break;
 		case "AALOAD":
-			executeAALOAD((InstructionAALOAD) instruction);
+			generateAALOAD(source, (InstructionAALOAD) instruction);
 			break;
 		case "BALOAD":
-			executeBALOAD((InstructionBALOAD) instruction);
+			generateBALOAD(source, (InstructionBALOAD) instruction);
 			break;
 		case "CALOAD":
-			executeCALOAD((InstructionCALOAD) instruction);
+			generateCALOAD(source, (InstructionCALOAD) instruction);
 			break;
 		case "SALOAD":
-			executeSALOAD((InstructionSALOAD) instruction);
+			generateSALOAD(source, (InstructionSALOAD) instruction);
 			break;
 		case "ISTORE":
-			executeISTORE((InstructionISTORE) instruction);
+			generateISTORE(source, (InstructionISTORE) instruction);
 			break;
 		case "LSTORE":
-			executeLSTORE((InstructionLSTORE) instruction);
+			generateLSTORE(source, (InstructionLSTORE) instruction);
 			break;
 		case "FSTORE":
-			executeFSTORE((InstructionFSTORE) instruction);
+			generateFSTORE(source, (InstructionFSTORE) instruction);
 			break;
 		case "DSTORE":
-			executeDSTORE((InstructionDSTORE) instruction);
+			generateDSTORE(source, (InstructionDSTORE) instruction);
 			break;
 		case "ASTORE":
-			executeASTORE((InstructionASTORE) instruction);
+			generateASTORE(source, (InstructionASTORE) instruction);
 			break;
 		case "IASTORE":
-			executeIASTORE((InstructionIASTORE) instruction);
+			generateIASTORE(source, (InstructionIASTORE) instruction);
 			break;
 		case "LASTORE":
-			executeLASTORE((InstructionLASTORE) instruction);
+			generateLASTORE(source, (InstructionLASTORE) instruction);
 			break;
 		case "FASTORE":
-			executeFASTORE((InstructionFASTORE) instruction);
+			generateFASTORE(source, (InstructionFASTORE) instruction);
 			break;
 		case "DASTORE":
-			executeDASTORE((InstructionDASTORE) instruction);
+			generateDASTORE(source, (InstructionDASTORE) instruction);
 			break;
 		case "AASTORE":
-			executeAASTORE((InstructionAASTORE) instruction);
+			generateAASTORE(source, (InstructionAASTORE) instruction);
 			break;
 		case "BASTORE":
-			executeBASTORE((InstructionBASTORE) instruction);
+			generateBASTORE(source, (InstructionBASTORE) instruction);
 			break;
 		case "CASTORE":
-			executeCASTORE((InstructionCASTORE) instruction);
+			generateCASTORE(source, (InstructionCASTORE) instruction);
 			break;
 		case "SASTORE":
-			executeSASTORE((InstructionSASTORE) instruction);
+			generateSASTORE(source, (InstructionSASTORE) instruction);
 			break;
 		case "POP":
-			executePOP((InstructionPOP) instruction);
+			generatePOP(source, (InstructionPOP) instruction);
 			break;
 		case "POP2":
-			executePOP2((InstructionPOP2) instruction);
+			generatePOP2(source, (InstructionPOP2) instruction);
 			break;
 		case "DUP":
-			executeDUP((InstructionDUP) instruction);
+			generateDUP(source, (InstructionDUP) instruction);
 			break;
 		case "DUP_X1":
-			executeDUP_X1((InstructionDUP_X1) instruction);
+			generateDUP_X1(source, (InstructionDUP_X1) instruction);
 			break;
 		case "DUP_X2":
-			executeDUP_X2((InstructionDUP_X2) instruction);
+			generateDUP_X2(source, (InstructionDUP_X2) instruction);
 			break;
 		case "DUP2":
-			executeDUP2((InstructionDUP2) instruction);
+			generateDUP2(source, (InstructionDUP2) instruction);
 			break;
 		case "DUP2_X1":
-			executeDUP2_X1((InstructionDUP2_X1) instruction);
+			generateDUP2_X1(source, (InstructionDUP2_X1) instruction);
 			break;
 		case "DUP2_X2":
-			executeDUP2_X2((InstructionDUP2_X2) instruction);
+			generateDUP2_X2(source, (InstructionDUP2_X2) instruction);
 			break;
 		case "SWAP":
-			executeSWAP((InstructionSWAP) instruction);
+			generateSWAP(source, (InstructionSWAP) instruction);
 			break;
 		case "IADD":
-			executeIADD((InstructionIADD) instruction);
+			generateIADD(source, (InstructionIADD) instruction);
 			break;
 		case "LADD":
-			executeLADD((InstructionLADD) instruction);
+			generateLADD(source, (InstructionLADD) instruction);
 			break;
 		case "FADD":
-			executeFADD((InstructionFADD) instruction);
+			generateFADD(source, (InstructionFADD) instruction);
 			break;
 		case "DADD":
-			executeDADD((InstructionDADD) instruction);
+			generateDADD(source, (InstructionDADD) instruction);
 			break;
 		case "ISUB":
-			executeISUB((InstructionISUB) instruction);
+			generateISUB(source, (InstructionISUB) instruction);
 			break;
 		case "LSUB":
-			executeLSUB((InstructionLSUB) instruction);
+			generateLSUB(source, (InstructionLSUB) instruction);
 			break;
 		case "FSUB":
-			executeFSUB((InstructionFSUB) instruction);
+			generateFSUB(source, (InstructionFSUB) instruction);
 			break;
 		case "DSUB":
-			executeDSUB((InstructionDSUB) instruction);
+			generateDSUB(source, (InstructionDSUB) instruction);
 			break;
 		case "IMUL":
-			executeIMUL((InstructionIMUL) instruction);
+			generateIMUL(source, (InstructionIMUL) instruction);
 			break;
 		case "LMUL":
-			executeLMUL((InstructionLMUL) instruction);
+			generateLMUL(source, (InstructionLMUL) instruction);
 			break;
 		case "FMUL":
-			executeFMUL((InstructionFMUL) instruction);
+			generateFMUL(source, (InstructionFMUL) instruction);
 			break;
 		case "DMUL":
-			executeDMUL((InstructionDMUL) instruction);
+			generateDMUL(source, (InstructionDMUL) instruction);
 			break;
 		case "IDIV":
-			executeIDIV((InstructionIDIV) instruction);
+			generateIDIV(source, (InstructionIDIV) instruction);
 			break;
 		case "LDIV":
-			executeLDIV((InstructionLDIV) instruction);
+			generateLDIV(source, (InstructionLDIV) instruction);
 			break;
 		case "FDIV":
-			executeFDIV((InstructionFDIV) instruction);
+			generateFDIV(source, (InstructionFDIV) instruction);
 			break;
 		case "DDIV":
-			executeDDIV((InstructionDDIV) instruction);
+			generateDDIV(source, (InstructionDDIV) instruction);
 			break;
 		case "IREM":
-			executeIREM((InstructionIREM) instruction);
+			generateIREM(source, (InstructionIREM) instruction);
 			break;
 		case "LREM":
-			executeLREM((InstructionLREM) instruction);
+			generateLREM(source, (InstructionLREM) instruction);
 			break;
 		case "FREM":
-			executeFREM((InstructionFREM) instruction);
+			generateFREM(source, (InstructionFREM) instruction);
 			break;
 		case "DREM":
-			executeDREM((InstructionDREM) instruction);
+			generateDREM(source, (InstructionDREM) instruction);
 			break;
 		case "INEG":
-			executeINEG((InstructionINEG) instruction);
+			generateINEG(source, (InstructionINEG) instruction);
 			break;
 		case "LNEG":
-			executeLNEG((InstructionLNEG) instruction);
+			generateLNEG(source, (InstructionLNEG) instruction);
 			break;
 		case "FNEG":
-			executeFNEG((InstructionFNEG) instruction);
+			generateFNEG(source, (InstructionFNEG) instruction);
 			break;
 		case "DNEG":
-			executeDNEG((InstructionDNEG) instruction);
+			generateDNEG(source, (InstructionDNEG) instruction);
 			break;
 		case "ISHL":
-			executeISHL((InstructionISHL) instruction);
+			generateISHL(source, (InstructionISHL) instruction);
 			break;
 		case "LSHL":
-			executeLSHL((InstructionLSHL) instruction);
+			generateLSHL(source, (InstructionLSHL) instruction);
 			break;
 		case "ISHR":
-			executeISHR((InstructionISHR) instruction);
+			generateISHR(source, (InstructionISHR) instruction);
 			break;
 		case "LSHR":
-			executeLSHR((InstructionLSHR) instruction);
+			generateLSHR(source, (InstructionLSHR) instruction);
 			break;
 		case "IUSHR":
-			executeIUSHR((InstructionIUSHR) instruction);
+			generateIUSHR(source, (InstructionIUSHR) instruction);
 			break;
 		case "LUSHR":
-			executeLUSHR((InstructionLUSHR) instruction);
+			generateLUSHR(source, (InstructionLUSHR) instruction);
 			break;
 		case "IAND":
-			executeIAND((InstructionIAND) instruction);
+			generateIAND(source, (InstructionIAND) instruction);
 			break;
 		case "LAND":
-			executeLAND((InstructionLAND) instruction);
+			generateLAND(source, (InstructionLAND) instruction);
 			break;
 		case "IOR":
-			executeIOR((InstructionIOR) instruction);
+			generateIOR(source, (InstructionIOR) instruction);
 			break;
 		case "LOR":
-			executeLOR((InstructionLOR) instruction);
+			generateLOR(source, (InstructionLOR) instruction);
 			break;
 		case "IXOR":
-			executeIXOR((InstructionIXOR) instruction);
+			generateIXOR(source, (InstructionIXOR) instruction);
 			break;
 		case "LXOR":
-			executeLXOR((InstructionLXOR) instruction);
+			generateLXOR(source, (InstructionLXOR) instruction);
 			break;
 		case "IINC":
-			executeIINC((InstructionIINC) instruction);
+			generateIINC(source, (InstructionIINC) instruction);
 			break;
 		case "I2L":
-			executeI2L((InstructionI2L) instruction);
+			generateI2L(source, (InstructionI2L) instruction);
 			break;
 		case "I2F":
-			executeI2F((InstructionI2F) instruction);
+			generateI2F(source, (InstructionI2F) instruction);
 			break;
 		case "I2D":
-			executeI2D((InstructionI2D) instruction);
+			generateI2D(source, (InstructionI2D) instruction);
 			break;
 		case "L2I":
-			executeL2I((InstructionL2I) instruction);
+			generateL2I(source, (InstructionL2I) instruction);
 			break;
 		case "L2F":
-			executeL2F((InstructionL2F) instruction);
+			generateL2F(source, (InstructionL2F) instruction);
 			break;
 		case "L2D":
-			executeL2D((InstructionL2D) instruction);
+			generateL2D(source, (InstructionL2D) instruction);
 			break;
 		case "F2I":
-			executeF2I((InstructionF2I) instruction);
+			generateF2I(source, (InstructionF2I) instruction);
 			break;
 		case "F2L":
-			executeF2L((InstructionF2L) instruction);
+			generateF2L(source, (InstructionF2L) instruction);
 			break;
 		case "F2D":
-			executeF2D((InstructionF2D) instruction);
+			generateF2D(source, (InstructionF2D) instruction);
 			break;
 		case "D2I":
-			executeD2I((InstructionD2I) instruction);
+			generateD2I(source, (InstructionD2I) instruction);
 			break;
 		case "D2L":
-			executeD2L((InstructionD2L) instruction);
+			generateD2L(source, (InstructionD2L) instruction);
 			break;
 		case "D2F":
-			executeD2F((InstructionD2F) instruction);
+			generateD2F(source, (InstructionD2F) instruction);
 			break;
 		case "I2B":
-			executeI2B((InstructionI2B) instruction);
+			generateI2B(source, (InstructionI2B) instruction);
 			break;
 		case "I2C":
-			executeI2C((InstructionI2C) instruction);
+			generateI2C(source, (InstructionI2C) instruction);
 			break;
 		case "I2S":
-			executeI2S((InstructionI2S) instruction);
+			generateI2S(source, (InstructionI2S) instruction);
 			break;
 		case "LCMP":
-			executeLCMP((InstructionLCMP) instruction);
+			generateLCMP(source, (InstructionLCMP) instruction);
 			break;
 		case "FCMPL":
-			executeFCMPL((InstructionFCMPL) instruction);
+			generateFCMPL(source, (InstructionFCMPL) instruction);
 			break;
 		case "FCMPG":
-			executeFCMPG((InstructionFCMPG) instruction);
+			generateFCMPG(source, (InstructionFCMPG) instruction);
 			break;
 		case "DCMPL":
-			executeDCMPL((InstructionDCMPL) instruction);
+			generateDCMPL(source, (InstructionDCMPL) instruction);
 			break;
 		case "DCMPG":
-			executeDCMPG((InstructionDCMPG) instruction);
+			generateDCMPG(source, (InstructionDCMPG) instruction);
 			break;
 		case "IFEQ":
-			executeIFEQ((InstructionIFEQ) instruction);
+			generateIFEQ(source, (InstructionIFEQ) instruction);
 			break;
 		case "IFNE":
-			executeIFNE((InstructionIFNE) instruction);
+			generateIFNE(source, (InstructionIFNE) instruction);
 			break;
 		case "IFLT":
-			executeIFLT((InstructionIFLT) instruction);
+			generateIFLT(source, (InstructionIFLT) instruction);
 			break;
 		case "IFGE":
-			executeIFGE((InstructionIFGE) instruction);
+			generateIFGE(source, (InstructionIFGE) instruction);
 			break;
 		case "IFGT":
-			executeIFGT((InstructionIFGT) instruction);
+			generateIFGT(source, (InstructionIFGT) instruction);
 			break;
 		case "IFLE":
-			executeIFLE((InstructionIFLE) instruction);
+			generateIFLE(source, (InstructionIFLE) instruction);
 			break;
 		case "IF_ICMPEQ":
-			executeIF_ICMPEQ((InstructionIF_ICMPEQ) instruction);
+			generateIF_ICMPEQ(source, (InstructionIF_ICMPEQ) instruction);
 			break;
 		case "IF_ICMPNE":
-			executeIF_ICMPNE((InstructionIF_ICMPNE) instruction);
+			generateIF_ICMPNE(source, (InstructionIF_ICMPNE) instruction);
 			break;
 		case "IF_ICMPLT":
-			executeIF_ICMPLT((InstructionIF_ICMPLT) instruction);
+			generateIF_ICMPLT(source, (InstructionIF_ICMPLT) instruction);
 			break;
 		case "IF_ICMPGE":
-			executeIF_ICMPGE((InstructionIF_ICMPGE) instruction);
+			generateIF_ICMPGE(source, (InstructionIF_ICMPGE) instruction);
 			break;
 		case "IF_ICMPGT":
-			executeIF_ICMPGT((InstructionIF_ICMPGT) instruction);
+			generateIF_ICMPGT(source, (InstructionIF_ICMPGT) instruction);
 			break;
 		case "IF_ICMPLE":
-			executeIF_ICMPLE((InstructionIF_ICMPLE) instruction);
+			generateIF_ICMPLE(source, (InstructionIF_ICMPLE) instruction);
 			break;
 		case "IF_ACMPEQ":
-			executeIF_ACMPEQ((InstructionIF_ACMPEQ) instruction);
+			generateIF_ACMPEQ(source, (InstructionIF_ACMPEQ) instruction);
 			break;
 		case "IF_ACMPNE":
-			executeIF_ACMPNE((InstructionIF_ACMPNE) instruction);
+			generateIF_ACMPNE(source, (InstructionIF_ACMPNE) instruction);
 			break;
 		case "GOTO":
-			executeGOTO((InstructionGOTO) instruction);
+			generateGOTO(source, (InstructionGOTO) instruction);
 			break;
 		case "JSR":
-			executeJSR((InstructionJSR) instruction);
+			generateJSR(source, (InstructionJSR) instruction);
 			break;
 		case "RET":
-			executeRET((InstructionRET) instruction);
+			generateRET(source, (InstructionRET) instruction);
 			break;
 		case "TABLESWITCH":
-			executeTABLESWITCH((InstructionTABLESWITCH) instruction);
+			generateTABLESWITCH(source, (InstructionTABLESWITCH) instruction);
 			break;
 		case "LOOKUPSWITCH":
-			executeLOOKUPSWITCH((InstructionLOOKUPSWITCH) instruction);
+			generateLOOKUPSWITCH(source, (InstructionLOOKUPSWITCH) instruction);
 			break;
 		case "IRETURN":
-			executeIRETURN((InstructionIRETURN) instruction);
+			generateIRETURN(source, (InstructionIRETURN) instruction);
 			break;
 		case "LRETURN":
-			executeLRETURN((InstructionLRETURN) instruction);
+			generateLRETURN(source, (InstructionLRETURN) instruction);
 			break;
 		case "FRETURN":
-			executeFRETURN((InstructionFRETURN) instruction);
+			generateFRETURN(source, (InstructionFRETURN) instruction);
 			break;
 		case "DRETURN":
-			executeDRETURN((InstructionDRETURN) instruction);
+			generateDRETURN(source, (InstructionDRETURN) instruction);
 			break;
 		case "ARETURN":
-			executeARETURN((InstructionARETURN) instruction);
+			generateARETURN(source, (InstructionARETURN) instruction);
 			break;
 		case "RETURN":
-			executeRETURN((InstructionRETURN) instruction);
+			generateRETURN(source, (InstructionRETURN) instruction);
 			break;
 		case "GETSTATIC":
-			executeGETSTATIC((InstructionGETSTATIC) instruction);
+			generateGETSTATIC(source, (InstructionGETSTATIC) instruction);
 			break;
 		case "PUTSTATIC":
-			executePUTSTATIC((InstructionPUTSTATIC) instruction);
+			generatePUTSTATIC(source, (InstructionPUTSTATIC) instruction);
 			break;
 		case "GETFIELD":
-			executeGETFIELD((InstructionGETFIELD) instruction);
+			generateGETFIELD(source, (InstructionGETFIELD) instruction);
 			break;
 		case "PUTFIELD":
-			executePUTFIELD((InstructionPUTFIELD) instruction);
+			generatePUTFIELD(source, (InstructionPUTFIELD) instruction);
 			break;
 		case "INVOKEVIRTUAL":
-			executeINVOKEVIRTUAL((InstructionINVOKEVIRTUAL) instruction);
+			generateINVOKEVIRTUAL(source, (InstructionINVOKEVIRTUAL) instruction);
 			break;
 		case "INVOKESPECIAL":
-			executeINVOKESPECIAL((InstructionINVOKESPECIAL) instruction);
+			generateINVOKESPECIAL(source, (InstructionINVOKESPECIAL) instruction);
 			break;
 		case "INVOKESTATIC":
-			executeINVOKESTATIC((InstructionINVOKESTATIC) instruction);
+			generateINVOKESTATIC(source, (InstructionINVOKESTATIC) instruction);
 			break;
 		case "INVOKEINTERFACE":
-			executeINVOKEINTERFACE((InstructionINVOKEINTERFACE) instruction);
+			generateINVOKEINTERFACE(source, (InstructionINVOKEINTERFACE) instruction);
 			break;
 		case "INVOKEDYNAMIC":
-			executeINVOKEDYNAMIC((InstructionINVOKEDYNAMIC) instruction);
+			generateINVOKEDYNAMIC(source, (InstructionINVOKEDYNAMIC) instruction);
 			break;
 		case "NEW":
-			executeNEW((InstructionNEW) instruction);
+			generateNEW(source, (InstructionNEW) instruction);
 			break;
 		case "NEWARRAY":
-			executeNEWARRAY((InstructionNEWARRAY) instruction);
+			generateNEWARRAY(source, (InstructionNEWARRAY) instruction);
 			break;
 		case "ANEWARRAY":
-			executeANEWARRAY((InstructionANEWARRAY) instruction);
+			generateANEWARRAY(source, (InstructionANEWARRAY) instruction);
 			break;
 		case "ARRAYLENGTH":
-			executeARRAYLENGTH((InstructionARRAYLENGTH) instruction);
+			generateARRAYLENGTH(source, (InstructionARRAYLENGTH) instruction);
 			break;
 		case "ATHROW":
-			executeATHROW((InstructionATHROW) instruction);
+			generateATHROW(source, (InstructionATHROW) instruction);
 			break;
 		case "CHECKCAST":
-			executeCHECKCAST((InstructionCHECKCAST) instruction);
+			generateCHECKCAST(source, (InstructionCHECKCAST) instruction);
 			break;
 		case "INSTANCEOF":
-			executeINSTANCEOF((InstructionINSTANCEOF) instruction);
+			generateINSTANCEOF(source, (InstructionINSTANCEOF) instruction);
 			break;
 		case "MONITORENTER":
-			executeMONITORENTER((InstructionMONITORENTER) instruction);
+			generateMONITORENTER(source, (InstructionMONITORENTER) instruction);
 			break;
 		case "MONITOREXIT":
-			executeMONITOREXIT((InstructionMONITOREXIT) instruction);
+			generateMONITOREXIT(source, (InstructionMONITOREXIT) instruction);
 			break;
 		case "WIDE":
-			executeWIDE((InstructionWIDE) instruction);
+			generateWIDE(source, (InstructionWIDE) instruction);
 			break;
 		case "MULTIANEWARRAY":
-			executeMULTIANEWARRAY((InstructionMULTIANEWARRAY) instruction);
+			generateMULTIANEWARRAY(source, (InstructionMULTIANEWARRAY) instruction);
 			break;
 		case "IFNULL":
-			executeIFNULL((InstructionIFNULL) instruction);
+			generateIFNULL(source, (InstructionIFNULL) instruction);
 			break;
 		case "IFNONNULL":
-			executeIFNONNULL((InstructionIFNONNULL) instruction);
+			generateIFNONNULL(source, (InstructionIFNONNULL) instruction);
 			break;
 		case "GOTO_W":
-			executeGOTO_W((InstructionGOTO_W) instruction);
+			generateGOTO_W(source, (InstructionGOTO_W) instruction);
 			break;
 		case "JSR_W":
-			executeJSR_W((InstructionJSR_W) instruction);
+			generateJSR_W(source, (InstructionJSR_W) instruction);
 			break;
 		default:
 			System.out.println("Instruction " + opcode + " execution not supported");
 		}
 	}
 
-	private void executeAALOAD(InstructionAALOAD instruction)
+	private void generateAALOAD(IndentedOutputStream source, InstructionAALOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeAASTORE(InstructionAASTORE instruction)
+	private void generateAASTORE(IndentedOutputStream source, InstructionAASTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeACONST_NULL(InstructionACONST_NULL instruction)
+	private void generateACONST_NULL(IndentedOutputStream source, InstructionACONST_NULL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeALOAD(InstructionALOAD instruction)
+	private void generateALOAD(IndentedOutputStream source, InstructionALOAD instruction)
 	{
 		int index = instruction.getIndex();
 		Assert(index >= 0 && index < maxLocals, "ALOAD index out of range");
@@ -518,742 +531,763 @@ public class CppExecutionContext extends ExecutionContext
 		locals[index].push(getStack());
 	}
 
-	private void executeANEWARRAY(InstructionANEWARRAY instruction)
+	private void generateANEWARRAY(IndentedOutputStream source, InstructionANEWARRAY instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeARETURN(InstructionARETURN instruction)
+	private void generateARETURN(IndentedOutputStream source, InstructionARETURN instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeARRAYLENGTH(InstructionARRAYLENGTH instruction)
+	private void generateARRAYLENGTH(IndentedOutputStream source, InstructionARRAYLENGTH instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeASTORE(InstructionASTORE instruction)
+	private void generateASTORE(IndentedOutputStream source, InstructionASTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeATHROW(InstructionATHROW instruction)
+	private void generateATHROW(IndentedOutputStream source, InstructionATHROW instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeBALOAD(InstructionBALOAD instruction)
+	private void generateBALOAD(IndentedOutputStream source, InstructionBALOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeBASTORE(InstructionBASTORE instruction)
+	private void generateBASTORE(IndentedOutputStream source, InstructionBASTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeBIPUSH(InstructionBIPUSH instruction)
+	private void generateBIPUSH(IndentedOutputStream source, InstructionBIPUSH instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeCALOAD(InstructionCALOAD instruction)
+	private void generateCALOAD(IndentedOutputStream source, InstructionCALOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeCASTORE(InstructionCASTORE instruction)
+	private void generateCASTORE(IndentedOutputStream source, InstructionCASTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeCHECKCAST(InstructionCHECKCAST instruction)
+	private void generateCHECKCAST(IndentedOutputStream source, InstructionCHECKCAST instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeD2F(InstructionD2F instruction)
+	private void generateD2F(IndentedOutputStream source, InstructionD2F instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeD2I(InstructionD2I instruction)
+	private void generateD2I(IndentedOutputStream source, InstructionD2I instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeD2L(InstructionD2L instruction)
+	private void generateD2L(IndentedOutputStream source, InstructionD2L instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDADD(InstructionDADD instruction)
+	private void generateDADD(IndentedOutputStream source, InstructionDADD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDALOAD(InstructionDALOAD instruction)
+	private void generateDALOAD(IndentedOutputStream source, InstructionDALOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDASTORE(InstructionDASTORE instruction)
+	private void generateDASTORE(IndentedOutputStream source, InstructionDASTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDCMPG(InstructionDCMPG instruction)
+	private void generateDCMPG(IndentedOutputStream source, InstructionDCMPG instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDCMPL(InstructionDCMPL instruction)
+	private void generateDCMPL(IndentedOutputStream source, InstructionDCMPL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDCONST(InstructionDCONST instruction)
+	private void generateDCONST(IndentedOutputStream source, InstructionDCONST instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDDIV(InstructionDDIV instruction)
+	private void generateDDIV(IndentedOutputStream source, InstructionDDIV instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDLOAD(InstructionDLOAD instruction)
+	private void generateDLOAD(IndentedOutputStream source, InstructionDLOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDMUL(InstructionDMUL instruction)
+	private void generateDMUL(IndentedOutputStream source, InstructionDMUL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDNEG(InstructionDNEG instruction)
+	private void generateDNEG(IndentedOutputStream source, InstructionDNEG instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDREM(InstructionDREM instruction)
+	private void generateDREM(IndentedOutputStream source, InstructionDREM instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDRETURN(InstructionDRETURN instruction)
+	private void generateDRETURN(IndentedOutputStream source, InstructionDRETURN instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDSTORE(InstructionDSTORE instruction)
+	private void generateDSTORE(IndentedOutputStream source, InstructionDSTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDSUB(InstructionDSUB instruction)
+	private void generateDSUB(IndentedOutputStream source, InstructionDSUB instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDUP(InstructionDUP instruction)
+	private void generateDUP(IndentedOutputStream source, InstructionDUP instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDUP_X1(InstructionDUP_X1 instruction)
+	private void generateDUP_X1(IndentedOutputStream source, InstructionDUP_X1 instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDUP_X2(InstructionDUP_X2 instruction)
+	private void generateDUP_X2(IndentedOutputStream source, InstructionDUP_X2 instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDUP2(InstructionDUP2 instruction)
+	private void generateDUP2(IndentedOutputStream source, InstructionDUP2 instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDUP2_X1(InstructionDUP2_X1 instruction)
+	private void generateDUP2_X1(IndentedOutputStream source, InstructionDUP2_X1 instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeDUP2_X2(InstructionDUP2_X2 instruction)
+	private void generateDUP2_X2(IndentedOutputStream source, InstructionDUP2_X2 instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeF2D(InstructionF2D instruction)
+	private void generateF2D(IndentedOutputStream source, InstructionF2D instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeF2I(InstructionF2I instruction)
+	private void generateF2I(IndentedOutputStream source, InstructionF2I instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeF2L(InstructionF2L instruction)
+	private void generateF2L(IndentedOutputStream source, InstructionF2L instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFADD(InstructionFADD instruction)
+	private void generateFADD(IndentedOutputStream source, InstructionFADD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFALOAD(InstructionFALOAD instruction)
+	private void generateFALOAD(IndentedOutputStream source, InstructionFALOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFASTORE(InstructionFASTORE instruction)
+	private void generateFASTORE(IndentedOutputStream source, InstructionFASTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFCMPG(InstructionFCMPG instruction)
+	private void generateFCMPG(IndentedOutputStream source, InstructionFCMPG instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFCMPL(InstructionFCMPL instruction)
+	private void generateFCMPL(IndentedOutputStream source, InstructionFCMPL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFCONST(InstructionFCONST instruction)
+	private void generateFCONST(IndentedOutputStream source, InstructionFCONST instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFDIV(InstructionFDIV instruction)
+	private void generateFDIV(IndentedOutputStream source, InstructionFDIV instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFLOAD(InstructionFLOAD instruction)
+	private void generateFLOAD(IndentedOutputStream source, InstructionFLOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFMUL(InstructionFMUL instruction)
+	private void generateFMUL(IndentedOutputStream source, InstructionFMUL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFNEG(InstructionFNEG instruction)
+	private void generateFNEG(IndentedOutputStream source, InstructionFNEG instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFREM(InstructionFREM instruction)
+	private void generateFREM(IndentedOutputStream source, InstructionFREM instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFRETURN(InstructionFRETURN instruction)
+	private void generateFRETURN(IndentedOutputStream source, InstructionFRETURN instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFSTORE(InstructionFSTORE instruction)
+	private void generateFSTORE(IndentedOutputStream source, InstructionFSTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeFSUB(InstructionFSUB instruction)
+	private void generateFSUB(IndentedOutputStream source, InstructionFSUB instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeGETFIELD(InstructionGETFIELD instruction)
+	private void generateGETFIELD(IndentedOutputStream source, InstructionGETFIELD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeGETSTATIC(InstructionGETSTATIC instruction)
+	private void generateGETSTATIC(IndentedOutputStream source, InstructionGETSTATIC instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeGOTO(InstructionGOTO instruction)
+	private void generateGOTO(IndentedOutputStream source, InstructionGOTO instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeGOTO_W(InstructionGOTO_W instruction)
+	private void generateGOTO_W(IndentedOutputStream source, InstructionGOTO_W instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeI2B(InstructionI2B instruction)
+	private void generateI2B(IndentedOutputStream source, InstructionI2B instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeI2C(InstructionI2C instruction)
+	private void generateI2C(IndentedOutputStream source, InstructionI2C instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeI2D(InstructionI2D instruction)
+	private void generateI2D(IndentedOutputStream source, InstructionI2D instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeI2F(InstructionI2F instruction)
+	private void generateI2F(IndentedOutputStream source, InstructionI2F instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeI2L(InstructionI2L instruction)
+	private void generateI2L(IndentedOutputStream source, InstructionI2L instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeI2S(InstructionI2S instruction)
+	private void generateI2S(IndentedOutputStream source, InstructionI2S instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIADD(InstructionIADD instruction)
+	private void generateIADD(IndentedOutputStream source, InstructionIADD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIALOAD(InstructionIALOAD instruction)
+	private void generateIALOAD(IndentedOutputStream source, InstructionIALOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIAND(InstructionIAND instruction)
+	private void generateIAND(IndentedOutputStream source, InstructionIAND instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIASTORE(InstructionIASTORE instruction)
+	private void generateIASTORE(IndentedOutputStream source, InstructionIASTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeICONST(InstructionICONST instruction)
+	private void generateICONST(IndentedOutputStream source, InstructionICONST instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIDIV(InstructionIDIV instruction)
+	private void generateIDIV(IndentedOutputStream source, InstructionIDIV instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIF_ACMPEQ(InstructionIF_ACMPEQ instruction)
+	private void generateIF_ACMPEQ(IndentedOutputStream source, InstructionIF_ACMPEQ instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIF_ACMPNE(InstructionIF_ACMPNE instruction)
+	private void generateIF_ACMPNE(IndentedOutputStream source, InstructionIF_ACMPNE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIF_ICMPEQ(InstructionIF_ICMPEQ instruction)
+	private void generateIF_ICMPEQ(IndentedOutputStream source, InstructionIF_ICMPEQ instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIF_ICMPGE(InstructionIF_ICMPGE instruction)
+	private void generateIF_ICMPGE(IndentedOutputStream source, InstructionIF_ICMPGE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIF_ICMPGT(InstructionIF_ICMPGT instruction)
+	private void generateIF_ICMPGT(IndentedOutputStream source, InstructionIF_ICMPGT instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIF_ICMPLE(InstructionIF_ICMPLE instruction)
+	private void generateIF_ICMPLE(IndentedOutputStream source, InstructionIF_ICMPLE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIF_ICMPLT(InstructionIF_ICMPLT instruction)
+	private void generateIF_ICMPLT(IndentedOutputStream source, InstructionIF_ICMPLT instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIF_ICMPNE(InstructionIF_ICMPNE instruction)
+	private void generateIF_ICMPNE(IndentedOutputStream source, InstructionIF_ICMPNE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIFEQ(InstructionIFEQ instruction)
+	private void generateIFEQ(IndentedOutputStream source, InstructionIFEQ instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIFGE(InstructionIFGE instruction)
+	private void generateIFGE(IndentedOutputStream source, InstructionIFGE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIFGT(InstructionIFGT instruction)
+	private void generateIFGT(IndentedOutputStream source, InstructionIFGT instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIFLE(InstructionIFLE instruction)
+	private void generateIFLE(IndentedOutputStream source, InstructionIFLE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIFLT(InstructionIFLT instruction)
+	private void generateIFLT(IndentedOutputStream source, InstructionIFLT instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIFNE(InstructionIFNE instruction)
+	private void generateIFNE(IndentedOutputStream source, InstructionIFNE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIFNONNULL(InstructionIFNONNULL instruction)
+	private void generateIFNONNULL(IndentedOutputStream source, InstructionIFNONNULL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIFNULL(InstructionIFNULL instruction)
+	private void generateIFNULL(IndentedOutputStream source, InstructionIFNULL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIINC(InstructionIINC instruction)
+	private void generateIINC(IndentedOutputStream source, InstructionIINC instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeILOAD(InstructionILOAD instruction)
+	private void generateILOAD(IndentedOutputStream source, InstructionILOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIMUL(InstructionIMUL instruction)
+	private void generateIMUL(IndentedOutputStream source, InstructionIMUL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeINEG(InstructionINEG instruction)
+	private void generateINEG(IndentedOutputStream source, InstructionINEG instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeINSTANCEOF(InstructionINSTANCEOF instruction)
+	private void generateINSTANCEOF(IndentedOutputStream source, InstructionINSTANCEOF instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeINVOKEDYNAMIC(InstructionINVOKEDYNAMIC instruction)
+	private void generateINVOKEDYNAMIC(IndentedOutputStream source, InstructionINVOKEDYNAMIC instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeINVOKEINTERFACE(InstructionINVOKEINTERFACE instruction)
+	private void generateINVOKEINTERFACE(IndentedOutputStream source, InstructionINVOKEINTERFACE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeINVOKESPECIAL(InstructionINVOKESPECIAL instruction)
+	/**
+	 * Invoke a special method: special method is a class constructor or a TBD
+	 * method.
+	 */
+	private void generateINVOKESPECIAL(IndentedOutputStream source, InstructionINVOKESPECIAL instruction)
 	{
-		notSupported(instruction);
+		String methodClassName = javaToCppClass(instruction.getMethodClassName());
+		String methodName = instruction.getMethodName();
+		String[] topOfStack = stack.pop().split("[-]");
+		// 1. We are invoking the constructor of the base class from constructor of
+		// derived class? This statement is generated from special context of declaring
+		// a constructor for the derived class.
+		if (methodName.equals("<init>") && topOfStack[0].equals(classType) && topOfStack[1].equals("this")
+				&& methodClassName.equals(cppClass.parentClassName))
+		{
+			String simpleBaseClassName = cppClass.simplifyType(methodClassName);
+			String descriptor = instruction.getMethodDescriptor();
+			Assert(descriptor.startsWith("()"), "Super constructor parameter list not supported");
+			source.iprintln(simpleBaseClassName + "()");
+		}
+		else
+		{
+			notSupported(instruction);
+		}
 	}
 
-	private void executeINVOKESTATIC(InstructionINVOKESTATIC instruction)
+	private void generateINVOKESTATIC(IndentedOutputStream source, InstructionINVOKESTATIC instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeINVOKEVIRTUAL(InstructionINVOKEVIRTUAL instruction)
+	private void generateINVOKEVIRTUAL(IndentedOutputStream source, InstructionINVOKEVIRTUAL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIOR(InstructionIOR instruction)
+	private void generateIOR(IndentedOutputStream source, InstructionIOR instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIREM(InstructionIREM instruction)
+	private void generateIREM(IndentedOutputStream source, InstructionIREM instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIRETURN(InstructionIRETURN instruction)
+	private void generateIRETURN(IndentedOutputStream source, InstructionIRETURN instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeISHL(InstructionISHL instruction)
+	private void generateISHL(IndentedOutputStream source, InstructionISHL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeISHR(InstructionISHR instruction)
+	private void generateISHR(IndentedOutputStream source, InstructionISHR instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeISTORE(InstructionISTORE instruction)
+	private void generateISTORE(IndentedOutputStream source, InstructionISTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeISUB(InstructionISUB instruction)
+	private void generateISUB(IndentedOutputStream source, InstructionISUB instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIUSHR(InstructionIUSHR instruction)
+	private void generateIUSHR(IndentedOutputStream source, InstructionIUSHR instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeIXOR(InstructionIXOR instruction)
+	private void generateIXOR(IndentedOutputStream source, InstructionIXOR instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeJSR(InstructionJSR instruction)
+	private void generateJSR(IndentedOutputStream source, InstructionJSR instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeJSR_W(InstructionJSR_W instruction)
+	private void generateJSR_W(IndentedOutputStream source, InstructionJSR_W instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeL2D(InstructionL2D instruction)
+	private void generateL2D(IndentedOutputStream source, InstructionL2D instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeL2F(InstructionL2F instruction)
+	private void generateL2F(IndentedOutputStream source, InstructionL2F instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeL2I(InstructionL2I instruction)
+	private void generateL2I(IndentedOutputStream source, InstructionL2I instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLADD(InstructionLADD instruction)
+	private void generateLADD(IndentedOutputStream source, InstructionLADD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLALOAD(InstructionLALOAD instruction)
+	private void generateLALOAD(IndentedOutputStream source, InstructionLALOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLAND(InstructionLAND instruction)
+	private void generateLAND(IndentedOutputStream source, InstructionLAND instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLASTORE(InstructionLASTORE instruction)
+	private void generateLASTORE(IndentedOutputStream source, InstructionLASTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLCMP(InstructionLCMP instruction)
+	private void generateLCMP(IndentedOutputStream source, InstructionLCMP instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLCONST(InstructionLCONST instruction)
+	private void generateLCONST(IndentedOutputStream source, InstructionLCONST instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLDC(InstructionLDC instruction)
+	private void generateLDC(IndentedOutputStream source, InstructionLDC instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLDC_W(InstructionLDC_W instruction)
+	private void generateLDC_W(IndentedOutputStream source, InstructionLDC_W instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLDC2_W(InstructionLDC2_W instruction)
+	private void generateLDC2_W(IndentedOutputStream source, InstructionLDC2_W instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLDIV(InstructionLDIV instruction)
+	private void generateLDIV(IndentedOutputStream source, InstructionLDIV instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLLOAD(InstructionLLOAD instruction)
+	private void generateLLOAD(IndentedOutputStream source, InstructionLLOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLMUL(InstructionLMUL instruction)
+	private void generateLMUL(IndentedOutputStream source, InstructionLMUL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLNEG(InstructionLNEG instruction)
+	private void generateLNEG(IndentedOutputStream source, InstructionLNEG instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLOOKUPSWITCH(InstructionLOOKUPSWITCH instruction)
+	private void generateLOOKUPSWITCH(IndentedOutputStream source, InstructionLOOKUPSWITCH instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLOR(InstructionLOR instruction)
+	private void generateLOR(IndentedOutputStream source, InstructionLOR instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLREM(InstructionLREM instruction)
+	private void generateLREM(IndentedOutputStream source, InstructionLREM instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLRETURN(InstructionLRETURN instruction)
+	private void generateLRETURN(IndentedOutputStream source, InstructionLRETURN instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLSHL(InstructionLSHL instruction)
+	private void generateLSHL(IndentedOutputStream source, InstructionLSHL instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLSHR(InstructionLSHR instruction)
+	private void generateLSHR(IndentedOutputStream source, InstructionLSHR instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLSTORE(InstructionLSTORE instruction)
+	private void generateLSTORE(IndentedOutputStream source, InstructionLSTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLSUB(InstructionLSUB instruction)
+	private void generateLSUB(IndentedOutputStream source, InstructionLSUB instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLUSHR(InstructionLUSHR instruction)
+	private void generateLUSHR(IndentedOutputStream source, InstructionLUSHR instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeLXOR(InstructionLXOR instruction)
+	private void generateLXOR(IndentedOutputStream source, InstructionLXOR instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeMONITORENTER(InstructionMONITORENTER instruction)
+	private void generateMONITORENTER(IndentedOutputStream source, InstructionMONITORENTER instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeMONITOREXIT(InstructionMONITOREXIT instruction)
+	private void generateMONITOREXIT(IndentedOutputStream source, InstructionMONITOREXIT instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeMULTIANEWARRAY(InstructionMULTIANEWARRAY instruction)
+	private void generateMULTIANEWARRAY(IndentedOutputStream source, InstructionMULTIANEWARRAY instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeNEW(InstructionNEW instruction)
+	private void generateNEW(IndentedOutputStream source, InstructionNEW instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeNEWARRAY(InstructionNEWARRAY instruction)
+	private void generateNEWARRAY(IndentedOutputStream source, InstructionNEWARRAY instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeNOP(InstructionNOP instruction)
+	private void generateNOP(IndentedOutputStream source, InstructionNOP instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executePOP(InstructionPOP instruction)
+	private void generatePOP(IndentedOutputStream source, InstructionPOP instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executePOP2(InstructionPOP2 instruction)
+	private void generatePOP2(IndentedOutputStream source, InstructionPOP2 instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executePUTFIELD(InstructionPUTFIELD instruction)
+	private void generatePUTFIELD(IndentedOutputStream source, InstructionPUTFIELD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executePUTSTATIC(InstructionPUTSTATIC instruction)
+	private void generatePUTSTATIC(IndentedOutputStream source, InstructionPUTSTATIC instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeRET(InstructionRET instruction)
+	private void generateRET(IndentedOutputStream source, InstructionRET instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeRETURN(InstructionRETURN instruction)
+	private void generateRETURN(IndentedOutputStream source, InstructionRETURN instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeSALOAD(InstructionSALOAD instruction)
+	private void generateSALOAD(IndentedOutputStream source, InstructionSALOAD instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeSASTORE(InstructionSASTORE instruction)
+	private void generateSASTORE(IndentedOutputStream source, InstructionSASTORE instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeSIPUSH(InstructionSIPUSH instruction)
+	private void generateSIPUSH(IndentedOutputStream source, InstructionSIPUSH instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeSWAP(InstructionSWAP instruction)
+	private void generateSWAP(IndentedOutputStream source, InstructionSWAP instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeTABLESWITCH(InstructionTABLESWITCH instruction)
+	private void generateTABLESWITCH(IndentedOutputStream source, InstructionTABLESWITCH instruction)
 	{
 		notSupported(instruction);
 	}
 
-	private void executeWIDE(InstructionWIDE instruction)
+	private void generateWIDE(IndentedOutputStream source, InstructionWIDE instruction)
 	{
 		notSupported(instruction);
 	}

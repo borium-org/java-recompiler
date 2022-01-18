@@ -23,9 +23,9 @@ class CppMethod
 	/** True if method is static. */
 	private boolean isStatic;
 
-	public CppMethod(String namespace, String className, ClassMethod javaMethod)
+	public CppMethod(CppClass cppClass, ClassMethod javaMethod)
 	{
-		executionContext = new CppExecutionContext(javaMethod, namespace, className);
+		executionContext = new CppExecutionContext(this, cppClass, javaMethod);
 		isStatic = javaMethod.isStatic();
 		parseStatements();
 	}
@@ -69,7 +69,11 @@ class CppMethod
 		source.print(newName + newType.substring(0, pos + 1));
 		if (isConstructor)
 		{
+			source.println(" :");
 			source.indent(2);
+			source.iprint("");
+			statements.get(0).generateSource(source);
+			source.println(",//");
 			boolean first = true;
 			for (CppField field : fields)
 			{
@@ -77,7 +81,6 @@ class CppMethod
 				{
 					if (first)
 					{
-						source.println(" :");
 						source.iprint("");
 					}
 					else
@@ -99,7 +102,7 @@ class CppMethod
 		}
 		source.iprintln("{");
 		source.indent(1);
-		generateStatementSource(source);
+		generateStatementSource(source, isConstructor);
 		// TODO the other stuff
 		if (!isConstructor && !returnType.equals("void"))
 		{
@@ -120,13 +123,27 @@ class CppMethod
 		return executionContext.cppType;
 	}
 
-	private void generateStatementSource(IndentedOutputStream source)
+	/**
+	 * Generate source for statements. It is assumed that in derived class
+	 * constructor first statement is an invocation of the base class constructor,
+	 * so it is handled separately where derived class constructor is defined, and
+	 * it must be skipped in here to avoid duplication.
+	 *
+	 * @param source        Source file where to generate the method.
+	 * @param isConstructor True if this is a constructor and first statement must
+	 *                      be skipped.
+	 */
+	private void generateStatementSource(IndentedOutputStream source, boolean isConstructor)
 	{
+		boolean skip = isConstructor;
 		for (Statement statement : statements)
 		{
-			statement.generateSource(source);
+			if (!skip)
+			{
+				statement.generateSource(source);
+			}
+			skip = false;
 		}
-		// TODO Auto-generated method stub
 	}
 
 	private void parseStatements()

@@ -43,6 +43,21 @@ public class InstructionINVOKESPECIAL extends Instruction
 		stream.iprintln(className + " " + methodClassName + "." + methodName);
 	}
 
+	public String getMethodClassName()
+	{
+		return methodClassName;
+	}
+
+	public String getMethodDescriptor()
+	{
+		return nameType.getDescriptor();
+	}
+
+	public String getMethodName()
+	{
+		return methodName;
+	}
+
 	@Override
 	public int getStackDepthChange()
 	{

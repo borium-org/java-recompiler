@@ -31,6 +31,13 @@ public class ExecutionContext
 		/** Map to associate type and name. */
 		private HashMap<String, String> local = new HashMap<>();
 
+		/**
+		 * Make a single string for the entry that contains one or more local variable
+		 * options.
+		 *
+		 * @return String that has at least one option for the parameter or local
+		 *         variable.
+		 */
 		public String getEntry()
 		{
 			String entryString = "";
@@ -40,6 +47,7 @@ public class ExecutionContext
 				entryString += entry.getKey() + typeAndNameSeparator + entry.getValue() + separator;
 				separator = localSeparator;
 			}
+			Assert(entryString.length() > 0, "No local variable definition");
 			return entryString;
 		}
 
@@ -90,7 +98,7 @@ public class ExecutionContext
 
 	protected LocalVariable[] locals;
 
-	private Stack<String> stack = new Stack<>();
+	protected Stack<String> stack = new Stack<>();
 
 	protected ExecutionContext(ClassMethod javaMethod)
 	{

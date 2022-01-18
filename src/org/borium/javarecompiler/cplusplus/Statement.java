@@ -31,7 +31,7 @@ class Statement
 		{
 			source.iprint("// ");
 			instruction.oneLineDump(source);
-			executionContext.execute(instruction);
+			executionContext.generate(source, instruction);
 			dumpStack(source, executionContext.getStack());
 		}
 		// TODO Auto-generated method stub
@@ -40,9 +40,16 @@ class Statement
 	private void dumpStack(IndentedOutputStream source, Stack<String> stack)
 	{
 		source.indent(1);
-		for (int i = 0; i < stack.size(); i++)
+		if (stack.size() == 0)
 		{
-			source.iprintln("// stack[" + i + "]=" + stack.elementAt(i));
+			source.iprintln("// stack: empty");
+		}
+		else
+		{
+			for (int i = 0; i < stack.size(); i++)
+			{
+				source.iprintln("// stack[" + i + "]=" + stack.elementAt(i));
+			}
 		}
 		source.indent(-1);
 	}

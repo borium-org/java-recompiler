@@ -14,10 +14,10 @@ public class CppClass
 	private String fileName;
 
 	/** Simple class name. */
-	private String className;
+	String className;
 
 	/** Namespace where this class is declared. */
-	private String namespace;
+	String namespace;
 
 	/** This class fields. */
 	private CppField[] fields;
@@ -31,7 +31,12 @@ public class CppClass
 	/** This class methods. */
 	private CppMethod[] methods;
 
-	private String parentClassName;
+	/**
+	 * Parent class name for this class. All converted classes have a parent class.
+	 * Object is the only class that does not have a parent class, but Object will
+	 * be provided as part of C++ library and not converted from Java to C++.
+	 */
+	String parentClassName;
 
 	/**
 	 * Create the C++ class file given the Java class file.
@@ -72,6 +77,59 @@ public class CppClass
 		{
 			e.printStackTrace();
 		}
+	}
+
+	/**
+	 * Remove redundant namespaces from each component of the type if the simple
+	 * type name is unique within the class referenced types list.
+	 * <p>
+	 * Each field of class type is converted into a class pointer.
+	 *
+	 * @param className Fully qualified type.
+	 * @return Simplified type.
+	 */
+	String simplifyType(String className)
+	{
+		StringBuffer sb = new StringBuffer(className.length());
+		int index = 0;
+		StringBuffer component = new StringBuffer(className.length());
+		while (index < className.length())
+		{
+			if (Character.isJavaIdentifierPart(className.charAt(index)) || className.charAt(index) == ':')
+			{
+				component.append(className.charAt(index));
+			}
+			else
+			{
+				switch (className.charAt(index))
+				{
+				case '(':
+				case ')':
+				case '[':
+				case ']':
+				case '<':
+				case '>':
+				case ',':
+				case ' ':
+				case '*':
+					String componentType = component.toString();
+					sb.append(simplifyTypeComponent(componentType));
+					component.setLength(0);
+					sb.append(className.charAt(index));
+					break;
+				default:
+					throw new RuntimeException(
+							"SimplifyType: unexpected '" + className.charAt(index) + "' in " + className);
+				}
+			}
+			index++;
+		}
+		if (component.length() > 0)
+		{
+			String componentType = component.toString();
+			sb.append(simplifyTypeComponent(componentType));
+		}
+		return sb.toString();
 	}
 
 	/**
@@ -157,7 +215,7 @@ public class CppClass
 		for (int i = 0; i < javaMethods.length; i++)
 		{
 			ClassMethod javaMethod = javaMethods[i];
-			CppMethod method = new CppMethod(namespace, className, javaMethod);
+			CppMethod method = new CppMethod(this, javaMethod);
 			methods[i] = method;
 		}
 	}
@@ -291,59 +349,6 @@ public class CppClass
 			}
 			method.generateSource(source, className + "::" + methodName, methodType, fields);
 		}
-	}
-
-	/**
-	 * Remove redundant namespaces from each component of the type if the simple
-	 * type name is unique within the class referenced types list.
-	 * <p>
-	 * Each field of class type is converted into a class pointer.
-	 *
-	 * @param fieldType Fully qualified type.
-	 * @return Simplified type.
-	 */
-	private String simplifyType(String fieldType)
-	{
-		StringBuffer sb = new StringBuffer(fieldType.length());
-		int index = 0;
-		StringBuffer component = new StringBuffer(fieldType.length());
-		while (index < fieldType.length())
-		{
-			if (Character.isJavaIdentifierPart(fieldType.charAt(index)) || fieldType.charAt(index) == ':')
-			{
-				component.append(fieldType.charAt(index));
-			}
-			else
-			{
-				switch (fieldType.charAt(index))
-				{
-				case '(':
-				case ')':
-				case '[':
-				case ']':
-				case '<':
-				case '>':
-				case ',':
-				case ' ':
-				case '*':
-					String componentType = component.toString();
-					sb.append(simplifyTypeComponent(componentType));
-					component.setLength(0);
-					sb.append(fieldType.charAt(index));
-					break;
-				default:
-					throw new RuntimeException(
-							"SimplifyType: unexpected '" + fieldType.charAt(index) + "' in " + fieldType);
-				}
-			}
-			index++;
-		}
-		if (component.length() > 0)
-		{
-			String componentType = component.toString();
-			sb.append(simplifyTypeComponent(componentType));
-		}
-		return sb.toString();
 	}
 
 	/**
