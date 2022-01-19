@@ -13,17 +13,21 @@ abstract class InstructionWithTypeIndex extends Instruction
 	 */
 	private int index;
 
-	public InstructionWithTypeIndex(ByteInputStream in)
+	private ConstantClassInfo classInfo;
+
+	private String methodClassName;
+
+	public InstructionWithTypeIndex(ByteInputStream in, ConstantPool cp)
 	{
 		index = in.u2();
+		classInfo = cp.get(index, ConstantClassInfo.class);
+		methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		ConstantClassInfo classInfo = cp.get(index, ConstantClassInfo.class);
-		String methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
 		stream.iprintln(className + " " + methodClassName);
 	}
 

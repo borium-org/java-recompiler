@@ -8,4 +8,10 @@ public class InstructionDDIV extends Instruction
 	public InstructionDDIV()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

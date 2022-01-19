@@ -29,10 +29,18 @@ public class ConstantModule extends Constant
 	 */
 	private int nameIndex;
 
+	private String name;
+
 	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	protected void dump(IndentedOutputStream stream)
 	{
-		stream.println("Module: " + constantPool.getString(nameIndex));
+		stream.println("Module: " + name);
+	}
+
+	@Override
+	protected void fixup(ConstantPool constantPool)
+	{
+		name = constantPool.getString(nameIndex);
 	}
 
 	@Override

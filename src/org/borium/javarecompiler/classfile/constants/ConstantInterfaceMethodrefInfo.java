@@ -36,17 +36,26 @@ public class ConstantInterfaceMethodrefInfo extends Constant
 	 * CONSTANT_NameAndType_info structure (4.4.6). This constant_pool entry
 	 * indicates the name and descriptor of the method.
 	 */
-	private int nameAndTypeIndex;
+	public int nameAndTypeIndex;
+
+	private ConstantClassInfo classInfo;
+
+	private ConstantNameAndTypeInfo nameTypeInfo;
 
 	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	protected void dump(IndentedOutputStream stream)
 	{
 		stream.print("InterfaceMethodRef:  Class " + classIndex + " ");
-		ConstantClassInfo classInfo = constantPool.get(classIndex, ConstantClassInfo.class);
-		classInfo.dump(stream, constantPool);
+		classInfo.dump(stream);
 		stream.print(" NameType " + nameAndTypeIndex + " ");
-		ConstantNameAndTypeInfo nameTypeInfo = constantPool.get(nameAndTypeIndex, ConstantNameAndTypeInfo.class);
-		nameTypeInfo.dump(stream, constantPool);
+		nameTypeInfo.dump(stream);
+	}
+
+	@Override
+	protected void fixup(ConstantPool constantPool)
+	{
+		classInfo = constantPool.get(classIndex, ConstantClassInfo.class);
+		nameTypeInfo = constantPool.get(nameAndTypeIndex, ConstantNameAndTypeInfo.class);
 	}
 
 	@Override

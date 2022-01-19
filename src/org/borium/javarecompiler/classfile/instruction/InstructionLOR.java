@@ -8,4 +8,10 @@ public class InstructionLOR extends Instruction
 	public InstructionLOR()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

@@ -1,7 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
-import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Create new array.
@@ -57,11 +56,17 @@ public class InstructionNEWARRAY extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		String[] types = { "0", "1", "2", "3", "boolean", "char", "float", "double", "byte", "short", "int", "long" };
 		stream.iprintln(className + " " + types[atype]);
+	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
 	}
 
 	@Override

@@ -8,4 +8,10 @@ public class InstructionISHL extends Instruction
 	public InstructionISHL()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

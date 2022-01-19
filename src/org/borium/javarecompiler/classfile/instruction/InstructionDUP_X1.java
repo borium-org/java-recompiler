@@ -8,4 +8,10 @@ public class InstructionDUP_X1 extends Instruction
 	public InstructionDUP_X1()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 1;
+	}
 }

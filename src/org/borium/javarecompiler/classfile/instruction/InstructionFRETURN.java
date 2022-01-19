@@ -8,4 +8,10 @@ public class InstructionFRETURN extends Instruction
 	public InstructionFRETURN()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

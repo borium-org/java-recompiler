@@ -16,4 +16,15 @@ public class InstructionALOAD extends InstructionWithLocalVariableIndex
 	{
 		super(index);
 	}
+
+	public int getIndex()
+	{
+		return index;
+	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 1;
+	}
 }

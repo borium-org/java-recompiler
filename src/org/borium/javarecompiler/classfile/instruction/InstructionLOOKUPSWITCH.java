@@ -1,7 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
-import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Access jump table by key match and jump.
@@ -58,7 +57,7 @@ public class InstructionLOOKUPSWITCH extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		stream.iprintln("lookupswitch");
 		stream.indent(1);
@@ -78,8 +77,20 @@ public class InstructionLOOKUPSWITCH extends Instruction
 	}
 
 	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
+
+	@Override
 	public int length()
 	{
 		return 1 + padding + 4 + 4 + match.length * 8;
+	}
+
+	@Override
+	public void oneLineDump(IndentedOutputStream stream)
+	{
+		stream.iprintln("lookupswitch " + match.length + " cases");
 	}
 }

@@ -25,9 +25,15 @@ public class InstructionINVOKEINTERFACE extends Instruction
 	 */
 	private int zero;
 
-	public InstructionINVOKEINTERFACE(ByteInputStream in)
+	private ConstantInterfaceMethodrefInfo methodref;
+
+	private ConstantNameAndTypeInfo nameType;
+
+	public InstructionINVOKEINTERFACE(ByteInputStream in, ConstantPool cp)
 	{
 		index = in.u2();
+		methodref = cp.get(index, ConstantInterfaceMethodrefInfo.class);
+		nameType = cp.get(methodref.nameAndTypeIndex, ConstantNameAndTypeInfo.class);
 		count = in.u1();
 		if (count == 0)
 		{
@@ -41,11 +47,21 @@ public class InstructionINVOKEINTERFACE extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 //		Constant classRef = cp.get(index);
-		stream.iprintln(className + " " + index + " count " + count);
+		stream.iprintln(className + " " + index + " " + nameType.getName() + " count " + count);
+	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		int stackDepthChange = 0;
+		stackDepthChange--; // INVOKEINTERFACE has 'this' pointer
+		stackDepthChange -= nameType.getParameterCount(); // parameters, if any, are used and removed
+		stackDepthChange += nameType.getReturnTypeCount(); // void (0) or anything else (1)
+		return stackDepthChange;
 	}
 
 	@Override

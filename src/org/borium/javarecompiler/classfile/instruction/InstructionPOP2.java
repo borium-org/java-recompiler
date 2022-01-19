@@ -8,4 +8,10 @@ public class InstructionPOP2 extends Instruction
 	public InstructionPOP2()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -2;
+	}
 }

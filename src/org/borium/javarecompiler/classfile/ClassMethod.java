@@ -4,7 +4,9 @@ import static org.borium.javarecompiler.classfile.ClassFile.*;
 
 import java.util.*;
 
+import org.borium.javarecompiler.classfile.attribute.*;
 import org.borium.javarecompiler.classfile.constants.*;
+import org.borium.javarecompiler.classfile.instruction.*;
 
 /**
  * Each method, including each instance initialization method (2.9.1) and the
@@ -192,6 +194,12 @@ public class ClassMethod
 
 	private ArrayList<ClassAttribute> attributeList = new ArrayList<>();
 
+	/** This method name. */
+	private String name;
+
+	/** This method descriptor. */
+	private String descriptor;
+
 	public void dump(IndentedOutputStream stream, ConstantPool cp)
 	{
 		stream.println("Method: " + cp.getString(nameIndex) + " " + cp.getString(descriptorIndex));
@@ -225,16 +233,51 @@ public class ClassMethod
 		{
 			stream.iprint(i + ": ");
 			ClassAttribute attribute = attributeList.get(i);
-			attribute.dump(stream, cp);
+			attribute.dump(stream);
 		}
 		stream.indent(-2);
+	}
+
+	public AttributeCode getCode()
+	{
+		AttributeCode code = (AttributeCode) attributes.get("Code");
+		return code;
+	}
+
+	public String getDescriptor()
+	{
+		return descriptor;
+	}
+
+	public Instruction[] getInstructions()
+	{
+		AttributeCode code = (AttributeCode) attributes.get("Code");
+		return code.getInstructions();
+	}
+
+	public int getLocalsCount()
+	{
+		AttributeCode code = (AttributeCode) attributes.get("Code");
+		return code.getLocalsCount();
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public boolean isStatic()
+	{
+		return (accessFlags & 0x0008) != 0;
 	}
 
 	public void read(ByteInputStream in, ConstantPool cp)
 	{
 		accessFlags = in.u2();
 		nameIndex = in.u2();
+		name = cp.getString(nameIndex);
 		descriptorIndex = in.u2();
+		descriptor = cp.getString(descriptorIndex);
 		int attributeCount = in.u2();
 		for (int i = 0; i < attributeCount; i++)
 		{

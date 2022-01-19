@@ -41,15 +41,24 @@ public class ConstantFieldrefInfo extends Constant
 	 */
 	public int nameAndTypeIndex;
 
+	private ConstantClassInfo classInfo;
+
+	private ConstantNameAndTypeInfo nameTypeInfo;
+
 	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	protected void dump(IndentedOutputStream stream)
 	{
 		stream.print("FieldRef:  Class " + classIndex + " ");
-		ConstantClassInfo classInfo = constantPool.get(classIndex, ConstantClassInfo.class);
-		classInfo.dump(stream, constantPool);
+		classInfo.dump(stream);
 		stream.print(" NameType " + nameAndTypeIndex + " ");
-		ConstantNameAndTypeInfo nameTypeInfo = constantPool.get(nameAndTypeIndex, ConstantNameAndTypeInfo.class);
-		nameTypeInfo.dump(stream, constantPool);
+		nameTypeInfo.dump(stream);
+	}
+
+	@Override
+	protected void fixup(ConstantPool constantPool)
+	{
+		classInfo = constantPool.get(classIndex, ConstantClassInfo.class);
+		nameTypeInfo = constantPool.get(nameAndTypeIndex, ConstantNameAndTypeInfo.class);
 	}
 
 	@Override

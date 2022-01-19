@@ -15,16 +15,25 @@ public class AttributeSignature extends ClassAttribute
 	 */
 	private int signatureIndex;
 
+	/** The string that matches the signature index. */
+	private String signature;
+
 	public AttributeSignature(ClassAttribute attribute, ConstantPool cp)
 	{
 		super(attribute);
 		decode(cp);
+		signature = cp.getString(signatureIndex);
+	}
+
+	public String getSignature()
+	{
+		return signature;
 	}
 
 	@Override
-	protected void detailedDump(IndentedOutputStream stream, ConstantPool cp)
+	protected void detailedDump(IndentedOutputStream stream)
 	{
-		stream.iprintln("Signature: " + signatureIndex + " " + cp.getString(signatureIndex));
+		stream.iprintln("Signature: " + signatureIndex + " " + signature);
 	}
 
 	private void decode(ConstantPool cp)

@@ -8,4 +8,10 @@ public class InstructionDREM extends Instruction
 	public InstructionDREM()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

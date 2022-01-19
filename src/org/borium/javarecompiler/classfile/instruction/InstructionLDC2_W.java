@@ -16,16 +16,18 @@ public class InstructionLDC2_W extends Instruction
 	 */
 	private int index;
 
-	public InstructionLDC2_W(ByteInputStream in)
+	private Constant constant;
+
+	public InstructionLDC2_W(ByteInputStream in, ConstantPool cp)
 	{
 		index = in.u2();
+		constant = cp.get(index);
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		Constant constant = cp.get(index);
 		if (constant instanceof ConstantLong constantLong)
 		{
 			stream.iprintln(className + " " + index + " " + constantLong.value);
@@ -38,6 +40,12 @@ public class InstructionLDC2_W extends Instruction
 		{
 			stream.iprintln(className + " " + index + " " + constant.getClass().getSimpleName());
 		}
+	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 1;
 	}
 
 	@Override

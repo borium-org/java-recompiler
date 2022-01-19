@@ -10,20 +10,31 @@ public class InstructionLDC extends Instruction
 {
 	private int index;
 
-	public InstructionLDC(ByteInputStream in)
+	private Constant c;
+
+	private String value;
+
+	public InstructionLDC(ByteInputStream in, ConstantPool cp)
 	{
 		index = in.u1();
+		c = cp.get(index);
+		if (c instanceof ConstantStringInfo stringValue)
+		{
+			value = stringValue.getValue(cp);
+		}
+		else if (c instanceof ConstantClassInfo classValue)
+		{
+			value = cp.getString(classValue.nameIndex);
+		}
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		Constant c = cp.get(index);
 		if (c instanceof ConstantStringInfo stringValue)
 		{
-			stream.iprintln(className + " \"" + stringValue.getValue(cp) + "\"");
-
+			stream.iprintln(className + " \"" + value + "\"");
 		}
 		else if (c instanceof ConstantInteger intValue)
 		{
@@ -31,13 +42,19 @@ public class InstructionLDC extends Instruction
 		}
 		else if (c instanceof ConstantClassInfo classValue)
 		{
-			stream.iprintln(className + " " + cp.getString(classValue.nameIndex));
+			stream.iprintln(className + " " + value);
 		}
 		else
 		{
 			stream.iprintln(className + " " + index);
 			throw new RuntimeException(className + ": Dump not implemented");
 		}
+	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 1;
 	}
 
 	@Override

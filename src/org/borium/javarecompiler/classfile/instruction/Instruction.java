@@ -211,7 +211,7 @@ public abstract class Instruction
 	public static final int IMPDEP1 = 254;
 	public static final int IMPDEP2 = 255;
 
-	public static Instruction read(ByteInputStream in)
+	public static Instruction read(ByteInputStream in, ConstantPool cp)
 	{
 		int code = in.u1();
 		if (code == -1)
@@ -257,11 +257,11 @@ public abstract class Instruction
 		case SIPUSH:
 			return new InstructionSIPUSH(in);
 		case LDC:
-			return new InstructionLDC(in);
+			return new InstructionLDC(in, cp);
 		case LDC_W:
-			return new InstructionLDC_W(in);
+			return new InstructionLDC_W(in, cp);
 		case LDC2_W:
-			return new InstructionLDC2_W(in);
+			return new InstructionLDC2_W(in, cp);
 		case ILOAD:
 			return new InstructionILOAD(in, false);
 		case LLOAD:
@@ -577,37 +577,37 @@ public abstract class Instruction
 		case RETURN:
 			return new InstructionRETURN();
 		case GETSTATIC:
-			return new InstructionGETSTATIC(in);
+			return new InstructionGETSTATIC(in, cp);
 		case PUTSTATIC:
-			return new InstructionPUTSTATIC(in);
+			return new InstructionPUTSTATIC(in, cp);
 		case GETFIELD:
-			return new InstructionGETFIELD(in);
+			return new InstructionGETFIELD(in, cp);
 		case PUTFIELD:
-			return new InstructionPUTFIELD(in);
+			return new InstructionPUTFIELD(in, cp);
 		case INVOKEVIRTUAL:
-			return new InstructionINVOKEVIRTUAL(in);
+			return new InstructionINVOKEVIRTUAL(in, cp);
 		case INVOKESPECIAL:
-			return new InstructionINVOKESPECIAL(in);
+			return new InstructionINVOKESPECIAL(in, cp);
 		case INVOKESTATIC:
-			return new InstructionINVOKESTATIC(in);
+			return new InstructionINVOKESTATIC(in, cp);
 		case INVOKEINTERFACE:
-			return new InstructionINVOKEINTERFACE(in);
+			return new InstructionINVOKEINTERFACE(in, cp);
 		case INVOKEDYNAMIC:
 			return new InstructionINVOKEDYNAMIC(in);
 		case NEW:
-			return new InstructionNEW(in);
+			return new InstructionNEW(in, cp);
 		case NEWARRAY:
 			return new InstructionNEWARRAY(in);
 		case ANEWARRAY:
-			return new InstructionANEWARRAY(in);
+			return new InstructionANEWARRAY(in, cp);
 		case ARRAYLENGTH:
 			return new InstructionARRAYLENGTH();
 		case ATHROW:
 			return new InstructionATHROW();
 		case CHECKCAST:
-			return new InstructionCHECKCAST(in);
+			return new InstructionCHECKCAST(in, cp);
 		case INSTANCEOF:
-			return new InstructionINSTANCEOF(in);
+			return new InstructionINSTANCEOF(in, cp);
 		case MONITORENTER:
 			return new InstructionMONITORENTER();
 		case MONITOREXIT:
@@ -634,6 +634,9 @@ public abstract class Instruction
 		return null;
 	}
 
+	/** Address of this instruction in the Code attribute. */
+	public int address;
+
 	/**
 	 * Add a label flag into the labels array if instruction has a target to
 	 * transfer control to. Default implementation does not add a label.
@@ -645,14 +648,46 @@ public abstract class Instruction
 	{
 	}
 
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	/**
+	 * Detailed dump of an instruction, one line in most cases, multiple lines for
+	 * switch instructions.
+	 *
+	 * @param stream Output stream where to send the dump to.
+	 */
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		stream.iprintln(className);
 	}
 
+	public int getAddress()
+	{
+		return address;
+	}
+
+	/**
+	 * Calculate the stack depth change that is caused by executing this current
+	 * instruction. Total stack depth after executing this instruction should not be
+	 * negative, but here we cannot verify if this is the case.
+	 *
+	 * @return Stack depth change, positive or negative as appropriate.
+	 */
+	public abstract int getStackDepthChange();
+
 	public int length()
 	{
 		return 1;
+	}
+
+	/**
+	 * Helper routine to produce minimal one-line dump for the instruction. Mostly
+	 * output is same as for detailedDump(), except for switch instructions. Output
+	 * is indented through detailedDump().
+	 *
+	 * @param stream Output stream where to send the dump to.
+	 */
+	public void oneLineDump(IndentedOutputStream stream)
+	{
+		detailedDump(stream);
 	}
 }

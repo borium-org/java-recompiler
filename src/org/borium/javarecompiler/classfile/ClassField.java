@@ -4,6 +4,7 @@ import static org.borium.javarecompiler.classfile.ClassFile.*;
 
 import java.util.*;
 
+import org.borium.javarecompiler.classfile.attribute.*;
 import org.borium.javarecompiler.classfile.constants.*;
 
 /**
@@ -25,6 +26,24 @@ import org.borium.javarecompiler.classfile.constants.*;
  */
 public class ClassField
 {
+	public static final int AccessPublic = 0x0001;
+
+	public static final int AccessPrivate = 0x0002;
+
+	public static final int AccessProtected = 0x0004;
+
+	public static final int AccessStatic = 0x0008;
+
+	public static final int AccessFinal = 0x0010;
+
+	public static final int AccessVolatile = 0x0040;
+
+	public static final int AccessTransient = 0x0080;
+
+	public static final int AccessSynthetic = 0x1000;
+
+	public static final int AccessEnum = 0x4000;
+
 	/**
 	 * The value of the access_flags item is a mask of flags used to denote access
 	 * permission to and properties of this field. The interpretation of each flag,
@@ -123,23 +142,27 @@ public class ClassField
 
 	private ArrayList<ClassAttribute> attributeList = new ArrayList<>();
 
-	public void dump(IndentedOutputStream stream, ConstantPool cp)
+	private String name;
+
+	private String descriptor;
+
+	public void dump(IndentedOutputStream stream)
 	{
-		stream.println("Field: " + cp.getString(nameIndex) + " " + cp.getString(descriptorIndex));
+		stream.println("Field: " + name + " " + descriptor);
 		stream.indent(1);
 
 		stream.iprint("Access Flags: ");
 		stream.printHex(accessFlags, 4);
 		int flags = accessFlags;
-		flags = printAccessFlag(stream, flags, 0x4000, " Enum");
-		flags = printAccessFlag(stream, flags, 0x1000, " Synthetic");
-		flags = printAccessFlag(stream, flags, 0x0080, " Transient");
-		flags = printAccessFlag(stream, flags, 0x0040, " Volatile");
-		flags = printAccessFlag(stream, flags, 0x0010, " Final");
-		flags = printAccessFlag(stream, flags, 0x0008, " Static");
-		flags = printAccessFlag(stream, flags, 0x0004, " Protected");
-		flags = printAccessFlag(stream, flags, 0x0002, " Private");
-		flags = printAccessFlag(stream, flags, 0x0001, " Public");
+		flags = printAccessFlag(stream, flags, AccessEnum, " Enum");
+		flags = printAccessFlag(stream, flags, AccessSynthetic, " Synthetic");
+		flags = printAccessFlag(stream, flags, AccessTransient, " Transient");
+		flags = printAccessFlag(stream, flags, AccessVolatile, " Volatile");
+		flags = printAccessFlag(stream, flags, AccessFinal, " Final");
+		flags = printAccessFlag(stream, flags, AccessStatic, " Static");
+		flags = printAccessFlag(stream, flags, AccessProtected, " Protected");
+		flags = printAccessFlag(stream, flags, AccessPrivate, " Private");
+		flags = printAccessFlag(stream, flags, AccessPublic, " Public");
 		if (flags != 0)
 		{
 			stream.print(" Invalid ");
@@ -153,16 +176,38 @@ public class ClassField
 		{
 			stream.iprint(i + ": ");
 			ClassAttribute attribute = attributeList.get(i);
-			attribute.dump(stream, cp);
+			attribute.dump(stream);
 		}
 		stream.indent(-2);
+	}
+
+	public int getAccessFlags()
+	{
+		return accessFlags;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	public String getType()
+	{
+		if (attributes.containsKey("Signature"))
+		{
+			AttributeSignature sig = (AttributeSignature) attributes.get("Signature");
+			return sig.getSignature();
+		}
+		return descriptor;
 	}
 
 	public void read(ByteInputStream in, ConstantPool cp)
 	{
 		accessFlags = in.u2();
 		nameIndex = in.u2();
+		name = cp.getString(nameIndex);
 		descriptorIndex = in.u2();
+		descriptor = cp.getString(descriptorIndex);
 		int attributeCount = in.u2();
 		for (int i = 0; i < attributeCount; i++)
 		{

@@ -8,4 +8,10 @@ public class InstructionFALOAD extends Instruction
 	public InstructionFALOAD()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

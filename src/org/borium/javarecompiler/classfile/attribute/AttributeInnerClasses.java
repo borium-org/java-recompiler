@@ -15,22 +15,35 @@ public class AttributeInnerClasses extends ClassAttribute
 
 		private int innerClassAccessFlags;
 
+		private ConstantClassInfo outer;
+
+		private ConstantClassInfo inner;
+
+		private String outerName;
+
+		private String innerName;
+
+		private String innerClassName;
+
 		public InnerClass(ByteInputStream in, ConstantPool cp)
 		{
 			innerClassInfoIndex = in.u2();
 			outerClassInfoIndex = in.u2();
 			innerClassNameIndex = in.u2();
 			innerClassAccessFlags = in.u2();
+			outer = cp.get(outerClassInfoIndex, ConstantClassInfo.class);
+			outerName = cp.getString(outer.nameIndex);
+			inner = cp.get(innerClassInfoIndex, ConstantClassInfo.class);
+			innerName = cp.getString(inner.nameIndex);
+			innerClassName = cp.getString(innerClassNameIndex);
 		}
 
-		public void detailedDump(IndentedOutputStream stream, ConstantPool cp)
+		public void detailedDump(IndentedOutputStream stream)
 		{
 			stream.indent(1);
-			ConstantClassInfo outer = cp.get(outerClassInfoIndex, ConstantClassInfo.class);
-			stream.iprintln("Outer: " + cp.getString(outer.nameIndex));
-			ConstantClassInfo inner = cp.get(innerClassInfoIndex, ConstantClassInfo.class);
-			stream.iprintln("Inner: " + cp.getString(inner.nameIndex));
-			stream.iprintln("Name: " + cp.getString(innerClassNameIndex));
+			stream.iprintln("Outer: " + outerName);
+			stream.iprintln("Inner: " + innerName);
+			stream.iprintln("Name: " + innerClassName);
 
 			stream.iprint("Access: ");
 			int flags = innerClassAccessFlags;
@@ -65,14 +78,14 @@ public class AttributeInnerClasses extends ClassAttribute
 	}
 
 	@Override
-	protected void detailedDump(IndentedOutputStream stream, ConstantPool cp)
+	protected void detailedDump(IndentedOutputStream stream)
 	{
 		stream.iprintln("Inner classes: " + classTable.length);
 		stream.indent(1);
 		for (int i = 0; i < classTable.length; i++)
 		{
 			stream.iprintln(i + ":");
-			classTable[i].detailedDump(stream, cp);
+			classTable[i].detailedDump(stream);
 		}
 		stream.indent(-1);
 	}

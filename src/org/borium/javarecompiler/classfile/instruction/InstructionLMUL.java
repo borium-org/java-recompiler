@@ -8,4 +8,10 @@ public class InstructionLMUL extends Instruction
 	public InstructionLMUL()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

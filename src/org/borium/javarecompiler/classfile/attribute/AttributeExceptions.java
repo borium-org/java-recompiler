@@ -13,22 +13,28 @@ public class AttributeExceptions extends ClassAttribute
 	 */
 	private int[] exceptionIndexTable;
 
+	private ConstantClassInfo[] classInfo;
+
 	public AttributeExceptions(ClassAttribute attribute, ConstantPool cp)
 	{
 		super(attribute);
 		decode(cp);
+		classInfo = new ConstantClassInfo[exceptionIndexTable.length];
+		for (int i = 0; i < classInfo.length; i++)
+		{
+			classInfo[i] = cp.get(exceptionIndexTable[i], ConstantClassInfo.class);
+		}
 	}
 
 	@Override
-	protected void detailedDump(IndentedOutputStream stream, ConstantPool cp)
+	protected void detailedDump(IndentedOutputStream stream)
 	{
 		stream.iprintln("Exceptions: " + exceptionIndexTable.length);
 		stream.indent(1);
 		for (int i = 0; i < exceptionIndexTable.length; i++)
 		{
 			stream.iprint(i + ": " + exceptionIndexTable[i] + " ");
-			ConstantClassInfo classInfo = cp.get(exceptionIndexTable[i], ConstantClassInfo.class);
-			classInfo.dump(stream, cp);
+			classInfo[i].dump(stream);
 			stream.println();
 		}
 		stream.indent(-1);

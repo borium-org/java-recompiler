@@ -101,7 +101,7 @@ public class ClassAttribute
 	{
 	}
 
-	public final void dump(IndentedOutputStream stream, ConstantPool cp)
+	public final void dump(IndentedOutputStream stream)
 	{
 		stream.println("Attribute: " + attributeName);
 		stream.indent(1);
@@ -109,7 +109,7 @@ public class ClassAttribute
 		stream.indent(1);
 		stream.iprintln(info);
 		stream.indent(-1);
-		detailedDump(stream, cp);
+		detailedDump(stream);
 		stream.indent(-1);
 	}
 
@@ -118,7 +118,7 @@ public class ClassAttribute
 		return attributeName;
 	}
 
-	protected void detailedDump(IndentedOutputStream stream, ConstantPool cp)
+	protected void detailedDump(IndentedOutputStream stream)
 	{
 		stream.iprintln("Attribute " + attributeName + ": Detailed dump not implemented");
 	}

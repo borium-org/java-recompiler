@@ -8,4 +8,10 @@ public class InstructionDCMPG extends Instruction
 	public InstructionDCMPG()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

@@ -12,16 +12,19 @@ public class AttributeSourceFile extends ClassAttribute
 	 */
 	private int index;
 
+	private String sourceFile;
+
 	public AttributeSourceFile(ClassAttribute attribute, ConstantPool cp)
 	{
 		super(attribute);
 		decode(cp);
+		sourceFile = cp.getString(index);
 	}
 
 	@Override
-	protected void detailedDump(IndentedOutputStream stream, ConstantPool cp)
+	protected void detailedDump(IndentedOutputStream stream)
 	{
-		stream.iprintln("Source File: " + cp.getString(index));
+		stream.iprintln("Source File: " + sourceFile);
 	}
 
 	private void decode(ConstantPool cp)

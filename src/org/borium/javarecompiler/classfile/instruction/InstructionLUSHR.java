@@ -8,4 +8,10 @@ public class InstructionLUSHR extends Instruction
 	public InstructionLUSHR()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

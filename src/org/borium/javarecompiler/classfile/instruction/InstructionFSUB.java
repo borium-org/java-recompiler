@@ -8,4 +8,10 @@ public class InstructionFSUB extends Instruction
 	public InstructionFSUB()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

@@ -8,4 +8,10 @@ public class InstructionLRETURN extends Instruction
 	public InstructionLRETURN()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
 }

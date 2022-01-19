@@ -8,4 +8,10 @@ public class InstructionIF_ICMPGT extends InstructionWithLabel
 	{
 		super(in);
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return -2;
+	}
 }

@@ -18,6 +18,11 @@ public class IndentedOutputStream
 		stream = new PrintStream(fileName);
 	}
 
+	public void close()
+	{
+		stream.close();
+	}
+
 	public void indent(int i)
 	{
 		indentLevel += i;

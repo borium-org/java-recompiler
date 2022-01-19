@@ -183,9 +183,9 @@ public class ClassFile
 	 */
 	private int[] interfaces;
 
-	private ArrayList<ClassField> fields = new ArrayList<>();
+	private ClassField[] fields;
 
-	private ArrayList<ClassMethod> methods = new ArrayList<>();
+	private ClassMethod[] methods;
 
 	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
@@ -193,6 +193,9 @@ public class ClassFile
 
 	/** Fully qualified class name. */
 	private String className;
+
+	/** Fully qualified super class name. */
+	private String superClassName;
 
 	public void dump(IndentedOutputStream stream)
 	{
@@ -210,6 +213,26 @@ public class ClassFile
 	public String getClassName()
 	{
 		return className.replace('/', '.');
+	}
+
+	public String getClassSimpleName()
+	{
+		return className.substring(className.lastIndexOf('.') + 1);
+	}
+
+	public ClassField[] getFields()
+	{
+		return fields;
+	}
+
+	public ClassMethod[] getMethods()
+	{
+		return methods;
+	}
+
+	public String getParentClassName()
+	{
+		return superClassName;
 	}
 
 	public List<String> getReferencedClasses()
@@ -247,7 +270,7 @@ public class ClassFile
 		{
 			stream.iprint(i + ": ");
 			ClassAttribute attribute = attributeList.get(i);
-			attribute.dump(stream, cp);
+			attribute.dump(stream);
 		}
 		stream.indent(-1);
 	}
@@ -275,7 +298,7 @@ public class ClassFile
 
 		stream.print("This Class: " + thisClass + " ");
 		ConstantClassInfo thisClassInfo = cp.get(thisClass, ConstantClassInfo.class);
-		thisClassInfo.dump(stream, cp);
+		thisClassInfo.dump(stream);
 		stream.println();
 
 		stream.print("Super Class: " + superClass + " ");
@@ -286,20 +309,20 @@ public class ClassFile
 		else
 		{
 			ConstantClassInfo superClassInfo = cp.get(superClass, ConstantClassInfo.class);
-			superClassInfo.dump(stream, cp);
+			superClassInfo.dump(stream);
 		}
 		stream.println();
 	}
 
 	private void dumpFields(IndentedOutputStream stream)
 	{
-		stream.println("Fields: " + fields.size());
+		stream.println("Fields: " + fields.length);
 		stream.indent(1);
-		for (int i = 0; i < fields.size(); i++)
+		for (int i = 0; i < fields.length; i++)
 		{
 			stream.iprint(i + ": ");
-			ClassField field = fields.get(i);
-			field.dump(stream, cp);
+			ClassField field = fields[i];
+			field.dump(stream);
 		}
 		stream.indent(-1);
 	}
@@ -312,7 +335,7 @@ public class ClassFile
 		{
 			stream.iprint(i + ": ");
 			ConstantClassInfo classInfo = cp.get(interfaces[i], ConstantClassInfo.class);
-			classInfo.dump(stream, cp);
+			classInfo.dump(stream);
 			stream.println();
 		}
 		stream.indent(-1);
@@ -320,12 +343,12 @@ public class ClassFile
 
 	private void dumpMethods(IndentedOutputStream stream)
 	{
-		stream.println("Methods: " + methods.size());
+		stream.println("Methods: " + methods.length);
 		stream.indent(1);
-		for (int i = 0; i < methods.size(); i++)
+		for (int i = 0; i < methods.length; i++)
 		{
 			stream.iprint(i + ": ");
-			ClassMethod method = methods.get(i);
+			ClassMethod method = methods[i];
 			method.dump(stream, cp);
 		}
 		stream.indent(-1);
@@ -348,8 +371,9 @@ public class ClassFile
 		accessFlags = in.u2();
 		thisClass = in.u2();
 		superClass = in.u2();
+		ConstantClassInfo ci = cp.get(superClass, ConstantClassInfo.class);
+		superClassName = cp.getString(ci.nameIndex).replace('/', '.');
 		// TODO extended validation
-		// throw new ClassFormatError("Feature is not supported yet");
 	}
 
 	private void readConstants() throws IOException
@@ -361,14 +385,14 @@ public class ClassFile
 	private void readFields() throws IOException
 	{
 		int count = in.u2();
+		fields = new ClassField[count];
 		for (int i = 0; i < count; i++)
 		{
 			ClassField field = new ClassField();
 			field.read(in, cp);
-			fields.add(field);
+			fields[i] = field;
 		}
 		// TODO extended validation
-		// throw new ClassFormatError("Feature is not supported yet");
 	}
 
 	private void readID() throws IOException, ClassFormatError
@@ -389,20 +413,19 @@ public class ClassFile
 			interfaces[i] = in.u2();
 		}
 		// TODO validation
-		// throw new ClassFormatError("Feature is not supported yet");
 	}
 
 	private void readMethods() throws IOException
 	{
 		int count = in.u2();
+		methods = new ClassMethod[count];
 		for (int i = 0; i < count; i++)
 		{
 			ClassMethod method = new ClassMethod();
 			method.read(in, cp);
-			methods.add(method);
+			methods[i] = method;
 		}
 		// TODO validation
-		// throw new ClassFormatError("Feature is not supported yet");
 	}
 
 	private void readVersion() throws IOException, ClassFormatError

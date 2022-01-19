@@ -1,7 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
-import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Branch always (wide index).
@@ -30,10 +29,16 @@ public class InstructionGOTO_W extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		stream.iprintln(className + " L" + (address + offset));
+	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
 	}
 
 	@Override

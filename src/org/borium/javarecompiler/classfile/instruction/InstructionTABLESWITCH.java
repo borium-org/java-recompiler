@@ -1,7 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
-import org.borium.javarecompiler.classfile.constants.*;
 
 /**
  * Access jump table by index and jump.
@@ -59,7 +58,7 @@ public class InstructionTABLESWITCH extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		stream.iprintln("tableswitch");
 		stream.indent(1);
@@ -81,8 +80,20 @@ public class InstructionTABLESWITCH extends Instruction
 	}
 
 	@Override
+	public int getStackDepthChange()
+	{
+		return -1;
+	}
+
+	@Override
 	public int length()
 	{
 		return 1 + padding + 4 + 4 + 4 + offset.length * 4;
+	}
+
+	@Override
+	public void oneLineDump(IndentedOutputStream stream)
+	{
+		stream.iprintln("tableswitch " + offset.length + " cases");
 	}
 }

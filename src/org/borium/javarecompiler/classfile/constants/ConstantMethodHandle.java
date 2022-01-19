@@ -64,7 +64,7 @@ public class ConstantMethodHandle extends Constant
 	private int referenceIndex;
 
 	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	protected void dump(IndentedOutputStream stream)
 	{
 		stream.println("MethodHandle: Kind " + referenceKind + " Index " + referenceIndex);
 	}

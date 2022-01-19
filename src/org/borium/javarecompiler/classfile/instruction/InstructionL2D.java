@@ -8,4 +8,10 @@ public class InstructionL2D extends Instruction
 	public InstructionL2D()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
+	}
 }

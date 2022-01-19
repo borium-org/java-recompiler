@@ -12,4 +12,10 @@ public class InstructionDCONST extends Instruction
 	{
 		this.value = value;
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 1;
+	}
 }

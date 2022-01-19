@@ -19,7 +19,7 @@ public class ConstantPool
 			if (constants[i] != null)
 			{
 				stream.iprint(i + ": ");
-				constants[i].dump(stream, this);
+				constants[i].dump(stream);
 				stream.println();
 			}
 		}
@@ -78,6 +78,17 @@ public class ConstantPool
 		throw new ClassFormatError("Index " + index + " is not a string but " + constant.getClass().getSimpleName());
 	}
 
+	/**
+	 * Read the constant pool in two phases:
+	 * <ol>
+	 * <li>Raw data read</li>
+	 * <li>Fix up references to other constants</li>
+	 * </ol>
+	 * Two phases are necessary because all constants that refer to other constants
+	 * have forward references which are nulls in first phase.
+	 *
+	 * @param in
+	 */
 	public void read(ByteInputStream in)
 	{
 		int count = in.u2();
@@ -91,6 +102,13 @@ public class ConstantPool
 			if (constant.is(CONSTANT_Long) || constant.is(CONSTANT_Double))
 			{
 				i++;
+			}
+		}
+		for (int i = 1; i < count; i++)
+		{
+			if (constants[i] != null)
+			{
+				constants[i].fixup(this);
 			}
 		}
 	}

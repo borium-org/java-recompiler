@@ -35,11 +35,72 @@ public class ConstantNameAndTypeInfo extends Constant
 	 */
 	private int descriptorIndex;
 
-	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	private String name;
+
+	private String descriptor;
+
+	public String getDescriptor()
 	{
-		stream.print("NameType: Name " + nameIndex + " " + constantPool.getString(nameIndex) + " Descriptor "
-				+ descriptorIndex + " " + constantPool.getString(descriptorIndex));
+		return descriptor;
+	}
+
+	public String getName()
+	{
+		return name;
+	}
+
+	/**
+	 * Calculate number of parameters to the method that is part of this name and
+	 * type info. 'This' is not assumed to be present.
+	 *
+	 * @return Parameter count, excluding optional 'this'.
+	 */
+	public int getParameterCount()
+	{
+		if (!descriptor.startsWith("("))
+		{
+			throw new RuntimeException("Get parameter count for non-method");
+		}
+		int[] data = { 1, 0 };
+		while (descriptor.charAt(data[0]) != ')')
+		{
+			parseSingleType(data);
+		}
+		return data[1];
+	}
+
+	/**
+	 * Calculate return value count. The method id used in calculating stack depth
+	 * after the method is executed.
+	 *
+	 * @return 0 (void) or 1 (anything else).
+	 */
+	public int getReturnTypeCount()
+	{
+		if (!descriptor.startsWith("("))
+		{
+			throw new RuntimeException("Get return type for non-method");
+		}
+		int pos = descriptor.indexOf(')');
+		if (pos == -1)
+		{
+			throw new RuntimeException("No closing ')'");
+		}
+
+		return descriptor.charAt(pos + 1) != 'V' ? 1 : 0;
+	}
+
+	@Override
+	protected void dump(IndentedOutputStream stream)
+	{
+		stream.print("NameType: Name " + nameIndex + " " + name + " Descriptor " + descriptorIndex + " " + descriptor);
+	}
+
+	@Override
+	protected void fixup(ConstantPool constantPool)
+	{
+		name = constantPool.getString(nameIndex);
+		descriptor = constantPool.getString(descriptorIndex);
 	}
 
 	@Override
@@ -70,5 +131,59 @@ public class ConstantNameAndTypeInfo extends Constant
 			return false;
 		}
 		return true;
+	}
+
+	private void parseClass(int[] data)
+	{
+		while (descriptor.charAt(data[0]) != ';' && descriptor.charAt(data[0]) != '<')
+		{
+			data[0]++;
+		}
+		if (descriptor.charAt(data[0]) == '<')
+		{
+			throw new RuntimeException("Templates not supported");
+//			data[0]++;
+//			while (descriptor.charAt(data[0]) != '>')
+//			{
+//				int count = data[1];
+//				parseSingleType(data);
+//				data[1] = count;
+//			}
+//			data[0]++;
+		}
+		if (descriptor.charAt(data[0]) == ';')
+		{
+			data[0]++;
+		}
+	}
+
+	private void parseSingleType(int[] data)
+	{
+		while (descriptor.charAt(data[0]) == '[')
+		{
+			data[0]++;
+		}
+		switch (descriptor.charAt(data[0]))
+		{
+		case 'B':
+		case 'C':
+		case 'D':
+		case 'F':
+		case 'I':
+		case 'J':
+		case 'S':
+		case 'Z':
+			data[0]++;
+			data[1]++;
+			break;
+		case 'L':
+			data[0]++;
+			data[1]++;
+			parseClass(data);
+			break;
+		case 'V':
+			data[0]++;
+			break;
+		}
 	}
 }

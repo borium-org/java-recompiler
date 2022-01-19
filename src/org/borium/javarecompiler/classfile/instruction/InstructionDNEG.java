@@ -8,4 +8,10 @@ public class InstructionDNEG extends Instruction
 	public InstructionDNEG()
 	{
 	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		return 0;
+	}
 }

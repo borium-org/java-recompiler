@@ -1,7 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
-import org.borium.javarecompiler.classfile.constants.*;
 
 abstract class InstructionWithLocalVariableIndex extends Instruction
 {
@@ -11,7 +10,7 @@ abstract class InstructionWithLocalVariableIndex extends Instruction
 	 * reference. The objectref in the local variable at index is pushed onto the
 	 * operand stack.
 	 */
-	private int index;
+	protected int index;
 
 	/**
 	 * Index constant length, 0 for hard-coded index 0...3, 1 for generic one-byte
@@ -32,7 +31,7 @@ abstract class InstructionWithLocalVariableIndex extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		stream.iprintln(className + " " + index);

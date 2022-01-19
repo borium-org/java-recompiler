@@ -15,22 +15,41 @@ public class InstructionINVOKESTATIC extends Instruction
 	 * method or interface method is to be found.
 	 */
 	private int index;
+	private ConstantMethodrefInfo methodref;
 
-	public InstructionINVOKESTATIC(ByteInputStream in)
+	private ConstantClassInfo classInfo;
+
+	private ConstantNameAndTypeInfo nameType;
+
+	private String methodClassName;
+
+	private String methodName;
+
+	public InstructionINVOKESTATIC(ByteInputStream in, ConstantPool cp)
 	{
 		index = in.u2();
+		methodref = cp.get(index, ConstantMethodrefInfo.class);
+		classInfo = cp.get(methodref.classIndex, ConstantClassInfo.class);
+		nameType = cp.get(methodref.nameAndTypeIndex, ConstantNameAndTypeInfo.class);
+		methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
+		methodName = cp.getString(nameType.nameIndex);
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		ConstantMethodrefInfo methodref = cp.get(index, ConstantMethodrefInfo.class);
-		ConstantClassInfo classInfo = cp.get(methodref.classIndex, ConstantClassInfo.class);
-		ConstantNameAndTypeInfo nameType = cp.get(methodref.nameAndTypeIndex, ConstantNameAndTypeInfo.class);
-		String methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
-		String methodName = cp.getString(nameType.nameIndex);
 		stream.iprintln(className + " " + methodClassName + "." + methodName);
+	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		int stackDepthChange = 0;
+		// stackDepthChange--; // INVOKESTATIC does not have 'this' pointer
+		stackDepthChange -= nameType.getParameterCount(); // parameters, if any, are used and removed
+		stackDepthChange += nameType.getReturnTypeCount(); // void (0) or anything else (1)
+		return stackDepthChange;
 	}
 
 	@Override

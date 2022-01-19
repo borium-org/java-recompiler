@@ -1,7 +1,6 @@
 package org.borium.javarecompiler.classfile.instruction;
 
 import org.borium.javarecompiler.classfile.*;
-import org.borium.javarecompiler.classfile.constants.*;
 
 public class InstructionINVOKEDYNAMIC extends Instruction
 {
@@ -30,12 +29,19 @@ public class InstructionINVOKEDYNAMIC extends Instruction
 	}
 
 	@Override
-	public void detailedDump(IndentedOutputStream stream, int address, ConstantPool cp)
+	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 //		Constant classRef = cp.get(index);
 		stream.iprintln(className + " " + index);
 		throw new RuntimeException(className + ": Dump not implemented");
+	}
+
+	@Override
+	public int getStackDepthChange()
+	{
+		String name = getClass().getSimpleName().substring(11);
+		throw new RuntimeException(name + " stack depth change not implemented");
 	}
 
 	@Override

@@ -28,7 +28,7 @@ public class ConstantLong extends Constant
 	public long value;
 
 	@Override
-	protected void dump(IndentedOutputStream stream, ConstantPool constantPool)
+	protected void dump(IndentedOutputStream stream)
 	{
 		stream.print("Long: " + value);
 	}
