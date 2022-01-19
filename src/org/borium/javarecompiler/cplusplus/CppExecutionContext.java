@@ -20,7 +20,6 @@ public class CppExecutionContext extends ExecutionContext
 	 * C++ object that is implementing the class containing the method that is using
 	 * this execution context.
 	 */
-	@SuppressWarnings("unused")
 	private CppClass cppClass;
 
 	/** C++ method that this using this execution context. */

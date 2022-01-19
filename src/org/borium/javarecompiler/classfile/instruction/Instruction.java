@@ -681,7 +681,8 @@ public abstract class Instruction
 
 	/**
 	 * Helper routine to produce minimal one-line dump for the instruction. Mostly
-	 * output is same as for detailedDump(), except for switch instructions.
+	 * output is same as for detailedDump(), except for switch instructions. Output
+	 * is indented through detailedDump().
 	 *
 	 * @param stream Output stream where to send the dump to.
 	 */

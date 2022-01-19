@@ -29,7 +29,7 @@ class Statement
 		source.println(":");
 		for (Instruction instruction : instructions)
 		{
-			source.iprint("// ");
+			source.iprint("//");
 			instruction.oneLineDump(source);
 			executionContext.generate(source, instruction);
 			dumpStack(source, executionContext.getStack());
@@ -37,20 +37,25 @@ class Statement
 		// TODO Auto-generated method stub
 	}
 
+	/**
+	 * Dump stack contents. Comments start indented, and content has 4 tabs before
+	 * the actual stack content.
+	 *
+	 * @param source Source file where to dump the stack.
+	 * @param stack  Stack contents to dump.
+	 */
 	private void dumpStack(IndentedOutputStream source, Stack<String> stack)
 	{
-		source.indent(1);
 		if (stack.size() == 0)
 		{
-			source.iprintln("// stack: empty");
+			source.iprintln("//\t\t\t\tstack: empty");
 		}
 		else
 		{
 			for (int i = 0; i < stack.size(); i++)
 			{
-				source.iprintln("// stack[" + i + "]=" + stack.elementAt(i));
+				source.iprintln("//\t\t\t\tstack[" + i + "]=" + stack.elementAt(i));
 			}
 		}
-		source.indent(-1);
 	}
 }

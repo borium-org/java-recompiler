@@ -23,8 +23,15 @@ class CppMethod
 	/** True if method is static. */
 	private boolean isStatic;
 
+	/**
+	 * C++ class that owns this method. C++ class info is used to simplify field
+	 * types.
+	 */
+	private CppClass cppClass;
+
 	public CppMethod(CppClass cppClass, ClassMethod javaMethod)
 	{
+		this.cppClass = cppClass;
 		executionContext = new CppExecutionContext(this, cppClass, javaMethod);
 		isStatic = javaMethod.isStatic();
 		parseStatements();
@@ -71,9 +78,7 @@ class CppMethod
 		{
 			source.println(" :");
 			source.indent(2);
-			source.iprint("");
 			statements.get(0).generateSource(source);
-			source.println(",//");
 			boolean first = true;
 			for (CppField field : fields)
 			{
@@ -81,7 +86,7 @@ class CppMethod
 				{
 					if (first)
 					{
-						source.iprint("");
+						source.iprint(", ");
 					}
 					else
 					{
@@ -90,8 +95,14 @@ class CppMethod
 						source.indent(-2);
 					}
 					first = false;
-					source.print(field.getName() + "(0) //");
-					source.println();
+					source.println(field.getName() + "(0) //");
+					String fieldType = cppClass.simplifyType(field.getType());
+					if (fieldType.endsWith("*"))
+					{
+						source.indent(2);
+						source.iprintln(", ref_" + field.getName() + "(" + field.getName() + ") //");
+						source.indent(-2);
+					}
 				}
 			}
 			source.indent(-2);
