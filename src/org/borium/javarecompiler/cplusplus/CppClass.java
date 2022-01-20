@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.cplusplus;
 
+import static org.borium.javarecompiler.Statics.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -51,6 +53,24 @@ public class CppClass
 		extractNamespaces();
 		extractFields();
 		extractMethods();
+	}
+
+	public CppField getField(String fieldName)
+	{
+		for (CppField field : fields)
+		{
+			if (field.getName().equals(fieldName))
+			{
+				return field;
+			}
+		}
+		Assert(false, "Field " + fieldName + " not found");
+		return null;
+	}
+
+	public String getFullClassName()
+	{
+		return namespace + "::" + className;
 	}
 
 	/**

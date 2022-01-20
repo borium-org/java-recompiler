@@ -31,6 +31,11 @@ abstract class InstructionWithTypeIndex extends Instruction
 		stream.iprintln(className + " " + methodClassName);
 	}
 
+	public String getMethodClassName()
+	{
+		return methodClassName;
+	}
+
 	@Override
 	public int length()
 	{

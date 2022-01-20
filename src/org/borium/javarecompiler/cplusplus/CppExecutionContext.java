@@ -672,7 +672,9 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateDUP(IndentedOutputStream source, InstructionDUP instruction)
 	{
-		notSupported(instruction);
+		String top = stack.pop();
+		stack.push(top);
+		stack.push(top);
 	}
 
 	private void generateDUP_X1(IndentedOutputStream source, InstructionDUP_X1 instruction)
@@ -1002,7 +1004,14 @@ public class CppExecutionContext extends ExecutionContext
 		}
 		else
 		{
-			notSupported(instruction);
+			String newClassName = cppClass.simplifyType(javaToCppClass(instruction.getMethodClassName()));
+			Assert(topOfStack[0].equals(newClassName + "*") && topOfStack[1].equals("new"), "Bad stack top");
+			Assert(instruction.getMethodDescriptor().equals("()V"), "Constructor with parameters not supported");
+			String[] dupInStack = stack.pop().split("[-]");
+			Assert(dupInStack[0].equals(newClassName + "*") && dupInStack[1].equals("new"), "Bad stack DUP");
+			String newStackTop = dupInStack[0] + "-new " + dupInStack[0].substring(0, dupInStack[0].length() - 1)
+					+ "()";
+			stack.push(newStackTop);
 		}
 	}
 
@@ -1218,7 +1227,9 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateNEW(IndentedOutputStream source, InstructionNEW instruction)
 	{
-		notSupported(instruction);
+		String className = javaToCppClass(instruction.getMethodClassName());
+		String simpleClassName = cppClass.simplifyType(className);
+		stack.push(simpleClassName + "*-new");
 	}
 
 	private void generateNEWARRAY(IndentedOutputStream source, InstructionNEWARRAY instruction)
@@ -1243,7 +1254,29 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generatePUTFIELD(IndentedOutputStream source, InstructionPUTFIELD instruction)
 	{
-		notSupported(instruction);
+		String[] value = stack.pop().split("[-]");
+		String[] object = stack.pop().split("[-]");
+		Assert(object[0].equals(cppClass.getFullClassName()) && object[1].equals("this"),
+				"Assigning to non-this class " + object[0] + " field " + instruction.getFieldName());
+		CppField field = cppClass.getField(instruction.getFieldName());
+		String fieldType = new JavaTypeConverter(instruction.getFieldType(), false).getCppType();
+		String actualType = field.getType();
+		String baseType = removeStar(fieldType);
+		if (actualType.startsWith(baseType + "<") && actualType.endsWith(">*"))
+		{
+			if (value[1].startsWith("new " + removeStar(value[0]) + "("))
+			{
+				value[1] = "new " + cppClass.simplifyType(removeStar(actualType))
+						+ value[1].substring(value[1].indexOf("("));
+			}
+			else
+			{
+				Assert(false, "Don't know what is going on yet");
+			}
+		}
+		source.iprint("");
+		source.print(object[1] + "->");
+		source.println(field.getName() + " = " + value[1] + ";");
 	}
 
 	private void generatePUTSTATIC(IndentedOutputStream source, InstructionPUTSTATIC instruction)

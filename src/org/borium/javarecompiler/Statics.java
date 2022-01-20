@@ -25,4 +25,15 @@ public class Statics
 		String[] split = javaClassName.split("[.]");
 		return String.join("::", split);
 	}
+
+	/**
+	 * Convenience method to remove trailing star from a pointer type.
+	 *
+	 * @param typeWithStar Pointer type with trailing star.
+	 * @return Pointed-to type, without that trailing star.
+	 */
+	public static String removeStar(String typeWithStar)
+	{
+		return typeWithStar.substring(0, typeWithStar.length() - 1);
+	}
 }
