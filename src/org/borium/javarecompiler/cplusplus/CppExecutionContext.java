@@ -542,7 +542,10 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateARRAYLENGTH(IndentedOutputStream source, InstructionARRAYLENGTH instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		// check if top[0] is an array
+		Assert(topOfStack[0].startsWith("JavaArray<"), "Top of stack is not an array");
+		stack.push("int" + StackEntrySeparator + topOfStack[1] + "->length");
 	}
 
 	private void generateASTORE(IndentedOutputStream source, InstructionASTORE instruction)
@@ -990,7 +993,7 @@ public class CppExecutionContext extends ExecutionContext
 	{
 		String methodClassName = javaToCppClass(instruction.getMethodClassName());
 		String methodName = instruction.getMethodName();
-		String[] topOfStack = stack.pop().split("[-]");
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
 		// 1. We are invoking the constructor of the base class from constructor of
 		// derived class? This statement is generated from special context of declaring
 		// a constructor for the derived class.
@@ -1007,10 +1010,10 @@ public class CppExecutionContext extends ExecutionContext
 			String newClassName = cppClass.simplifyType(javaToCppClass(instruction.getMethodClassName()));
 			Assert(topOfStack[0].equals(newClassName + "*") && topOfStack[1].equals("new"), "Bad stack top");
 			Assert(instruction.getMethodDescriptor().equals("()V"), "Constructor with parameters not supported");
-			String[] dupInStack = stack.pop().split("[-]");
+			String[] dupInStack = stack.pop().split(SplitStackEntrySeparator);
 			Assert(dupInStack[0].equals(newClassName + "*") && dupInStack[1].equals("new"), "Bad stack DUP");
-			String newStackTop = dupInStack[0] + "-new " + dupInStack[0].substring(0, dupInStack[0].length() - 1)
-					+ "()";
+			String newStackTop = dupInStack[0] + StackEntrySeparator + "new "
+					+ dupInStack[0].substring(0, dupInStack[0].length() - 1) + "()";
 			stack.push(newStackTop);
 		}
 	}
@@ -1229,7 +1232,7 @@ public class CppExecutionContext extends ExecutionContext
 	{
 		String className = javaToCppClass(instruction.getMethodClassName());
 		String simpleClassName = cppClass.simplifyType(className);
-		stack.push(simpleClassName + "*-new");
+		stack.push(simpleClassName + "*" + StackEntrySeparator + "new");
 	}
 
 	private void generateNEWARRAY(IndentedOutputStream source, InstructionNEWARRAY instruction)
@@ -1254,8 +1257,8 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generatePUTFIELD(IndentedOutputStream source, InstructionPUTFIELD instruction)
 	{
-		String[] value = stack.pop().split("[-]");
-		String[] object = stack.pop().split("[-]");
+		String[] value = stack.pop().split(SplitStackEntrySeparator);
+		String[] object = stack.pop().split(SplitStackEntrySeparator);
 		Assert(object[0].equals(cppClass.getFullClassName()) && object[1].equals("this"),
 				"Assigning to non-this class " + object[0] + " field " + instruction.getFieldName());
 		CppField field = cppClass.getField(instruction.getFieldName());

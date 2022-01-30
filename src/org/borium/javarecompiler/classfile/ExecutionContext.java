@@ -42,10 +42,11 @@ public class ExecutionContext
 		{
 			String entryString = "";
 			String separator = "";
+			Assert(local.size() == 1, "Multiple locals not handled yet");
 			for (Entry<String, String> entry : local.entrySet())
 			{
-				entryString += entry.getKey() + typeAndNameSeparator + entry.getValue() + separator;
-				separator = localSeparator;
+				entryString += entry.getKey() + StackEntrySeparator + entry.getValue() + separator;
+//				separator = localSeparator;
 			}
 			Assert(entryString.length() > 0, "No local variable definition");
 			return entryString;
@@ -72,17 +73,22 @@ public class ExecutionContext
 	}
 
 	/**
-	 * Type and name separator in the stack entry. It must be different from any
-	 * character that could appear in the type, including commas, templates,
-	 * pointers, etc. We're using '-' here.
+	 * Separator between stack entry type and value. The character must not be
+	 * present in the expression for the value of the stack entry.
 	 */
-	private static final String typeAndNameSeparator = "-";
+	protected static final String StackEntrySeparator = "=";
 
 	/**
-	 * Separator for multiple locals of different types in same slot. Using '&' as
-	 * in 'and there is more...'
+	 * Since String.split() expects a regular expression, this separator is the
+	 * version to use for splitting stack entries.
 	 */
-	private static final String localSeparator = "&";
+	protected static final String SplitStackEntrySeparator = "[" + StackEntrySeparator + "]";
+
+//	/**
+//	 * Separator for multiple locals of different types in same slot. Using '&' as
+//	 * in 'and there is more...'
+//	 */
+//	private static final String localSeparator = "&";
 
 	/** Java method name. */
 	public String name;

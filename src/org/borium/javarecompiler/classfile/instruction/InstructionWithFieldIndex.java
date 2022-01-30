@@ -33,7 +33,7 @@ abstract class InstructionWithFieldIndex extends Instruction
 	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		stream.iprintln(className + " " + index + " " + fieldName);
+		stream.iprintln(className + " " + fieldName + " " + fieldType);
 	}
 
 	public String getFieldName()

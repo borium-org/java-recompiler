@@ -54,7 +54,7 @@ class Statement
 		{
 			for (int i = 0; i < stack.size(); i++)
 			{
-				source.iprintln("//\t\t\t\tstack[" + i + "]=" + stack.elementAt(i));
+				source.iprintln("//\t\t\t\tstack[" + i + "]: " + stack.elementAt(i));
 			}
 		}
 	}
