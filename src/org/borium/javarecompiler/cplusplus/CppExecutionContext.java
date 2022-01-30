@@ -1291,7 +1291,7 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateRETURN(IndentedOutputStream source, InstructionRETURN instruction)
 	{
-		notSupported(instruction);
+		source.iprintln("return;");
 	}
 
 	private void generateSALOAD(IndentedOutputStream source, InstructionSALOAD instruction)
@@ -1327,7 +1327,8 @@ public class CppExecutionContext extends ExecutionContext
 	private void notSupported(Instruction instruction)
 	{
 		String opcode = instruction.getClass().getSimpleName().substring(11);
-		System.out.println("Instruction " + opcode + " execution not supported");
+//		System.out.println("Instruction " + opcode + " execution not supported");
+		Assert(false, "Instruction " + opcode + " execution not supported");
 	}
 
 	private void parseParameters()
