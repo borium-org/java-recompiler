@@ -28,6 +28,11 @@ public class ConstantStringInfo extends Constant
 
 	private String string;
 
+	public String getString()
+	{
+		return string;
+	}
+
 	public String getValue(ConstantPool constantPool)
 	{
 		return constantPool.getString(stringIndex);

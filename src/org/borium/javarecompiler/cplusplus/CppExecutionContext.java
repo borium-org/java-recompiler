@@ -3,6 +3,7 @@ package org.borium.javarecompiler.cplusplus;
 import static org.borium.javarecompiler.Statics.*;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.constants.*;
 import org.borium.javarecompiler.classfile.instruction.*;
 
 /**
@@ -25,6 +26,9 @@ public class CppExecutionContext extends ExecutionContext
 	/** C++ method that this using this execution context. */
 	@SuppressWarnings("unused")
 	private CppMethod cppMethod;
+
+	/** True for special handling of initialized string array construction. */
+	private boolean isStringArray = false;
 
 	protected CppExecutionContext(CppMethod cppMethod, CppClass cppClass, ClassMethod javaMethod)
 	{
@@ -513,7 +517,17 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateAASTORE(IndentedOutputStream source, InstructionAASTORE instruction)
 	{
-		notSupported(instruction);
+		String[] value = stack.pop().split(SplitStackEntrySeparator);
+		String[] index = stack.pop().split(SplitStackEntrySeparator);
+		String[] array = stack.pop().split(SplitStackEntrySeparator);
+		Assert(array[0].startsWith("JavaArray<"), "ANEWARRAY: Array expected");
+		Assert(index[0].equals("int"), "ANEWARRAY: Integer index expected");
+		String arrayElementType = array[0].substring(10);
+		int pos = arrayElementType.indexOf('*');
+		Assert(pos > 0, "JavaArray element is not a pointer");
+		arrayElementType = arrayElementType.substring(0, pos) + " *";
+		Assert(value[0].equals(arrayElementType), "ANEWARRAY: Value does not match JavaArray type");
+		source.iprintln("temp->assignString(" + index[1] + ", " + value[1] + ");");
 	}
 
 	private void generateACONST_NULL(IndentedOutputStream source, InstructionACONST_NULL instruction)
@@ -537,10 +551,22 @@ public class CppExecutionContext extends ExecutionContext
 		String length = topOfStack[1];
 		String type = instruction.getClassName();
 		type = javaToCppClass(type);
-		type = cppClass.simplifyType(type);
-		String newEntry = "JavaArray<" + type + "*> *" + StackEntrySeparator + //
-				"new JavaArray<" + type + "*>(" + length + ")";
-		stack.push(newEntry);
+		String simpleType = cppClass.simplifyType(type);
+		isStringArray = type.equals("java::lang::String");
+		if (isStringArray)
+		{
+			source.iprintln("{");
+			source.indent(1);
+			source.iprintln("JavaArray<String*> *temp = new JavaArray<" + simpleType + "*>(" + length + ");");
+			String newEntry = "JavaArray<" + simpleType + "*>*" + StackEntrySeparator + "temp";
+			stack.push(newEntry);
+		}
+		else
+		{
+			String newEntry = "JavaArray<" + simpleType + "*>*" + StackEntrySeparator + //
+					"new JavaArray<" + simpleType + "*>(" + length + ")";
+			stack.push(newEntry);
+		}
 	}
 
 	private void generateARETURN(IndentedOutputStream source, InstructionARETURN instruction)
@@ -558,7 +584,18 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateASTORE(IndentedOutputStream source, InstructionASTORE instruction)
 	{
-		notSupported(instruction);
+		int index = instruction.getIndex();
+		Assert(index >= 0 && index < maxLocals, "Local index out of range");
+		String[] local = locals[index].getEntry().split(SplitStackEntrySeparator);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(local[0].equals(topOfStack[0]), "ASTORE: Type mismatch");
+		source.iprintln(local[1] + " = " + topOfStack[1] + ";");
+		if (isStringArray)
+		{
+			source.indent(-1);
+			source.iprintln("}");
+		}
+		isStringArray = false;
 	}
 
 	private void generateATHROW(IndentedOutputStream source, InstructionATHROW instruction)
@@ -1143,7 +1180,28 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateLDC(IndentedOutputStream source, InstructionLDC instruction)
 	{
-		notSupported(instruction);
+		Constant constant = instruction.getConstant();
+		String newEntry = "";
+		if (constant instanceof ConstantStringInfo stringValue)
+		{
+			String type = cppClass.simplifyType("java::lang::String");
+			newEntry = type + " *" + StackEntrySeparator + "\"" + stringValue.getString() + "\"";
+		}
+		else if (constant instanceof ConstantInteger intValue)
+		{
+			newEntry = type + " *" + StackEntrySeparator + intValue.getValue();
+		}
+		else if (constant instanceof ConstantFloat floatValue)
+		{
+			newEntry = type + " *" + StackEntrySeparator + floatValue.getValue();
+		}
+		else
+		{
+			throw new RuntimeException(
+					"LDC: Constant type " + constant.getClass().getSimpleName().substring(8) + " not implemented");
+		}
+		Assert(newEntry.length() > 0, "LDC: Empty constant");
+		stack.push(newEntry);
 	}
 
 	private void generateLDC_W(IndentedOutputStream source, InstructionLDC_W instruction)
@@ -1357,6 +1415,7 @@ public class CppExecutionContext extends ExecutionContext
 			if (parameterPos != -1)
 			{
 				String parameterType = parameterList.substring(0, parameterPos);
+				parameterType = cppClass.simplifyType(parameterType);
 				if (parameterType.endsWith("*"))
 				{
 					parameterType = parameterType.substring(0, parameterType.length() - 2) + "*";
