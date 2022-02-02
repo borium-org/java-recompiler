@@ -532,7 +532,15 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateANEWARRAY(IndentedOutputStream source, InstructionANEWARRAY instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(topOfStack[0].equals("int"), "ANEWARRAY: Integer operand expected");
+		String length = topOfStack[1];
+		String type = instruction.getClassName();
+		type = javaToCppClass(type);
+		type = cppClass.simplifyType(type);
+		String newEntry = "JavaArray<" + type + "*> *" + StackEntrySeparator + //
+				"new JavaArray<" + type + "*>(" + length + ")";
+		stack.push(newEntry);
 	}
 
 	private void generateARETURN(IndentedOutputStream source, InstructionARETURN instruction)
@@ -570,7 +578,8 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateBIPUSH(IndentedOutputStream source, InstructionBIPUSH instruction)
 	{
-		notSupported(instruction);
+		String stackEntry = "int" + StackEntrySeparator + instruction.getValue();
+		stack.push(stackEntry);
 	}
 
 	private void generateCALOAD(IndentedOutputStream source, InstructionCALOAD instruction)
@@ -862,7 +871,8 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateICONST(IndentedOutputStream source, InstructionICONST instruction)
 	{
-		notSupported(instruction);
+		String newEntry = "int" + StackEntrySeparator + instruction.getValue();
+		stack.push(newEntry);
 	}
 
 	private void generateIDIV(IndentedOutputStream source, InstructionIDIV instruction)
@@ -1233,7 +1243,7 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateNEW(IndentedOutputStream source, InstructionNEW instruction)
 	{
-		String className = javaToCppClass(instruction.getMethodClassName());
+		String className = javaToCppClass(instruction.getClassName());
 		String simpleClassName = cppClass.simplifyType(className);
 		stack.push(simpleClassName + "*" + StackEntrySeparator + "new");
 	}

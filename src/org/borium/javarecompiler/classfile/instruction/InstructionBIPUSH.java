@@ -31,6 +31,11 @@ public class InstructionBIPUSH extends Instruction
 		return 1;
 	}
 
+	public int getValue()
+	{
+		return value;
+	}
+
 	@Override
 	public int length()
 	{

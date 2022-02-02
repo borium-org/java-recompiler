@@ -15,25 +15,25 @@ abstract class InstructionWithTypeIndex extends Instruction
 
 	private ConstantClassInfo classInfo;
 
-	private String methodClassName;
+	private String className;
 
 	public InstructionWithTypeIndex(ByteInputStream in, ConstantPool cp)
 	{
 		index = in.u2();
 		classInfo = cp.get(index, ConstantClassInfo.class);
-		methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
+		className = cp.getString(classInfo.nameIndex).replace('/', '.');
 	}
 
 	@Override
 	public void detailedDump(IndentedOutputStream stream)
 	{
-		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		stream.iprintln(className + " " + methodClassName);
+		String instructionClassName = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
+		stream.iprintln(instructionClassName + " " + className);
 	}
 
-	public String getMethodClassName()
+	public String getClassName()
 	{
-		return methodClassName;
+		return className;
 	}
 
 	@Override
