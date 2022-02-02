@@ -78,7 +78,7 @@ class CppMethod
 		{
 			source.println(" :");
 			source.indent(2);
-			statements.get(0).generateSource(source);
+			statements.get(0).generateSource(source, false);
 			boolean first = true;
 			for (CppField field : fields)
 			{
@@ -151,7 +151,7 @@ class CppMethod
 		{
 			if (!skip)
 			{
-				statement.generateSource(source);
+				statement.generateSource(source, true);
 			}
 			skip = false;
 		}

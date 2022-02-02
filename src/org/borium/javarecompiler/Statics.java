@@ -14,6 +14,20 @@ public class Statics
 	}
 
 	/**
+	 * Generate upper-cased hex string. String will have leading zeros if necessary.
+	 *
+	 * @param value  Value to fill the string with.
+	 * @param length Length of output string.
+	 * @return hex string of value, with specified length.
+	 */
+	public static String hexString(int value, int length)
+	{
+		String result = "00000000" + Integer.toHexString(value);
+		result = result.substring(result.length() - length);
+		return result.toUpperCase();
+	}
+
+	/**
 	 * Convert simple non-template non-pointer Java class name to C++ class name by
 	 * replacing all '.' with '::'.
 	 *

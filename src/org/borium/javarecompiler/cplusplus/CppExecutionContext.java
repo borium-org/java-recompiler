@@ -937,7 +937,10 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateIFNE(IndentedOutputStream source, InstructionIFNE instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(topOfStack[0].equals("int"), "IFNE: Integer operand expected");
+		source.iprintln("if ((" + topOfStack[1] + ") != 0)");
+		source.iprintln("\tgoto " + instruction.getLabel() + ";");
 	}
 
 	private void generateIFNONNULL(IndentedOutputStream source, InstructionIFNONNULL instruction)

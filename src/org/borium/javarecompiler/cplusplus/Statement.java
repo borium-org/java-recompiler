@@ -22,10 +22,21 @@ class Statement
 		this.executionContext = executionContext;
 	}
 
-	public void generateSource(IndentedOutputStream source)
+	/**
+	 * Generate C++ source code for the statement.
+	 *
+	 * @param source   Source output stream.
+	 * @param addLabel True if need to add label, false if statement is in this
+	 *                 class constructor to invoke base class constructor.
+	 */
+	public void generateSource(IndentedOutputStream source, boolean addLabel)
 	{
-		source.iprint("// L");
-		source.printHex(instructions.get(0).getAddress(), 4);
+		if (!addLabel)
+		{
+			source.iprint("// ");
+		}
+		source.print("L");
+		source.printHex(instructions.get(0).address, 4);
 		source.println(":");
 		for (Instruction instruction : instructions)
 		{

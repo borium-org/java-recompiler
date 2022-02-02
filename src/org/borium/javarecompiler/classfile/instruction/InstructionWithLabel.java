@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
+import static org.borium.javarecompiler.Statics.*;
+
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -37,6 +39,11 @@ abstract class InstructionWithLabel extends Instruction
 		stream.iprint(className + " L");
 		stream.printHex(address + offset, 4);
 		stream.println();
+	}
+
+	public String getLabel()
+	{
+		return "L" + hexString(address + offset, 4);
 	}
 
 	@Override
