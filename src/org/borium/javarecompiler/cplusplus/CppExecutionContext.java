@@ -520,7 +520,7 @@ public class CppExecutionContext extends ExecutionContext
 		int pos = arrayElementType.indexOf('*');
 		Assert(pos > 0, "JavaArray element is not a pointer");
 		arrayElementType = arrayElementType.substring(0, pos + 1);
-		String newEntry = arrayElementType + StackEntrySeparator + array[1] + "[" + index[1] + "]";
+		String newEntry = arrayElementType + StackEntrySeparator + array[1] + "->get(" + index[1] + ")";
 		stack.push(newEntry);
 	}
 
