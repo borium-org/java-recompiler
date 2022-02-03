@@ -557,7 +557,7 @@ public class CppExecutionContext extends ExecutionContext
 		{
 			source.iprintln("{");
 			source.indent(1);
-			source.iprintln("JavaArray<String*> *temp = new JavaArray<" + simpleType + "*>(" + length + ");");
+			source.iprintln("JavaArray<String*>* temp = new JavaArray<" + simpleType + "*>(" + length + ");");
 			String newEntry = "JavaArray<" + simpleType + "*>*" + StackEntrySeparator + "temp";
 			stack.push(newEntry);
 		}

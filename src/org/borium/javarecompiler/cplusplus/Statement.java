@@ -31,10 +31,7 @@ class Statement
 	 */
 	public void generateSource(IndentedOutputStream source, boolean addLabel)
 	{
-		if (!addLabel)
-		{
-			source.iprint("// ");
-		}
+		source.iprint(addLabel ? "" : "// ");
 		source.print("L");
 		source.printHex(instructions.get(0).address, 4);
 		source.println(":");
