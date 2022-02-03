@@ -17,11 +17,6 @@ public class InstructionASTORE extends InstructionWithLocalVariableIndex
 		super(index);
 	}
 
-	public int getIndex()
-	{
-		return index;
-	}
-
 	@Override
 	public int getStackDepthChange()
 	{

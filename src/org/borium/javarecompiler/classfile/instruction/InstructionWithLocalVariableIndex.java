@@ -37,6 +37,11 @@ abstract class InstructionWithLocalVariableIndex extends Instruction
 		stream.iprintln(className + " " + index);
 	}
 
+	public int getIndex()
+	{
+		return index;
+	}
+
 	@Override
 	public int length()
 	{
