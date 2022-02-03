@@ -42,7 +42,11 @@ public class ExecutionContext
 		{
 			String entryString = "";
 			String separator = "";
-			Assert(local.size() == 1, "Multiple locals not handled yet");
+			Assert(local.size() <= 1, "Multiple locals not handled yet");
+			if (local.size() == 0)
+			{
+				return "";
+			}
 			for (Entry<String, String> entry : local.entrySet())
 			{
 				entryString += entry.getKey() + StackEntrySeparator + entry.getValue() + separator;

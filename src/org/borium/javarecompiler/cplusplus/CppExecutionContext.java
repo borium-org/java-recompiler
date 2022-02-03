@@ -588,8 +588,18 @@ public class CppExecutionContext extends ExecutionContext
 		Assert(index >= 0 && index < maxLocals, "Local index out of range");
 		String[] local = locals[index].getEntry().split(SplitStackEntrySeparator);
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		Assert(local[0].equals(topOfStack[0]), "ASTORE: Type mismatch");
-		source.iprintln(local[1] + " = " + topOfStack[1] + ";");
+		if (local.length == 2)
+		{
+			Assert(local[0].equals(topOfStack[0]), "ASTORE: Type mismatch");
+			source.iprintln(local[1] + " = " + topOfStack[1] + ";");
+		}
+		else
+		{
+			locals[index].set(topOfStack[0], "local" + index);
+			String localType = topOfStack[0];
+			Assert(localType.endsWith("*"), "ASTORE: Local pointer expected");
+			source.iprintln(localType + " local" + index + " = " + topOfStack[1] + ";");
+		}
 		if (isStringArray)
 		{
 			source.indent(-1);
