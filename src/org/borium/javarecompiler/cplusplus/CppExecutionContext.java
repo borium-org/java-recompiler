@@ -512,7 +512,16 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateAALOAD(IndentedOutputStream source, InstructionAALOAD instruction)
 	{
-		notSupported(instruction);
+		String[] index = stack.pop().split(SplitStackEntrySeparator);
+		String[] array = stack.pop().split(SplitStackEntrySeparator);
+		Assert(array[0].startsWith("JavaArray<"), "AALOAD: Array expected");
+		Assert(index[0].equals("int"), "AALOAD: Integer index expected");
+		String arrayElementType = array[0].substring(10);
+		int pos = arrayElementType.indexOf('*');
+		Assert(pos > 0, "JavaArray element is not a pointer");
+		arrayElementType = arrayElementType.substring(0, pos + 1);
+		String newEntry = arrayElementType + StackEntrySeparator + array[1] + "[" + index[1] + "]";
+		stack.push(newEntry);
 	}
 
 	private void generateAASTORE(IndentedOutputStream source, InstructionAASTORE instruction)
@@ -858,7 +867,7 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateGOTO(IndentedOutputStream source, InstructionGOTO instruction)
 	{
-		notSupported(instruction);
+		source.iprintln("goto " + instruction.getLabel() + ";");
 	}
 
 	private void generateGOTO_W(IndentedOutputStream source, InstructionGOTO_W instruction)
@@ -1017,7 +1026,11 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateILOAD(IndentedOutputStream source, InstructionILOAD instruction)
 	{
-		notSupported(instruction);
+		int index = instruction.getIndex();
+		Assert(index >= 0 && index < maxLocals, "ILOAD index out of range");
+		Assert(locals[index] != null, "Local at " + index + " is null");
+		Assert(locals[index].getEntry().length() > 0, "Local at " + index + " is not available");
+		locals[index].push(getStack());
 	}
 
 	private void generateIMUL(IndentedOutputStream source, InstructionIMUL instruction)
@@ -1115,7 +1128,22 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateISTORE(IndentedOutputStream source, InstructionISTORE instruction)
 	{
-		notSupported(instruction);
+		int index = instruction.getIndex();
+		Assert(index >= 0 && index < maxLocals, "Local index out of range");
+		String[] local = locals[index].getEntry().split(SplitStackEntrySeparator);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		if (local.length == 2)
+		{
+			Assert(local[0].equals(topOfStack[0]), "ISTORE: Type mismatch");
+			source.iprintln(local[1] + " = " + topOfStack[1] + ";");
+			Assert(false, "");
+		}
+		else
+		{
+			locals[index].set(topOfStack[0], "local" + index);
+			Assert(topOfStack[0].equals("int"), "ISTORE: Integer expected");
+			source.iprintln("int local" + index + " = " + topOfStack[1] + ";");
+		}
 	}
 
 	private void generateISUB(IndentedOutputStream source, InstructionISUB instruction)
