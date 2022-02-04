@@ -41,6 +41,45 @@ public class Statics
 	}
 
 	/**
+	 * Parse Java method return type.
+	 *
+	 * @param javaMethodSignature Method signature.
+	 * @return Return type or null for void.
+	 */
+	public static String parseJavaReturnType(String javaMethodSignature)
+	{
+		int pos = javaMethodSignature.indexOf(')');
+		Assert(pos >= 1, "Method with no return type");
+		String type = javaMethodSignature.substring(pos + 1);
+		switch (type.charAt(0))
+		{
+		case 'B':
+			return "byte";
+		case 'C':
+			return "char";
+		case 'D':
+			return "double";
+		case 'F':
+			return "float";
+		case 'I':
+			return "int";
+		case 'J':
+			return "long";
+		case 'S':
+			return "short";
+		case 'Z':
+			return "bool";
+		case 'L':
+			Assert(false, "Unhandled class type " + type);
+		case 'V':
+			Assert(false, "Unhandled void type " + type);
+		default:
+			Assert(false, "Unhandled type " + type);
+		}
+		return null;
+	}
+
+	/**
 	 * Convenience method to remove trailing star from a pointer type.
 	 *
 	 * @param typeWithStar Pointer type with trailing star.

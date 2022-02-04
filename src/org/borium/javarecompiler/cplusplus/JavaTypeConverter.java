@@ -145,6 +145,8 @@ public class JavaTypeConverter
 			cppType += "void";
 			index++;
 			break;
+		default:
+			Assert(false, "Unhandled type " + javaType.charAt(index));
 		}
 		while (dimensions > 0)
 		{

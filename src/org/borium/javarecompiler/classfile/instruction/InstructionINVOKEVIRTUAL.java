@@ -42,6 +42,21 @@ public class InstructionINVOKEVIRTUAL extends Instruction
 		stream.iprintln(className + " " + methodClassName + "." + methodName);
 	}
 
+	public String getMethodClassName()
+	{
+		return methodClassName;
+	}
+
+	public String getMethodName()
+	{
+		return methodName;
+	}
+
+	public String getmethodSignature()
+	{
+		return nameType.getDescriptor();
+	}
+
 	@Override
 	public int getStackDepthChange()
 	{

@@ -1098,7 +1098,18 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateINVOKEVIRTUAL(IndentedOutputStream source, InstructionINVOKEVIRTUAL instruction)
 	{
-		notSupported(instruction);
+		String methodCppClass = javaToCppClass(instruction.getMethodClassName());
+		methodCppClass = cppClass.simplifyType(methodCppClass) + "*";
+		String methodName = instruction.getMethodName();
+		String methodSignature = instruction.getmethodSignature();
+		// TODO: parse parameter list
+		Assert(methodSignature.startsWith("()"), "INVOKEVIRTUAL: Parameters not supported yet");
+		String[] object = stack.pop().split(SplitStackEntrySeparator);
+		Assert(object[0].equals(methodCppClass), "INVOKEVIRTUAL: Object/method type mismatch");
+		String returnType = parseJavaReturnType(methodSignature);
+		String newEntry = returnType + StackEntrySeparator + //
+				object[1] + "->" + methodName + "()";
+		stack.push(newEntry);
 	}
 
 	private void generateIOR(IndentedOutputStream source, InstructionIOR instruction)
