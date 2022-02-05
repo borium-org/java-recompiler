@@ -112,6 +112,14 @@ public class JavaTypeConverter
 		parseSingleType(false);
 	}
 
+	/**
+	 * Parse a single type starting with javaType[index]. The type (and parameter if
+	 * allowed) is appended to cppType field.
+	 *
+	 * @param addParameter If true, the 'paramX' string is added to the type, where
+	 *                     'X' is the parameter number in the method signature. X
+	 *                     starts with 1 for regular methods and with 0 for statics.
+	 */
 	private void parseSingleType(boolean addParameter)
 	{
 		while (javaType.charAt(index) == '[')
