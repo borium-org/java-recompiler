@@ -74,6 +74,28 @@ public class CppClass
 	}
 
 	/**
+	 * Determine if the source type is assignable to the destination type.
+	 *
+	 * @param source      The type which we want to assign to destination.
+	 * @param destination The type to which source is assigned.
+	 * @return true if destination=source assignment is valid. Types must be equal,
+	 *         or destination is Object, or source must be derived from destination.
+	 */
+	public boolean isAssignable(String source, String destination)
+	{
+		if (source.equals(destination))
+		{
+			return true;
+		}
+		if (destination.equals("java::lang::Object*"))
+		{
+			return true;
+		}
+		Assert(false, "Check object inheritance tree");
+		return false;
+	}
+
+	/**
 	 * Write header and source files for the C++ class. All headers and sources are
 	 * in same output path, all namespaces in one folder.
 	 *
