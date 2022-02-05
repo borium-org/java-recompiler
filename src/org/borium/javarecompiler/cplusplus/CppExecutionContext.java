@@ -1102,13 +1102,28 @@ public class CppExecutionContext extends ExecutionContext
 		methodCppClass = cppClass.simplifyType(methodCppClass) + "*";
 		String methodName = instruction.getMethodName();
 		String methodSignature = instruction.getmethodSignature();
-		// TODO: parse parameter list
-		Assert(methodSignature.startsWith("()"), "INVOKEVIRTUAL: Parameters not supported yet");
+		String[] parameterTypes = new JavaTypeConverter(methodSignature, false).parseParameterTypes();
+		int parameterCount = parameterTypes.length;
+		String[] parameterValues = new String[parameterCount];
+		for (int i = 0; i < parameterCount; i++)
+		{
+			String[] stackEntry = stack.pop().split(SplitStackEntrySeparator);
+			parameterValues[i] = stackEntry[1];
+			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[i]), "Parameter type mismatch");
+		}
+		// More than 1 parameter - verify their order in stack
+		Assert(parameterCount <= 1, "More than 1 parameter");
 		String[] object = stack.pop().split(SplitStackEntrySeparator);
 		Assert(object[0].equals(methodCppClass), "INVOKEVIRTUAL: Object/method type mismatch");
 		String returnType = parseJavaReturnType(methodSignature);
-		String newEntry = returnType + StackEntrySeparator + //
-				object[1] + "->" + methodName + "()";
+		String newEntry = returnType + StackEntrySeparator + object[1] + "->" + methodName + "(";
+		String separator = "";
+		for (int i = 0; i < parameterCount; i++)
+		{
+			newEntry += separator + parameterValues[i];
+			separator = ", ";
+		}
+		newEntry += ")";
 		stack.push(newEntry);
 	}
 
