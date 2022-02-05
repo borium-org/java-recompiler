@@ -1004,9 +1004,19 @@ public class CppExecutionContext extends ExecutionContext
 	private void generateIFNE(IndentedOutputStream source, InstructionIFNE instruction)
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		Assert(topOfStack[0].equals("int"), "IFNE: Integer operand expected");
-		source.iprintln("if ((" + topOfStack[1] + ") != 0)");
-		source.iprintln("\tgoto " + instruction.getLabel() + ";");
+		switch (topOfStack[0])
+		{
+		case "int":
+			source.iprintln("if ((" + topOfStack[1] + ") != 0)");
+			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			break;
+		case "bool":
+			source.iprintln("if (" + topOfStack[1] + ")");
+			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			break;
+		default:
+			Assert(false, "IFNE: Unhandled operand type " + topOfStack[0]);
+		}
 	}
 
 	private void generateIFNONNULL(IndentedOutputStream source, InstructionIFNONNULL instruction)
