@@ -83,11 +83,14 @@ public class CppClass
 	 */
 	public boolean isAssignable(String source, String destination)
 	{
+		// Some types may be simplified, so simplify them both
+		source = simplifyType(source);
+		destination = simplifyType(destination);
 		if (source.equals(destination))
 		{
 			return true;
 		}
-		if (destination.equals("java::lang::Object*"))
+		if (destination.equals("Object*"))
 		{
 			return true;
 		}

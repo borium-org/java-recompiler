@@ -72,7 +72,7 @@ public class Statics
 		case 'L':
 			Assert(false, "Unhandled class type " + type);
 		case 'V':
-			Assert(false, "Unhandled void type " + type);
+			return "void";
 		default:
 			Assert(false, "Unhandled type " + type);
 		}

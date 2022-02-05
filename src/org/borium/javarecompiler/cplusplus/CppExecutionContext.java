@@ -907,7 +907,12 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateIADD(IndentedOutputStream source, InstructionIADD instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		Assert(left[0].equals("int"), "IADD: Integer expected");
+		Assert(right[0].equals("int"), "IADD: Integer expected");
+		String newEntry = "int" + StackEntrySeparator + "(" + left[1] + ") + (" + right[1] + ")";
+		stack.push(newEntry);
 	}
 
 	private void generateIALOAD(IndentedOutputStream source, InstructionIALOAD instruction)
@@ -1134,7 +1139,14 @@ public class CppExecutionContext extends ExecutionContext
 			separator = ", ";
 		}
 		newEntry += ")";
-		stack.push(newEntry);
+		if (returnType.equals("void"))
+		{
+			source.iprintln(newEntry.substring(5) + ";");
+		}
+		else
+		{
+			stack.push(newEntry);
+		}
 	}
 
 	private void generateIOR(IndentedOutputStream source, InstructionIOR instruction)
