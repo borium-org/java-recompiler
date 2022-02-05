@@ -1285,7 +1285,18 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateLOOKUPSWITCH(IndentedOutputStream source, InstructionLOOKUPSWITCH instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(topOfStack[0].equals("int"), "LOOKUPSWITCH: Integer expected");
+		source.iprintln("switch (" + topOfStack[1] + ")");
+		source.iprintln("{");
+		for (int i = 0; i < instruction.getCaseCount(); i++)
+		{
+			source.iprintln("case 0x" + hexString(instruction.getMatch(i), 8) + ":");
+			source.iprintln("\tgoto " + instruction.getLabel(i) + ";");
+		}
+		source.iprintln("default:");
+		source.iprintln("\tgoto " + instruction.getDefaultLabel() + ";");
+		source.iprintln("}");
 	}
 
 	private void generateLOR(IndentedOutputStream source, InstructionLOR instruction)
@@ -1397,8 +1408,7 @@ public class CppExecutionContext extends ExecutionContext
 				Assert(false, "Don't know what is going on yet");
 			}
 		}
-		source.iprint("");
-		source.print(object[1] + "->");
+		source.iprint(object[1] + "->");
 		source.println(field.getName() + " = " + value[1] + ";");
 	}
 
