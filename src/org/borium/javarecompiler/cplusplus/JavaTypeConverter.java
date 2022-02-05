@@ -2,6 +2,8 @@ package org.borium.javarecompiler.cplusplus;
 
 import static org.borium.javarecompiler.Statics.*;
 
+import java.util.*;
+
 /**
  * Class to convert from Java types to C++ types. All C++ classes are fully
  * qualified in here, and they will have to be converted to simple class names
@@ -42,6 +44,21 @@ public class JavaTypeConverter
 			parseSingleType(false);
 		}
 		return cppType;
+	}
+
+	public String[] parseParameterTypes()
+	{
+		Assert(javaType.startsWith("("), "Need a method signature");
+		ArrayList<String> parameterTypes = new ArrayList<>();
+		index++;
+
+		while (javaType.charAt(index) != ')')
+		{
+			cppType = "";
+			parseSingleType(false);
+			parameterTypes.add(cppType);
+		}
+		return parameterTypes.toArray(new String[parameterTypes.size()]);
 	}
 
 	private void parseClass()
