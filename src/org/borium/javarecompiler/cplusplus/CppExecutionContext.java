@@ -873,7 +873,8 @@ public class CppExecutionContext extends ExecutionContext
 		String fieldName = instruction.getFieldName();
 		String fieldType = new JavaTypeConverter(instruction.getFieldType(), true).getCppType();
 		fieldType = cppClass.simplifyType(fieldType);
-		String newEntry = fieldType + StackEntrySeparator + className + "::" + fieldName;
+		String newEntry = fieldType + StackEntrySeparator + //
+				"GetStatic(" + className + "::ClassInit, " + className + "::" + fieldName + ")";
 		stack.push(newEntry);
 	}
 
