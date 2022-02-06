@@ -619,7 +619,10 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateATHROW(IndentedOutputStream source, InstructionATHROW instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(topOfStack[0].endsWith("*"), "ATHROW: Reference expected");
+		Assert(cppClass.isAssignable(topOfStack[0], "java::lang::Exception*"), "ATHROW: Not an exception thrown");
+		source.iprintln("throw " + topOfStack[1] + ";");
 	}
 
 	private void generateBALOAD(IndentedOutputStream source, InstructionBALOAD instruction)
@@ -1143,6 +1146,10 @@ public class CppExecutionContext extends ExecutionContext
 		Assert(parameterCount <= 1, "More than 1 parameter");
 		String[] object = stack.pop().split(SplitStackEntrySeparator);
 		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEVIRTUAL: Object/method type mismatch");
+		if (object[1].startsWith("new "))
+		{
+			object[1] = "(" + object[1] + ")";
+		}
 		String returnType = parseJavaReturnType(methodDescriptor);
 		String newEntry = returnType + StackEntrySeparator + object[1] + "->" + methodName + "(";
 		newEntry += commaSeparatedList(parameterValues);
