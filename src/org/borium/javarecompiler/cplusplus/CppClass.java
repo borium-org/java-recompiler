@@ -86,6 +86,15 @@ public class CppClass
 		// Some types may be simplified, so simplify them both
 		source = simplifyType(source);
 		destination = simplifyType(destination);
+		// In some cases types may have a space between type and '*'
+		if (source.endsWith(" *"))
+		{
+			source = source.substring(0, source.length() - 2) + "*";
+		}
+		if (destination.endsWith(" *"))
+		{
+			destination = destination.substring(0, destination.length() - 2) + "*";
+		}
 		if (source.equals(destination))
 		{
 			return true;

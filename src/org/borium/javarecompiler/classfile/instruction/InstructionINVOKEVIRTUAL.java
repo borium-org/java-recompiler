@@ -52,7 +52,7 @@ public class InstructionINVOKEVIRTUAL extends Instruction
 		return methodName;
 	}
 
-	public String getmethodSignature()
+	public String getmethodDescriptor()
 	{
 		return nameType.getDescriptor();
 	}

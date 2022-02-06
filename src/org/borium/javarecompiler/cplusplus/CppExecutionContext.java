@@ -41,7 +41,7 @@ public class CppExecutionContext extends ExecutionContext
 		{
 			locals[0].set(classType, "this");
 		}
-		parseParameters();
+		parseParameters(javaMethod.isStatic() ? 0 : 1);
 	}
 
 	public void generate(IndentedOutputStream source, Instruction instruction)
@@ -1079,31 +1079,44 @@ public class CppExecutionContext extends ExecutionContext
 	 */
 	private void generateINVOKESPECIAL(IndentedOutputStream source, InstructionINVOKESPECIAL instruction)
 	{
+		String methodDescriptor = instruction.getMethodDescriptor();
+		Assert(methodDescriptor.endsWith(")V"), "Constructor must be void");
+		String[] parameterTypes = new JavaTypeConverter(methodDescriptor, false).parseParameterTypes();
+		int parameterCount = parameterTypes.length;
+		String[] parameterValues = new String[parameterCount];
+		for (int i = 0; i < parameterCount; i++)
+		{
+			String[] stackEntry = stack.pop().split(SplitStackEntrySeparator);
+			parameterValues[parameterCount - 1 - i] = stackEntry[1];
+			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[i]), "Parameter type mismatch");
+		}
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
 		String methodClassName = javaToCppClass(instruction.getMethodClassName());
 		String methodName = instruction.getMethodName();
-		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
 		// 1. We are invoking the constructor of the base class from constructor of
 		// derived class? This statement is generated from special context of declaring
 		// a constructor for the derived class.
-		if (methodName.equals("<init>") && topOfStack[0].equals(classType) && topOfStack[1].equals("this")
+		Assert(methodName.equals("<init>"), "INVOKESPECIAL: <init> expected");
+		if (topOfStack[0].equals(classType) && topOfStack[1].equals("this")
 				&& methodClassName.equals(cppClass.parentClassName))
 		{
 			String simpleBaseClassName = cppClass.simplifyType(methodClassName);
-			String descriptor = instruction.getMethodDescriptor();
-			Assert(descriptor.startsWith("()"), "Super constructor parameter list not supported");
-			source.iprintln(simpleBaseClassName + "()");
+			String ctor = simpleBaseClassName + "(";
+			ctor += commaSeparatedList(parameterValues);
+			ctor += ")";
+			source.iprintln(ctor);
+			return;
 		}
-		else
-		{
-			String newClassName = cppClass.simplifyType(javaToCppClass(instruction.getMethodClassName()));
-			Assert(topOfStack[0].equals(newClassName + "*") && topOfStack[1].equals("new"), "Bad stack top");
-			Assert(instruction.getMethodDescriptor().equals("()V"), "Constructor with parameters not supported");
-			String[] dupInStack = stack.pop().split(SplitStackEntrySeparator);
-			Assert(dupInStack[0].equals(newClassName + "*") && dupInStack[1].equals("new"), "Bad stack DUP");
-			String newStackTop = dupInStack[0] + StackEntrySeparator + "new "
-					+ dupInStack[0].substring(0, dupInStack[0].length() - 1) + "()";
-			stack.push(newStackTop);
-		}
+		// 2. This is some other constructor
+		methodClassName = cppClass.simplifyType(methodClassName);
+		Assert(topOfStack[0].equals(methodClassName + "*") && topOfStack[1].equals("new"), "Bad stack top");
+		String[] dupInStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(dupInStack[0].equals(methodClassName + "*") && dupInStack[1].equals("new"), "Bad stack DUP");
+		String newStackTop = dupInStack[0] + StackEntrySeparator + "new ";
+		newStackTop += dupInStack[0].substring(0, dupInStack[0].length() - 1) + "(";
+		newStackTop += commaSeparatedList(parameterValues);
+		newStackTop += ")";
+		stack.push(newStackTop);
 	}
 
 	private void generateINVOKESTATIC(IndentedOutputStream source, InstructionINVOKESTATIC instruction)
@@ -1116,28 +1129,23 @@ public class CppExecutionContext extends ExecutionContext
 		String methodCppClass = javaToCppClass(instruction.getMethodClassName());
 		methodCppClass = cppClass.simplifyType(methodCppClass) + "*";
 		String methodName = instruction.getMethodName();
-		String methodSignature = instruction.getmethodSignature();
-		String[] parameterTypes = new JavaTypeConverter(methodSignature, false).parseParameterTypes();
+		String methodDescriptor = instruction.getmethodDescriptor();
+		String[] parameterTypes = new JavaTypeConverter(methodDescriptor, false).parseParameterTypes();
 		int parameterCount = parameterTypes.length;
 		String[] parameterValues = new String[parameterCount];
 		for (int i = 0; i < parameterCount; i++)
 		{
 			String[] stackEntry = stack.pop().split(SplitStackEntrySeparator);
-			parameterValues[i] = stackEntry[1];
+			parameterValues[parameterCount - 1 - i] = stackEntry[1];
 			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[i]), "Parameter type mismatch");
 		}
 		// More than 1 parameter - verify their order in stack
 		Assert(parameterCount <= 1, "More than 1 parameter");
 		String[] object = stack.pop().split(SplitStackEntrySeparator);
-		Assert(object[0].equals(methodCppClass), "INVOKEVIRTUAL: Object/method type mismatch");
-		String returnType = parseJavaReturnType(methodSignature);
+		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEVIRTUAL: Object/method type mismatch");
+		String returnType = parseJavaReturnType(methodDescriptor);
 		String newEntry = returnType + StackEntrySeparator + object[1] + "->" + methodName + "(";
-		String separator = "";
-		for (int i = 0; i < parameterCount; i++)
-		{
-			newEntry += separator + parameterValues[i];
-			separator = ", ";
-		}
+		newEntry += commaSeparatedList(parameterValues);
 		newEntry += ")";
 		if (returnType.equals("void"))
 		{
@@ -1501,23 +1509,20 @@ public class CppExecutionContext extends ExecutionContext
 		Assert(false, "Instruction " + opcode + " execution not supported");
 	}
 
-	private void parseParameters()
+	/**
+	 * Parse the parameter list for the method we are processing at this time.
+	 *
+	 * @param startingIndex 0 for statics, 1 otherwise, with 0 reserved for 'this'.
+	 */
+	private void parseParameters(int startingIndex)
 	{
 		// Skip starting '(', we're in the method
-		String parameterList = cppType.substring(1);
-		for (int i = 0; i < maxLocals; i++)
+		String[] parameterTypes = new JavaTypeConverter(type, false).parseParameterTypes();
+		for (int i = 0; i < parameterTypes.length; i++)
 		{
-			int parameterPos = parameterList.indexOf("param" + i);
-			if (parameterPos != -1)
-			{
-				String parameterType = parameterList.substring(0, parameterPos);
-				parameterType = cppClass.simplifyType(parameterType);
-				if (parameterType.endsWith("*"))
-				{
-					parameterType = parameterType.substring(0, parameterType.length() - 2) + "*";
-				}
-				locals[i].set(parameterType, "param" + i);
-			}
+			String parameterType = parameterTypes[i];
+			parameterType = cppClass.simplifyType(parameterType);
+			locals[i + startingIndex].set(parameterType, "param" + i);
 		}
 	}
 }

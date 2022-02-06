@@ -1,5 +1,7 @@
 package org.borium.javarecompiler;
 
+import org.borium.javarecompiler.cplusplus.*;
+
 /**
  * Helper class with various static methods to reduce clutter.
  */
@@ -11,6 +13,18 @@ public class Statics
 		{
 			throw new RuntimeException(errorMessage);
 		}
+	}
+
+	public static String commaSeparatedList(String[] values)
+	{
+		String result = "";
+		String separator = "";
+		for (String param : values)
+		{
+			result += separator + param;
+			separator = ", ";
+		}
+		return result;
 	}
 
 	/**
@@ -70,7 +84,7 @@ public class Statics
 		case 'Z':
 			return "bool";
 		case 'L':
-			Assert(false, "Unhandled class type " + type);
+			return new JavaTypeConverter(type, false).getCppType();
 		case 'V':
 			return "void";
 		default:
