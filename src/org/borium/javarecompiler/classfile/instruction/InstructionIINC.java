@@ -37,10 +37,20 @@ public class InstructionIINC extends Instruction
 		stream.iprintln(className + " " + index + " " + constant);
 	}
 
+	public int getIndex()
+	{
+		return index;
+	}
+
 	@Override
 	public int getStackDepthChange()
 	{
 		return 0;
+	}
+
+	public int getValue()
+	{
+		return constant;
 	}
 
 	@Override

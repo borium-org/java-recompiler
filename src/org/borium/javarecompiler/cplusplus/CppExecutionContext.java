@@ -976,7 +976,12 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateIF_ICMPLT(IndentedOutputStream source, InstructionIF_ICMPLT instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		Assert(left[0].equals("int"), "IF_ICMLPT: Integer expected");
+		Assert(right[0].equals("int"), "IF_ICMLPT: Integer expected");
+		source.iprintln("if ((" + left[1] + ") < (" + right[1] + "))");
+		source.iprintln("\tgoto " + instruction.getLabel() + ";");
 	}
 
 	private void generateIF_ICMPNE(IndentedOutputStream source, InstructionIF_ICMPNE instruction)
@@ -1039,7 +1044,7 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateIINC(IndentedOutputStream source, InstructionIINC instruction)
 	{
-		notSupported(instruction);
+		source.iprintln("local" + instruction.getIndex() + " += " + instruction.getValue() + ";");
 	}
 
 	private void generateILOAD(IndentedOutputStream source, InstructionILOAD instruction)
