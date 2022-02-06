@@ -36,10 +36,10 @@ public class CppExecutionContext extends ExecutionContext
 		this.cppClass = cppClass;
 		this.cppMethod = cppMethod;
 		cppType = new JavaTypeConverter(type, javaMethod.isStatic()).getCppType();
-		classType = cppClass.namespace + "::" + cppClass.className;
+		classType = cppClass.namespace + "::" + cppClass.className + "*";
 		if (!javaMethod.isStatic())
 		{
-			locals[0].set(classType, "this");
+			locals[0].set(cppClass.simplifyType(classType), "this");
 		}
 		parseParameters(javaMethod.isStatic() ? 0 : 1);
 	}
@@ -607,6 +607,7 @@ public class CppExecutionContext extends ExecutionContext
 			locals[index].set(topOfStack[0], "local" + index);
 			String localType = topOfStack[0];
 			Assert(localType.endsWith("*"), "ASTORE: Local pointer expected");
+			localType = cppClass.simplifyType(localType);
 			source.iprintln(localType + " local" + index + " = " + topOfStack[1] + ";");
 		}
 		if (isStringArray)
@@ -1120,7 +1121,7 @@ public class CppExecutionContext extends ExecutionContext
 		// derived class? This statement is generated from special context of declaring
 		// a constructor for the derived class.
 		Assert(methodName.equals("<init>"), "INVOKESPECIAL: <init> expected");
-		if (topOfStack[0].equals(classType) && topOfStack[1].equals("this")
+		if (topOfStack[0].equals(cppClass.simplifyType(classType)) && topOfStack[1].equals("this")
 				&& methodClassName.equals(cppClass.parentClassName))
 		{
 			String simpleBaseClassName = cppClass.simplifyType(methodClassName);
@@ -1463,7 +1464,7 @@ public class CppExecutionContext extends ExecutionContext
 	{
 		String[] value = stack.pop().split(SplitStackEntrySeparator);
 		String[] object = stack.pop().split(SplitStackEntrySeparator);
-		Assert(object[0].equals(cppClass.getFullClassName()) && object[1].equals("this"),
+		Assert(object[0].equals(cppClass.simplifyType(cppClass.getFullClassName() + "*")) && object[1].equals("this"),
 				"Assigning to non-this class " + object[0] + " field " + instruction.getFieldName());
 		CppField field = cppClass.getField(instruction.getFieldName());
 		String fieldType = new JavaTypeConverter(instruction.getFieldType(), false).getCppType();
