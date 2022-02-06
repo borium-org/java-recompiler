@@ -103,6 +103,12 @@ public class CppClass
 		{
 			return true;
 		}
+		String assign = source + "=" + destination;
+		switch (assign)
+		{
+		case "RuntimeException*=Exception*":
+			return true;
+		}
 		Assert(false, "Check object inheritance tree");
 		return false;
 	}
