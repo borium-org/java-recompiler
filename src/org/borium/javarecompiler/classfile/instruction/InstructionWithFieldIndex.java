@@ -36,6 +36,11 @@ abstract class InstructionWithFieldIndex extends Instruction
 		stream.iprintln(className + " " + fieldName + " " + fieldType);
 	}
 
+	public String getClassName()
+	{
+		return "L" + fieldref.getClassName() + ";";
+	}
+
 	public String getFieldName()
 	{
 		return fieldName;

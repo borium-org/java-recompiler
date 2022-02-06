@@ -865,7 +865,16 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateGETSTATIC(IndentedOutputStream source, InstructionGETSTATIC instruction)
 	{
-		notSupported(instruction);
+		String className = new JavaTypeConverter(instruction.getClassName(), true).getCppType();
+		className = cppClass.simplifyType(className);
+		// remove star for static access
+		Assert(className.endsWith("*"), "GETSTATIC: * expected");
+		className = className.substring(0, className.length() - 1);
+		String fieldName = instruction.getFieldName();
+		String fieldType = new JavaTypeConverter(instruction.getFieldType(), true).getCppType();
+		fieldType = cppClass.simplifyType(fieldType);
+		String newEntry = fieldType + StackEntrySeparator + className + "::" + fieldName;
+		stack.push(newEntry);
 	}
 
 	private void generateGOTO(IndentedOutputStream source, InstructionGOTO instruction)
@@ -1348,7 +1357,7 @@ public class CppExecutionContext extends ExecutionContext
 		source.iprintln("{");
 		for (int i = 0; i < instruction.getCaseCount(); i++)
 		{
-			source.iprintln("case 0x" + hexString(instruction.getMatch(i), 8) + ":");
+			source.iprintln("case (int) 0x" + hexString(instruction.getMatch(i), 8) + ":");
 			source.iprintln("\tgoto " + instruction.getLabel(i) + ";");
 		}
 		source.iprintln("default:");
