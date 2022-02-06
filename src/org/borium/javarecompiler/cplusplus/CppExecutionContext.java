@@ -860,7 +860,12 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generateGETFIELD(IndentedOutputStream source, InstructionGETFIELD instruction)
 	{
-		notSupported(instruction);
+		String[] object = stack.pop().split(SplitStackEntrySeparator);
+		String fieldName = instruction.getFieldName();
+		String fieldType = new JavaTypeConverter(instruction.getFieldType(), true).getCppType();
+		fieldType = cppClass.simplifyType(fieldType);
+		String newEntry = fieldType + StackEntrySeparator + object[1] + "->" + fieldName;
+		stack.push(newEntry);
 	}
 
 	private void generateGETSTATIC(IndentedOutputStream source, InstructionGETSTATIC instruction)
@@ -1445,7 +1450,8 @@ public class CppExecutionContext extends ExecutionContext
 
 	private void generatePOP(IndentedOutputStream source, InstructionPOP instruction)
 	{
-		notSupported(instruction);
+		String[] value = stack.pop().split(SplitStackEntrySeparator);
+		source.iprintln(value[1] + ";");
 	}
 
 	private void generatePOP2(IndentedOutputStream source, InstructionPOP2 instruction)
@@ -1544,7 +1550,7 @@ public class CppExecutionContext extends ExecutionContext
 		{
 			String parameterType = parameterTypes[i];
 			parameterType = cppClass.simplifyType(parameterType);
-			locals[i + startingIndex].set(parameterType, "param" + i);
+			locals[i + startingIndex].set(parameterType, "param" + (i + startingIndex));
 		}
 	}
 }
