@@ -9,7 +9,7 @@ import org.borium.javarecompiler.classfile.instruction.*;
 /**
  * C++-specific version of the execution context.
  */
-public class CppExecutionContext extends ExecutionContext
+public class CppExecutionContext extends ExecutionContext implements ClassTypeSimplifier
 {
 	/** C++ equivalent of method type. */
 	String cppType;
@@ -33,6 +33,10 @@ public class CppExecutionContext extends ExecutionContext
 	protected CppExecutionContext(CppMethod cppMethod, CppClass cppClass, ClassMethod javaMethod)
 	{
 		super(javaMethod);
+		for (int i = 0; i < maxLocals; i++)
+		{
+			locals[i] = new LocalVariable(this);
+		}
 		this.cppClass = cppClass;
 		this.cppMethod = cppMethod;
 		cppType = new JavaTypeConverter(type, javaMethod.isStatic()).getCppType();
@@ -508,6 +512,12 @@ public class CppExecutionContext extends ExecutionContext
 		default:
 			System.out.println("Instruction " + opcode + " execution not supported");
 		}
+	}
+
+	@Override
+	public String typeSimplifier(String type)
+	{
+		return cppClass.simplifyType(type);
 	}
 
 	private void generateAALOAD(IndentedOutputStream source, InstructionAALOAD instruction)
@@ -1160,11 +1170,10 @@ public class CppExecutionContext extends ExecutionContext
 		for (int i = 0; i < parameterCount; i++)
 		{
 			String[] stackEntry = stack.pop().split(SplitStackEntrySeparator);
-			parameterValues[parameterCount - 1 - i] = stackEntry[1];
-			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[i]), "Parameter type mismatch");
+			int parameterIndex = parameterCount - 1 - i;
+			parameterValues[parameterIndex] = stackEntry[1];
+			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[parameterIndex]), "Parameter type mismatch");
 		}
-		// More than 1 parameter - verify their order in stack
-		Assert(parameterCount <= 1, "More than 1 parameter");
 		String[] object = stack.pop().split(SplitStackEntrySeparator);
 		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEVIRTUAL: Object/method type mismatch");
 		if (object[1].startsWith("new "))
@@ -1172,6 +1181,7 @@ public class CppExecutionContext extends ExecutionContext
 			object[1] = "(" + object[1] + ")";
 		}
 		String returnType = parseJavaReturnType(methodDescriptor);
+		returnType = cppClass.simplifyType(returnType);
 		String newEntry = returnType + StackEntrySeparator + object[1] + "->" + methodName + "(";
 		newEntry += commaSeparatedList(parameterValues);
 		newEntry += ")";

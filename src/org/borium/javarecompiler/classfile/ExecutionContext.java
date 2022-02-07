@@ -31,6 +31,14 @@ public class ExecutionContext
 		/** Map to associate type and name. */
 		private HashMap<String, String> local = new HashMap<>();
 
+		/** A simplifier that will be applied to type when type is stored. */
+		private ClassTypeSimplifier simplifier;
+
+		public LocalVariable(ClassTypeSimplifier simplifier)
+		{
+			this.simplifier = simplifier;
+		}
+
 		/**
 		 * Make a single string for the entry that contains one or more local variable
 		 * options.
@@ -72,6 +80,7 @@ public class ExecutionContext
 		public void set(String cppType, String variable)
 		{
 			Assert(local.size() == 0, "set(): Locals map must be empty");
+			simplifier.typeSimplifier(cppType);
 			local.put(cppType, variable);
 		}
 	}
@@ -118,10 +127,6 @@ public class ExecutionContext
 		instructions = code.getInstructions();
 		maxLocals = code.getLocalsCount();
 		locals = new LocalVariable[maxLocals];
-		for (int i = 0; i < maxLocals; i++)
-		{
-			locals[i] = new LocalVariable();
-		}
 	}
 
 	public Stack<String> getStack()

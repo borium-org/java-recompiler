@@ -107,6 +107,7 @@ public class CppClass
 		switch (assign)
 		{
 		case "RuntimeException*=Exception*":
+		case "ArrayList*=List*":
 			return true;
 		}
 		Assert(false, "Check object inheritance tree");
