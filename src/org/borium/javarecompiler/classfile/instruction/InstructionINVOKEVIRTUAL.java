@@ -32,7 +32,7 @@ public class InstructionINVOKEVIRTUAL extends Instruction
 		classInfo = cp.get(methodref.classIndex, ConstantClassInfo.class);
 		nameType = cp.get(methodref.nameAndTypeIndex, ConstantNameAndTypeInfo.class);
 		methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
-		methodName = cp.getString(nameType.nameIndex);
+		methodName = nameType.getName();
 	}
 
 	@Override
@@ -40,6 +40,21 @@ public class InstructionINVOKEVIRTUAL extends Instruction
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
 		stream.iprintln(className + " " + methodClassName + "." + methodName);
+	}
+
+	public String getMethodClassName()
+	{
+		return methodClassName;
+	}
+
+	public String getMethodName()
+	{
+		return methodName;
+	}
+
+	public String getmethodDescriptor()
+	{
+		return nameType.getDescriptor();
 	}
 
 	@Override

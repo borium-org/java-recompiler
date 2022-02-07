@@ -25,7 +25,7 @@ public class ConstantNameAndTypeInfo extends Constant
 	 * structure (4.4.7) representing either a valid unqualified name denoting a
 	 * field or method (4.2.2), or the special method name <init> (2.9.1).
 	 */
-	public int nameIndex;
+	private int nameIndex;
 
 	/**
 	 * The value of the descriptor_index item must be a valid index into the

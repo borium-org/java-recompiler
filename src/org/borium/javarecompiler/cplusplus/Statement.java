@@ -22,10 +22,18 @@ class Statement
 		this.executionContext = executionContext;
 	}
 
-	public void generateSource(IndentedOutputStream source)
+	/**
+	 * Generate C++ source code for the statement.
+	 *
+	 * @param source   Source output stream.
+	 * @param addLabel True if need to add label, false if statement is in this
+	 *                 class constructor to invoke base class constructor.
+	 */
+	public void generateSource(IndentedOutputStream source, boolean addLabel)
 	{
-		source.iprint("// L");
-		source.printHex(instructions.get(0).getAddress(), 4);
+		source.iprint(addLabel ? "" : "// ");
+		source.print("L");
+		source.printHex(instructions.get(0).address, 4);
 		source.println(":");
 		for (Instruction instruction : instructions)
 		{
@@ -54,7 +62,7 @@ class Statement
 		{
 			for (int i = 0; i < stack.size(); i++)
 			{
-				source.iprintln("//\t\t\t\tstack[" + i + "]=" + stack.elementAt(i));
+				source.iprintln("//\t\t\t\tstack[" + i + "]: " + stack.elementAt(i));
 			}
 		}
 	}

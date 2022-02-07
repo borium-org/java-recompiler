@@ -45,6 +45,11 @@ public class ConstantFieldrefInfo extends Constant
 
 	private ConstantNameAndTypeInfo nameTypeInfo;
 
+	public String getClassName()
+	{
+		return classInfo.getName();
+	}
+
 	@Override
 	protected void dump(IndentedOutputStream stream)
 	{

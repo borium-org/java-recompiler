@@ -2,6 +2,8 @@ package org.borium.javarecompiler.cplusplus;
 
 import static org.borium.javarecompiler.Statics.*;
 
+import java.util.*;
+
 /**
  * Class to convert from Java types to C++ types. All C++ classes are fully
  * qualified in here, and they will have to be converted to simple class names
@@ -42,6 +44,21 @@ public class JavaTypeConverter
 			parseSingleType(false);
 		}
 		return cppType;
+	}
+
+	public String[] parseParameterTypes()
+	{
+		Assert(javaType.startsWith("("), "Need a method signature");
+		ArrayList<String> parameterTypes = new ArrayList<>();
+		index++;
+
+		while (javaType.charAt(index) != ')')
+		{
+			cppType = "";
+			parseSingleType(false);
+			parameterTypes.add(cppType);
+		}
+		return parameterTypes.toArray(new String[parameterTypes.size()]);
 	}
 
 	private void parseClass()
@@ -95,6 +112,14 @@ public class JavaTypeConverter
 		parseSingleType(false);
 	}
 
+	/**
+	 * Parse a single type starting with javaType[index]. The type (and parameter if
+	 * allowed) is appended to cppType field.
+	 *
+	 * @param addParameter If true, the 'paramX' string is added to the type, where
+	 *                     'X' is the parameter number in the method signature. X
+	 *                     starts with 1 for regular methods and with 0 for statics.
+	 */
 	private void parseSingleType(boolean addParameter)
 	{
 		while (javaType.charAt(index) == '[')
@@ -145,6 +170,8 @@ public class JavaTypeConverter
 			cppType += "void";
 			index++;
 			break;
+		default:
+			Assert(false, "Unhandled type " + javaType.charAt(index));
 		}
 		while (dimensions > 0)
 		{

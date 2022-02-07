@@ -26,4 +26,9 @@ public class InstructionICONST extends Instruction
 	{
 		return 1;
 	}
+
+	public int getValue()
+	{
+		return value;
+	}
 }

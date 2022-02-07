@@ -16,21 +16,39 @@ abstract class InstructionWithFieldIndex extends Instruction
 
 	private ConstantNameAndTypeInfo nameType;
 
-	private String name;
+	private String fieldName;
+
+	private String fieldType;
 
 	public InstructionWithFieldIndex(ByteInputStream in, ConstantPool cp)
 	{
 		index = in.u2();
 		fieldref = cp.get(index, ConstantFieldrefInfo.class);
 		nameType = cp.get(fieldref.nameAndTypeIndex, ConstantNameAndTypeInfo.class);
-		name = cp.getString(nameType.nameIndex);
+		fieldName = nameType.getName();
+		fieldType = nameType.getDescriptor();
 	}
 
 	@Override
 	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		stream.iprintln(className + " " + index + " " + name);
+		stream.iprintln(className + " " + fieldName + " " + fieldType);
+	}
+
+	public String getClassName()
+	{
+		return "L" + fieldref.getClassName() + ";";
+	}
+
+	public String getFieldName()
+	{
+		return fieldName;
+	}
+
+	public String getFieldType()
+	{
+		return fieldType;
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
+import static org.borium.javarecompiler.Statics.*;
+
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -54,6 +56,7 @@ public class InstructionLOOKUPSWITCH extends Instruction
 		{
 			labels[address + offs] = true;
 		}
+		labels[address + defaultLabel] = true;
 	}
 
 	@Override
@@ -74,6 +77,26 @@ public class InstructionLOOKUPSWITCH extends Instruction
 			stream.println();
 		}
 		stream.indent(-1);
+	}
+
+	public int getCaseCount()
+	{
+		return match.length;
+	}
+
+	public String getDefaultLabel()
+	{
+		return "L" + hexString(address + defaultLabel, 4);
+	}
+
+	public String getLabel(int index)
+	{
+		return "L" + hexString(address + offset[index], 4);
+	}
+
+	public int getMatch(int index)
+	{
+		return match[index];
 	}
 
 	@Override

@@ -51,6 +51,11 @@ public class InstructionLDC extends Instruction
 		}
 	}
 
+	public Constant getConstant()
+	{
+		return c;
+	}
+
 	@Override
 	public int getStackDepthChange()
 	{

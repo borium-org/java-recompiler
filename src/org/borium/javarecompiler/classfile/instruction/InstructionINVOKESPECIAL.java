@@ -33,7 +33,7 @@ public class InstructionINVOKESPECIAL extends Instruction
 		classInfo = cp.get(methodref.classIndex, ConstantClassInfo.class);
 		nameType = cp.get(methodref.nameAndTypeIndex, ConstantNameAndTypeInfo.class);
 		methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
-		methodName = cp.getString(nameType.nameIndex);
+		methodName = nameType.getName();
 	}
 
 	@Override

@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.cplusplus;
 
+import static org.borium.javarecompiler.Statics.*;
+
 import java.io.*;
 import java.util.*;
 
@@ -51,6 +53,65 @@ public class CppClass
 		extractNamespaces();
 		extractFields();
 		extractMethods();
+	}
+
+	public CppField getField(String fieldName)
+	{
+		for (CppField field : fields)
+		{
+			if (field.getName().equals(fieldName))
+			{
+				return field;
+			}
+		}
+		Assert(false, "Field " + fieldName + " not found");
+		return null;
+	}
+
+	public String getFullClassName()
+	{
+		return namespace + "::" + className;
+	}
+
+	/**
+	 * Determine if the source type is assignable to the destination type.
+	 *
+	 * @param source      The type which we want to assign to destination.
+	 * @param destination The type to which source is assigned.
+	 * @return true if destination=source assignment is valid. Types must be equal,
+	 *         or destination is Object, or source must be derived from destination.
+	 */
+	public boolean isAssignable(String source, String destination)
+	{
+		// Some types may be simplified, so simplify them both
+		source = simplifyType(source);
+		destination = simplifyType(destination);
+		// In some cases types may have a space between type and '*'
+		if (source.endsWith(" *"))
+		{
+			source = source.substring(0, source.length() - 2) + "*";
+		}
+		if (destination.endsWith(" *"))
+		{
+			destination = destination.substring(0, destination.length() - 2) + "*";
+		}
+		if (source.equals(destination))
+		{
+			return true;
+		}
+		if (destination.equals("Object*"))
+		{
+			return true;
+		}
+		String assign = source + "=" + destination;
+		switch (assign)
+		{
+		case "RuntimeException*=Exception*":
+		case "ArrayList*=List*":
+			return true;
+		}
+		Assert(false, "Check object inheritance tree");
+		return false;
 	}
 
 	/**

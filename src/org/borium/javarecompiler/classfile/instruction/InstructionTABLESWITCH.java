@@ -55,6 +55,7 @@ public class InstructionTABLESWITCH extends Instruction
 		{
 			labels[address + offs] = true;
 		}
+		labels[address + defaultLabel] = true;
 	}
 
 	@Override

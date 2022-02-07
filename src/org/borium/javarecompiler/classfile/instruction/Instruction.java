@@ -660,11 +660,6 @@ public abstract class Instruction
 		stream.iprintln(className);
 	}
 
-	public int getAddress()
-	{
-		return address;
-	}
-
 	/**
 	 * Calculate the stack depth change that is caused by executing this current
 	 * instruction. Total stack depth after executing this instruction should not be

@@ -25,6 +25,11 @@ public class ConstantFloat extends Constant
 	 */
 	private double value;
 
+	public double getValue()
+	{
+		return value;
+	}
+
 	@Override
 	protected void dump(IndentedOutputStream stream)
 	{
