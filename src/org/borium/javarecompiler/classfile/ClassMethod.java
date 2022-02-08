@@ -5,6 +5,7 @@ import static org.borium.javarecompiler.classfile.ClassFile.*;
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.attribute.*;
+import org.borium.javarecompiler.classfile.attribute.AttributeLocalVariableTable.*;
 import org.borium.javarecompiler.classfile.constants.*;
 import org.borium.javarecompiler.classfile.instruction.*;
 
@@ -259,6 +260,12 @@ public class ClassMethod
 	{
 		AttributeCode code = (AttributeCode) attributes.get("Code");
 		return code.getLocalsCount();
+	}
+
+	public VariableTableEntry[] getLocalVariableTable()
+	{
+		AttributeCode code = (AttributeCode) attributes.get("Code");
+		return code.getLocalVariableTable();
 	}
 
 	public String getName()

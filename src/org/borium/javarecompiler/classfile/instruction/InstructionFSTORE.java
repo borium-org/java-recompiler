@@ -19,4 +19,10 @@ public class InstructionFSTORE extends InstructionWithLocalVariableIndex
 	{
 		return -1;
 	}
+
+	@Override
+	public boolean isXStore()
+	{
+		return true;
+	}
 }

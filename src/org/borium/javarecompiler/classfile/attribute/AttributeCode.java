@@ -3,6 +3,7 @@ package org.borium.javarecompiler.classfile.attribute;
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.attribute.AttributeLocalVariableTable.*;
 import org.borium.javarecompiler.classfile.constants.*;
 import org.borium.javarecompiler.classfile.instruction.*;
 
@@ -123,6 +124,12 @@ public class AttributeCode extends ClassAttribute
 	public int getLocalsCount()
 	{
 		return maxLocals;
+	}
+
+	public VariableTableEntry[] getLocalVariableTable()
+	{
+		AttributeLocalVariableTable table = (AttributeLocalVariableTable) attributes.get("LocalVariableTable");
+		return table.getVariableTable();
 	}
 
 	@Override

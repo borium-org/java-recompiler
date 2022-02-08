@@ -5,6 +5,7 @@ import static org.borium.javarecompiler.Statics.*;
 import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.constants.*;
 import org.borium.javarecompiler.classfile.instruction.*;
+import org.borium.javarecompiler.cplusplus.LocalVariables.*;
 
 /**
  * C++-specific version of the execution context.
@@ -30,22 +31,17 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	/** True for special handling of initialized string array construction. */
 	private boolean isStringArray = false;
 
+	/** Local variables with their simplified C++ types. */
+	private LocalVariables locals;
+
 	protected CppExecutionContext(CppMethod cppMethod, CppClass cppClass, ClassMethod javaMethod)
 	{
 		super(javaMethod);
-		for (int i = 0; i < maxLocals; i++)
-		{
-			locals[i] = new LocalVariable(this);
-		}
 		this.cppClass = cppClass;
 		this.cppMethod = cppMethod;
+		locals = new LocalVariables(javaMethod.getLocalVariableTable(), cppClass);
 		cppType = new JavaTypeConverter(type, javaMethod.isStatic()).getCppType();
 		classType = cppClass.namespace + "::" + cppClass.className + "*";
-		if (!javaMethod.isStatic())
-		{
-			locals[0].set(cppClass.simplifyType(classType), "this");
-		}
-		parseParameters(javaMethod.isStatic() ? 0 : 1);
 	}
 
 	public void generate(IndentedOutputStream source, Instruction instruction)
@@ -557,10 +553,10 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateALOAD(IndentedOutputStream source, InstructionALOAD instruction)
 	{
 		int index = instruction.getIndex();
-		Assert(index >= 0 && index < maxLocals, "ALOAD index out of range");
-		Assert(locals[index] != null, "Local at " + index + " is null");
-		Assert(locals[index].getEntry().length() > 0, "Local at " + index + " is not available");
-		locals[index].push(getStack());
+		Assert(index >= 0 && index < maxLocals, "ALOAD: index out of range");
+		LocalVariable local = locals.get(index, instruction);
+		Assert(local != null, "Local at " + index + " is not available");
+		stack.push(local.getType() + StackEntrySeparator + local.getName());
 	}
 
 	private void generateANEWARRAY(IndentedOutputStream source, InstructionANEWARRAY instruction)
@@ -605,20 +601,21 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		int index = instruction.getIndex();
 		Assert(index >= 0 && index < maxLocals, "Local index out of range");
-		String[] local = locals[index].getEntry().split(SplitStackEntrySeparator);
+		LocalVariable local = locals.get(index, instruction);
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		if (local.length == 2)
+		if (local != null)
 		{
-			Assert(local[0].equals(topOfStack[0]), "ASTORE: Type mismatch");
-			source.iprintln(local[1] + " = " + topOfStack[1] + ";");
+			Assert(local.getType().equals(topOfStack[0]), "ASTORE: Type mismatch");
+			source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
 		}
 		else
 		{
-			locals[index].set(topOfStack[0], "local" + index);
-			String localType = topOfStack[0];
-			Assert(localType.endsWith("*"), "ASTORE: Local pointer expected");
-			localType = cppClass.simplifyType(localType);
-			source.iprintln(localType + " local" + index + " = " + topOfStack[1] + ";");
+			Assert(false, "");
+//			locals[index].set(topOfStack[0], "local" + index);
+//			String localType = topOfStack[0];
+//			Assert(localType.endsWith("*"), "ASTORE: Local pointer expected");
+//			localType = cppClass.simplifyType(localType);
+//			source.iprintln(localType + " local" + index + " = " + topOfStack[1] + ";");
 		}
 		if (isStringArray)
 		{
@@ -1076,10 +1073,10 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateILOAD(IndentedOutputStream source, InstructionILOAD instruction)
 	{
 		int index = instruction.getIndex();
-		Assert(index >= 0 && index < maxLocals, "ILOAD index out of range");
-		Assert(locals[index] != null, "Local at " + index + " is null");
-		Assert(locals[index].getEntry().length() > 0, "Local at " + index + " is not available");
-		locals[index].push(getStack());
+		Assert(index >= 0 && index < maxLocals, "ILOAD: index out of range");
+		LocalVariable local = locals.get(index, instruction);
+		Assert(local != null, "Local at " + index + " is not available");
+		stack.push(local.getType() + StackEntrySeparator + local.getName());
 	}
 
 	private void generateIMUL(IndentedOutputStream source, InstructionIMUL instruction)
@@ -1224,19 +1221,19 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		int index = instruction.getIndex();
 		Assert(index >= 0 && index < maxLocals, "Local index out of range");
-		String[] local = locals[index].getEntry().split(SplitStackEntrySeparator);
+		LocalVariable local = locals.get(index, instruction);
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		if (local.length == 2)
+		if (local != null)
 		{
-			Assert(local[0].equals(topOfStack[0]), "ISTORE: Type mismatch");
-			source.iprintln(local[1] + " = " + topOfStack[1] + ";");
-			Assert(false, "");
+			Assert(local.getType().equals(topOfStack[0]), "ISTORE: Type mismatch");
+			source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
 		}
 		else
 		{
-			locals[index].set(topOfStack[0], "local" + index);
-			Assert(topOfStack[0].equals("int"), "ISTORE: Integer expected");
-			source.iprintln("int local" + index + " = " + topOfStack[1] + ";");
+//			locals[index].set(topOfStack[0], "local" + index);
+//			Assert(topOfStack[0].equals("int"), "ISTORE: Integer expected");
+//			source.iprintln("int local" + index + " = " + topOfStack[1] + ";");
+			Assert(false, "");
 		}
 	}
 
@@ -1546,22 +1543,5 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String opcode = instruction.getClass().getSimpleName().substring(11);
 //		System.out.println("Instruction " + opcode + " execution not supported");
 		Assert(false, "Instruction " + opcode + " execution not supported");
-	}
-
-	/**
-	 * Parse the parameter list for the method we are processing at this time.
-	 *
-	 * @param startingIndex 0 for statics, 1 otherwise, with 0 reserved for 'this'.
-	 */
-	private void parseParameters(int startingIndex)
-	{
-		// Skip starting '(', we're in the method
-		String[] parameterTypes = new JavaTypeConverter(type, false).parseParameterTypes();
-		for (int i = 0; i < parameterTypes.length; i++)
-		{
-			String parameterType = parameterTypes[i];
-			parameterType = cppClass.simplifyType(parameterType);
-			locals[i + startingIndex].set(parameterType, "param" + (i + startingIndex));
-		}
 	}
 }
