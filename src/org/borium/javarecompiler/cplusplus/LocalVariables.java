@@ -33,6 +33,15 @@ class LocalVariables
 		 */
 		private int index;
 
+		public LocalVariable(int index, String type, int address)
+		{
+			this.index = index;
+			this.type = type;
+			startPc = address;
+			endPc = 0xFFFF;
+			name = "local_" + hexString(address, 4);
+		}
+
 		/**
 		 * Create new local variable entry. Most fields are copied from the local
 		 * variable table entry, except for constant pool indices. Type is converted to
@@ -108,6 +117,13 @@ class LocalVariables
 		}
 		System.err.println(message + " was not found, someone needs to create it");
 		return null;
+	}
+
+	public LocalVariable set(int index, String type, int address)
+	{
+		LocalVariable local = new LocalVariable(index, type, address);
+		localVariableTable.add(local);
+		return local;
 	}
 
 //	/**
