@@ -669,6 +669,11 @@ public abstract class Instruction
 	 */
 	public abstract int getStackDepthChange();
 
+	public boolean isXStore()
+	{
+		return false;
+	}
+
 	public int length()
 	{
 		return 1;

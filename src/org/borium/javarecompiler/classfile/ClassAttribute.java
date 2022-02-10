@@ -48,6 +48,8 @@ public class ClassAttribute
 			return new AttributeSignature(attribute, constants);
 		case "SourceFile":
 			return new AttributeSourceFile(attribute, constants);
+		case "LocalVariableTable":
+			return new AttributeLocalVariableTable(attribute, constants);
 		}
 		return attribute;
 	}

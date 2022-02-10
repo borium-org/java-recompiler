@@ -41,11 +41,13 @@ class CppMethod
 	{
 		if (newType.endsWith(")"))
 		{
+			// constructor type ends with ')', no return type
 			header.iprintln(newName + newType + ";");
 		}
 		else
 		{
-			header.iprint(isStatic ? "static " : "");
+			// anything non-static is virtual
+			header.iprint(isStatic ? "static " : "virtual ");
 			int pos = newType.indexOf(')');
 			header.println(newType.substring(pos + 1) + " " + newName + newType.substring(0, pos + 1) + ";");
 		}
