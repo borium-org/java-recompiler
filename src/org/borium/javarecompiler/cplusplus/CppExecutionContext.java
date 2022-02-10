@@ -1068,6 +1068,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateIFNULL(IndentedOutputStream source, InstructionIFNULL instruction)
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(topOfStack[0].endsWith("*"), "IFNULL: Reference expected");
 		source.iprintln("if ((" + topOfStack[1] + ") == nullptr)");
 		source.iprintln("\tgoto " + instruction.getLabel() + ";");
 	}
