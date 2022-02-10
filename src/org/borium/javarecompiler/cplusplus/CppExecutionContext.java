@@ -653,7 +653,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateCHECKCAST(IndentedOutputStream source, InstructionCHECKCAST instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		String className = javaToCppClass(instruction.getClassName());
+		className = cppClass.simplifyType(className) + "*";
+		source.iprintln("// ASSERT_KINDOF(" + className + ", " + topOfStack[1] + ");");
+		stack.push(className + StackEntrySeparator + topOfStack[1]);
 	}
 
 	private void generateD2F(IndentedOutputStream source, InstructionD2F instruction)
@@ -1016,7 +1020,16 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIFGT(IndentedOutputStream source, InstructionIFGT instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		switch (topOfStack[0])
+		{
+		case "int":
+			source.iprintln("if ((" + topOfStack[1] + ") > 0)");
+			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			break;
+		default:
+			Assert(false, "IFGT: Unhandled operand type " + topOfStack[0]);
+		}
 	}
 
 	private void generateIFLE(IndentedOutputStream source, InstructionIFLE instruction)
@@ -1054,7 +1067,9 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIFNULL(IndentedOutputStream source, InstructionIFNULL instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		source.iprintln("if ((" + topOfStack[1] + ") == nullptr)");
+		source.iprintln("\tgoto " + instruction.getLabel() + ";");
 	}
 
 	private void generateIINC(IndentedOutputStream source, InstructionIINC instruction)
