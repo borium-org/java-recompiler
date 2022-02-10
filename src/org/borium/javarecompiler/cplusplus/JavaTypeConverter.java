@@ -24,13 +24,21 @@ public class JavaTypeConverter
 
 	private int parameterIndex;
 
+	private LocalVariables locals;
+
 	public JavaTypeConverter(String javaType, boolean isStatic)
+	{
+		this(javaType, isStatic, null);
+	}
+
+	public JavaTypeConverter(String javaType, boolean isStatic, LocalVariables locals)
 	{
 		this.javaType = javaType;
 		cppType = "";
 		index = 0;
 		dimensions = 0;
 		parameterIndex = isStatic ? 0 : 1;
+		this.locals = locals;
 	}
 
 	public String getCppType()
@@ -183,7 +191,7 @@ public class JavaTypeConverter
 			if (cppType.endsWith("*"))
 			{
 				cppType = cppType.substring(0, cppType.length() - 1);
-				cppType += " *param" + parameterIndex;
+				cppType += " *" + locals.get(parameterIndex, null).getName();
 				parameterIndex++;
 			}
 			else

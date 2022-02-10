@@ -40,7 +40,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		this.cppClass = cppClass;
 		this.cppMethod = cppMethod;
 		locals = new LocalVariables(javaMethod.getLocalVariableTable(), cppClass);
-		cppType = new JavaTypeConverter(type, javaMethod.isStatic()).getCppType();
+		cppType = new JavaTypeConverter(type, javaMethod.isStatic(), locals).getCppType();
 		classType = cppClass.namespace + "::" + cppClass.className + "*";
 	}
 
