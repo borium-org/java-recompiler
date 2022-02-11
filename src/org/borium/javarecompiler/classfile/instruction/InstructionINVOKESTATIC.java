@@ -42,6 +42,21 @@ public class InstructionINVOKESTATIC extends Instruction
 		stream.iprintln(className + " " + methodClassName + "." + methodName);
 	}
 
+	public String getMethodClassName()
+	{
+		return methodClassName;
+	}
+
+	public String getmethodDescriptor()
+	{
+		return nameType.getDescriptor();
+	}
+
+	public String getMethodName()
+	{
+		return methodName;
+	}
+
 	@Override
 	public int getStackDepthChange()
 	{

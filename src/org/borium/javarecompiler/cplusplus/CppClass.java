@@ -103,11 +103,16 @@ public class CppClass
 		{
 			return true;
 		}
+		if (source.equals("nullptr") && destination.endsWith("*"))
+		{
+			return true;
+		}
 		String assign = source + "=" + destination;
 		switch (assign)
 		{
 		case "RuntimeException*=Exception*":
 		case "ArrayList*=List*":
+		case "int=char":
 			return true;
 		}
 		Assert(false, "Check object inheritance tree");

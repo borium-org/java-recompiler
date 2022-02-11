@@ -547,7 +547,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateACONST_NULL(IndentedOutputStream source, InstructionACONST_NULL instruction)
 	{
-		notSupported(instruction);
+		String newEntry = "nullptr" + StackEntrySeparator + "nullptr";
+		stack.push(newEntry);
 	}
 
 	private void generateALOAD(IndentedOutputStream source, InstructionALOAD instruction)
@@ -586,7 +587,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateARETURN(IndentedOutputStream source, InstructionARETURN instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		String returnType = parseJavaReturnType(type);
+		returnType = cppClass.simplifyType(returnType);
+		Assert(cppClass.isAssignable(topOfStack[0], returnType), "ARETURN: Type mismatch");
+		source.iprintln("return " + topOfStack[1] + ";");
 	}
 
 	private void generateARRAYLENGTH(IndentedOutputStream source, InstructionARRAYLENGTH instruction)
@@ -1010,7 +1015,20 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIFEQ(IndentedOutputStream source, InstructionIFEQ instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		switch (topOfStack[0])
+		{
+		case "int":
+			source.iprintln("if ((" + topOfStack[1] + ") == 0)");
+			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			break;
+		case "bool":
+			source.iprintln("if (!(" + topOfStack[1] + "))");
+			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			break;
+		default:
+			Assert(false, "IFEQ: Unhandled operand type " + topOfStack[0]);
+		}
 	}
 
 	private void generateIFGE(IndentedOutputStream source, InstructionIFGE instruction)
@@ -1062,7 +1080,10 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIFNONNULL(IndentedOutputStream source, InstructionIFNONNULL instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(topOfStack[0].endsWith("*"), "IFNONNULL: Reference expected");
+		source.iprintln("if ((" + topOfStack[1] + ") != nullptr)");
+		source.iprintln("\tgoto " + instruction.getLabel() + ";");
 	}
 
 	private void generateIFNULL(IndentedOutputStream source, InstructionIFNULL instruction)
@@ -1109,7 +1130,40 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateINVOKEINTERFACE(IndentedOutputStream source, InstructionINVOKEINTERFACE instruction)
 	{
-		notSupported(instruction);
+		String methodCppClass = javaToCppClass(instruction.getMethodClassName());
+		methodCppClass = cppClass.simplifyType(methodCppClass) + "*";
+		String methodName = instruction.getMethodName();
+		String methodDescriptor = instruction.getmethodDescriptor();
+		String[] parameterTypes = new JavaTypeConverter(methodDescriptor, false).parseParameterTypes();
+		int parameterCount = parameterTypes.length;
+		Assert(parameterCount + 1 == instruction.getCount(), "INVOKEINTERFACE: Parameter count mismatch");
+		String[] parameterValues = new String[parameterCount];
+		for (int i = 0; i < parameterCount; i++)
+		{
+			String[] stackEntry = stack.pop().split(SplitStackEntrySeparator);
+			int parameterIndex = parameterCount - 1 - i;
+			parameterValues[parameterIndex] = stackEntry[1];
+			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[parameterIndex]), "Parameter type mismatch");
+		}
+		String[] object = stack.pop().split(SplitStackEntrySeparator);
+		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEINTERFACE: Object/method type mismatch");
+		if (object[1].startsWith("new "))
+		{
+			object[1] = "(" + object[1] + ")";
+		}
+		String returnType = parseJavaReturnType(methodDescriptor);
+		returnType = cppClass.simplifyType(returnType);
+		String newEntry = returnType + StackEntrySeparator + object[1] + "->" + methodName + "(";
+		newEntry += commaSeparatedList(parameterValues);
+		newEntry += ")";
+		if (returnType.equals("void"))
+		{
+			source.iprintln(newEntry.substring(5) + ";");
+		}
+		else
+		{
+			stack.push(newEntry);
+		}
 	}
 
 	/**
@@ -1160,7 +1214,33 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateINVOKESTATIC(IndentedOutputStream source, InstructionINVOKESTATIC instruction)
 	{
-		notSupported(instruction);
+		String methodCppClass = javaToCppClass(instruction.getMethodClassName());
+		methodCppClass = cppClass.simplifyType(methodCppClass);
+		String methodName = instruction.getMethodName();
+		String methodDescriptor = instruction.getmethodDescriptor();
+		String[] parameterTypes = new JavaTypeConverter(methodDescriptor, false).parseParameterTypes();
+		int parameterCount = parameterTypes.length;
+		String[] parameterValues = new String[parameterCount];
+		for (int i = 0; i < parameterCount; i++)
+		{
+			String[] stackEntry = stack.pop().split(SplitStackEntrySeparator);
+			int parameterIndex = parameterCount - 1 - i;
+			parameterValues[parameterIndex] = stackEntry[1];
+			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[parameterIndex]), "Parameter type mismatch");
+		}
+		String returnType = parseJavaReturnType(methodDescriptor);
+		returnType = cppClass.simplifyType(returnType);
+		String newEntry = returnType + StackEntrySeparator + methodCppClass + "::" + methodName + "(";
+		newEntry += commaSeparatedList(parameterValues);
+		newEntry += ")";
+		if (returnType.equals("void"))
+		{
+			source.iprintln(newEntry.substring(5) + ";");
+		}
+		else
+		{
+			stack.push(newEntry);
+		}
 	}
 
 	private void generateINVOKEVIRTUAL(IndentedOutputStream source, InstructionINVOKEVIRTUAL instruction)
@@ -1317,33 +1397,12 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateLDC(IndentedOutputStream source, InstructionLDC instruction)
 	{
-		Constant constant = instruction.getConstant();
-		String newEntry = "";
-		if (constant instanceof ConstantStringInfo stringValue)
-		{
-			String type = cppClass.simplifyType("java::lang::String");
-			newEntry = type + " *" + StackEntrySeparator + "\"" + stringValue.getString() + "\"";
-		}
-		else if (constant instanceof ConstantInteger intValue)
-		{
-			newEntry = type + " *" + StackEntrySeparator + intValue.getValue();
-		}
-		else if (constant instanceof ConstantFloat floatValue)
-		{
-			newEntry = type + " *" + StackEntrySeparator + floatValue.getValue();
-		}
-		else
-		{
-			throw new RuntimeException(
-					"LDC: Constant type " + constant.getClass().getSimpleName().substring(8) + " not implemented");
-		}
-		Assert(newEntry.length() > 0, "LDC: Empty constant");
-		stack.push(newEntry);
+		generateLoadConstant(instruction.getConstant());
 	}
 
 	private void generateLDC_W(IndentedOutputStream source, InstructionLDC_W instruction)
 	{
-		notSupported(instruction);
+		generateLoadConstant(instruction.getConstant());
 	}
 
 	private void generateLDC2_W(IndentedOutputStream source, InstructionLDC2_W instruction)
@@ -1369,6 +1428,31 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateLNEG(IndentedOutputStream source, InstructionLNEG instruction)
 	{
 		notSupported(instruction);
+	}
+
+	private void generateLoadConstant(Constant constant)
+	{
+		String newEntry = "";
+		if (constant instanceof ConstantStringInfo stringValue)
+		{
+			String type = cppClass.simplifyType("java::lang::String");
+			newEntry = type + " *" + StackEntrySeparator + "\"" + stringValue.getString() + "\"";
+		}
+		else if (constant instanceof ConstantInteger intValue)
+		{
+			newEntry = type + " *" + StackEntrySeparator + intValue.getValue();
+		}
+		else if (constant instanceof ConstantFloat floatValue)
+		{
+			newEntry = type + " *" + StackEntrySeparator + floatValue.getValue();
+		}
+		else
+		{
+			throw new RuntimeException(
+					"LDC: Constant type " + constant.getClass().getSimpleName().substring(8) + " not implemented");
+		}
+		Assert(newEntry.length() > 0, "LDC: Empty constant");
+		stack.push(newEntry);
 	}
 
 	private void generateLOOKUPSWITCH(IndentedOutputStream source, InstructionLOOKUPSWITCH instruction)
