@@ -547,7 +547,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateACONST_NULL(IndentedOutputStream source, InstructionACONST_NULL instruction)
 	{
-		notSupported(instruction);
+		String newEntry = "nullptr" + StackEntrySeparator + "nullptr";
+		stack.push(newEntry);
 	}
 
 	private void generateALOAD(IndentedOutputStream source, InstructionALOAD instruction)
@@ -586,7 +587,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateARETURN(IndentedOutputStream source, InstructionARETURN instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		String returnType = parseJavaReturnType(type);
+		returnType = cppClass.simplifyType(returnType);
+		Assert(cppClass.isAssignable(topOfStack[0], returnType), "ARETURN: Type mismatch");
+		source.iprintln("return " + topOfStack[1] + ";");
 	}
 
 	private void generateARRAYLENGTH(IndentedOutputStream source, InstructionARRAYLENGTH instruction)
