@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
+import static org.borium.javarecompiler.Statics.*;
+
 import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.constants.*;
 
@@ -29,29 +31,52 @@ public class InstructionINVOKEINTERFACE extends Instruction
 
 	private ConstantNameAndTypeInfo nameType;
 
+	private ConstantClassInfo classInfo;
+
+	private String methodClassName;
+
+	@SuppressWarnings("unused")
+	private String methodName;
+
 	public InstructionINVOKEINTERFACE(ByteInputStream in, ConstantPool cp)
 	{
 		index = in.u2();
 		methodref = cp.get(index, ConstantInterfaceMethodrefInfo.class);
+		classInfo = cp.get(methodref.classIndex, ConstantClassInfo.class);
 		nameType = cp.get(methodref.nameAndTypeIndex, ConstantNameAndTypeInfo.class);
 		count = in.u1();
-		if (count == 0)
-		{
-			throw new ClassFormatError("INVOKEINTERFACE count-zero");
-		}
+		Assert(count != 0, "INVOKEINTERFACE: Count is zero");
 		zero = in.u1();
-		if (zero != 0)
-		{
-			throw new ClassFormatError("INVOKEINTERFACE non-zero");
-		}
+		Assert(zero == 0, "INVOKEINTERFACE: Zero is not zero");
+		methodClassName = cp.getString(classInfo.nameIndex).replace('/', '.');
+		methodName = nameType.getName();
 	}
 
 	@Override
 	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-//		Constant classRef = cp.get(index);
 		stream.iprintln(className + " " + index + " " + nameType.getName() + " count " + count);
+	}
+
+	public int getCount()
+	{
+		return count;
+	}
+
+	public String getMethodClassName()
+	{
+		return methodClassName;
+	}
+
+	public String getmethodDescriptor()
+	{
+		return nameType.getDescriptor();
+	}
+
+	public String getMethodName()
+	{
+		return methodName;
 	}
 
 	@Override

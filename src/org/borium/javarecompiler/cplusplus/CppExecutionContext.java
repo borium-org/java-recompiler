@@ -1010,7 +1010,20 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIFEQ(IndentedOutputStream source, InstructionIFEQ instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		switch (topOfStack[0])
+		{
+		case "int":
+			source.iprintln("if ((" + topOfStack[1] + ") == 0)");
+			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			break;
+		case "bool":
+			source.iprintln("if (!(" + topOfStack[1] + "))");
+			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			break;
+		default:
+			Assert(false, "IFEQ: Unhandled operand type " + topOfStack[0]);
+		}
 	}
 
 	private void generateIFGE(IndentedOutputStream source, InstructionIFGE instruction)
@@ -1109,7 +1122,40 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateINVOKEINTERFACE(IndentedOutputStream source, InstructionINVOKEINTERFACE instruction)
 	{
-		notSupported(instruction);
+		String methodCppClass = javaToCppClass(instruction.getMethodClassName());
+		methodCppClass = cppClass.simplifyType(methodCppClass) + "*";
+		String methodName = instruction.getMethodName();
+		String methodDescriptor = instruction.getmethodDescriptor();
+		String[] parameterTypes = new JavaTypeConverter(methodDescriptor, false).parseParameterTypes();
+		int parameterCount = parameterTypes.length;
+		Assert(parameterCount + 1 == instruction.getCount(), "INVOKEINTERFACE: Parameter count mismatch");
+		String[] parameterValues = new String[parameterCount];
+		for (int i = 0; i < parameterCount; i++)
+		{
+			String[] stackEntry = stack.pop().split(SplitStackEntrySeparator);
+			int parameterIndex = parameterCount - 1 - i;
+			parameterValues[parameterIndex] = stackEntry[1];
+			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[parameterIndex]), "Parameter type mismatch");
+		}
+		String[] object = stack.pop().split(SplitStackEntrySeparator);
+		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEINTERFACE: Object/method type mismatch");
+		if (object[1].startsWith("new "))
+		{
+			object[1] = "(" + object[1] + ")";
+		}
+		String returnType = parseJavaReturnType(methodDescriptor);
+		returnType = cppClass.simplifyType(returnType);
+		String newEntry = returnType + StackEntrySeparator + object[1] + "->" + methodName + "(";
+		newEntry += commaSeparatedList(parameterValues);
+		newEntry += ")";
+		if (returnType.equals("void"))
+		{
+			source.iprintln(newEntry.substring(5) + ";");
+		}
+		else
+		{
+			stack.push(newEntry);
+		}
 	}
 
 	/**

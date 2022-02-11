@@ -28,7 +28,7 @@ public class ConstantInterfaceMethodrefInfo extends Constant
 	 * In a CONSTANT_InterfaceMethodref_info structure, the class_index item must be
 	 * an interface type, not a class type.
 	 */
-	private int classIndex;
+	public int classIndex;
 
 	/**
 	 * The value of the name_and_type_index item must be a valid index into the

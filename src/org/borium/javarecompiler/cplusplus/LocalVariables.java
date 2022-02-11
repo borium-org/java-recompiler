@@ -21,7 +21,6 @@ class LocalVariables
 		private int endPc;
 
 		/** Variable name. */
-		@SuppressWarnings("unused")
 		private String name;
 
 		/** Variable type. */
