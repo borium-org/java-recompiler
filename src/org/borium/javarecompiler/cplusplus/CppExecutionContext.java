@@ -1080,7 +1080,10 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIFNONNULL(IndentedOutputStream source, InstructionIFNONNULL instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(topOfStack[0].endsWith("*"), "IFNONNULL: Reference expected");
+		source.iprintln("if ((" + topOfStack[1] + ") != nullptr)");
+		source.iprintln("\tgoto " + instruction.getLabel() + ";");
 	}
 
 	private void generateIFNULL(IndentedOutputStream source, InstructionIFNULL instruction)
@@ -1394,33 +1397,12 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateLDC(IndentedOutputStream source, InstructionLDC instruction)
 	{
-		Constant constant = instruction.getConstant();
-		String newEntry = "";
-		if (constant instanceof ConstantStringInfo stringValue)
-		{
-			String type = cppClass.simplifyType("java::lang::String");
-			newEntry = type + " *" + StackEntrySeparator + "\"" + stringValue.getString() + "\"";
-		}
-		else if (constant instanceof ConstantInteger intValue)
-		{
-			newEntry = type + " *" + StackEntrySeparator + intValue.getValue();
-		}
-		else if (constant instanceof ConstantFloat floatValue)
-		{
-			newEntry = type + " *" + StackEntrySeparator + floatValue.getValue();
-		}
-		else
-		{
-			throw new RuntimeException(
-					"LDC: Constant type " + constant.getClass().getSimpleName().substring(8) + " not implemented");
-		}
-		Assert(newEntry.length() > 0, "LDC: Empty constant");
-		stack.push(newEntry);
+		generateLoadConstant(instruction.getConstant());
 	}
 
 	private void generateLDC_W(IndentedOutputStream source, InstructionLDC_W instruction)
 	{
-		notSupported(instruction);
+		generateLoadConstant(instruction.getConstant());
 	}
 
 	private void generateLDC2_W(IndentedOutputStream source, InstructionLDC2_W instruction)
@@ -1446,6 +1428,31 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateLNEG(IndentedOutputStream source, InstructionLNEG instruction)
 	{
 		notSupported(instruction);
+	}
+
+	private void generateLoadConstant(Constant constant)
+	{
+		String newEntry = "";
+		if (constant instanceof ConstantStringInfo stringValue)
+		{
+			String type = cppClass.simplifyType("java::lang::String");
+			newEntry = type + " *" + StackEntrySeparator + "\"" + stringValue.getString() + "\"";
+		}
+		else if (constant instanceof ConstantInteger intValue)
+		{
+			newEntry = type + " *" + StackEntrySeparator + intValue.getValue();
+		}
+		else if (constant instanceof ConstantFloat floatValue)
+		{
+			newEntry = type + " *" + StackEntrySeparator + floatValue.getValue();
+		}
+		else
+		{
+			throw new RuntimeException(
+					"LDC: Constant type " + constant.getClass().getSimpleName().substring(8) + " not implemented");
+		}
+		Assert(newEntry.length() > 0, "LDC: Empty constant");
+		stack.push(newEntry);
 	}
 
 	private void generateLOOKUPSWITCH(IndentedOutputStream source, InstructionLOOKUPSWITCH instruction)
