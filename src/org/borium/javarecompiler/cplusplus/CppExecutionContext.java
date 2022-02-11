@@ -1211,7 +1211,33 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateINVOKESTATIC(IndentedOutputStream source, InstructionINVOKESTATIC instruction)
 	{
-		notSupported(instruction);
+		String methodCppClass = javaToCppClass(instruction.getMethodClassName());
+		methodCppClass = cppClass.simplifyType(methodCppClass);
+		String methodName = instruction.getMethodName();
+		String methodDescriptor = instruction.getmethodDescriptor();
+		String[] parameterTypes = new JavaTypeConverter(methodDescriptor, false).parseParameterTypes();
+		int parameterCount = parameterTypes.length;
+		String[] parameterValues = new String[parameterCount];
+		for (int i = 0; i < parameterCount; i++)
+		{
+			String[] stackEntry = stack.pop().split(SplitStackEntrySeparator);
+			int parameterIndex = parameterCount - 1 - i;
+			parameterValues[parameterIndex] = stackEntry[1];
+			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[parameterIndex]), "Parameter type mismatch");
+		}
+		String returnType = parseJavaReturnType(methodDescriptor);
+		returnType = cppClass.simplifyType(returnType);
+		String newEntry = returnType + StackEntrySeparator + methodCppClass + "::" + methodName + "(";
+		newEntry += commaSeparatedList(parameterValues);
+		newEntry += ")";
+		if (returnType.equals("void"))
+		{
+			source.iprintln(newEntry.substring(5) + ";");
+		}
+		else
+		{
+			stack.push(newEntry);
+		}
 	}
 
 	private void generateINVOKEVIRTUAL(IndentedOutputStream source, InstructionINVOKEVIRTUAL instruction)
