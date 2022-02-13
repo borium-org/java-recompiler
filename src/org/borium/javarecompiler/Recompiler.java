@@ -124,7 +124,6 @@ public class Recompiler
 			{
 				if (!processedClasses.containsKey(reference) && !newClassNames.contains(reference))
 				{
-					System.out.println("New: " + reference);
 					newClassNames.add(reference);
 				}
 			}
@@ -149,7 +148,6 @@ public class Recompiler
 		{
 			return null;
 		}
-		System.out.println("Enter: " + classFileName);
 		String classPathFileName = classFileName.replace('.', '/') + ".class";
 		String fileName = null;
 		for (String classPath : classPaths)
@@ -185,7 +183,6 @@ public class Recompiler
 		{
 			e.printStackTrace();
 		}
-		System.out.println("Leave: " + classFileName);
 		return classFile;
 	}
 

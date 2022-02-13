@@ -34,6 +34,9 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	/** Local variables with their simplified C++ types. */
 	private LocalVariables locals;
 
+	/** The bytecode size in bytes. */
+	private int codeSize;
+
 	protected CppExecutionContext(CppMethod cppMethod, CppClass cppClass, ClassMethod javaMethod)
 	{
 		super(javaMethod);
@@ -42,6 +45,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		locals = new LocalVariables(javaMethod.getLocalVariableTable(), cppClass);
 		cppType = new JavaTypeConverter(type, javaMethod.isStatic(), locals).getCppType();
 		classType = cppClass.namespace + "::" + cppClass.className + "*";
+		codeSize = javaMethod.getCode().getLength();
 	}
 
 	public void generate(IndentedOutputStream source, Instruction instruction)
@@ -510,6 +514,16 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		}
 	}
 
+	public int getCodeSize()
+	{
+		return codeSize;
+	}
+
+	public LocalVariable getLocalVariable(int index, int address)
+	{
+		return locals.get(index, address);
+	}
+
 	@Override
 	public String typeSimplifier(String type)
 	{
@@ -894,7 +908,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateGOTO(IndentedOutputStream source, InstructionGOTO instruction)
 	{
-		source.iprintln("goto " + instruction.getLabel() + ";");
+		source.iprintln("goto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateGOTO_W(IndentedOutputStream source, InstructionGOTO_W instruction)
@@ -1005,7 +1019,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		Assert(left[0].equals("int"), "IF_ICMLPT: Integer expected");
 		Assert(right[0].equals("int"), "IF_ICMLPT: Integer expected");
 		source.iprintln("if ((" + left[1] + ") < (" + right[1] + "))");
-		source.iprintln("\tgoto " + instruction.getLabel() + ";");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIF_ICMPNE(IndentedOutputStream source, InstructionIF_ICMPNE instruction)
@@ -1020,11 +1034,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		{
 		case "int":
 			source.iprintln("if ((" + topOfStack[1] + ") == 0)");
-			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 			break;
 		case "bool":
 			source.iprintln("if (!(" + topOfStack[1] + "))");
-			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 			break;
 		default:
 			Assert(false, "IFEQ: Unhandled operand type " + topOfStack[0]);
@@ -1043,7 +1057,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		{
 		case "int":
 			source.iprintln("if ((" + topOfStack[1] + ") > 0)");
-			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 			break;
 		default:
 			Assert(false, "IFGT: Unhandled operand type " + topOfStack[0]);
@@ -1067,11 +1081,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		{
 		case "int":
 			source.iprintln("if ((" + topOfStack[1] + ") != 0)");
-			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 			break;
 		case "bool":
 			source.iprintln("if (" + topOfStack[1] + ")");
-			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 			break;
 		default:
 			Assert(false, "IFNE: Unhandled operand type " + topOfStack[0]);
@@ -1083,7 +1097,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
 		Assert(topOfStack[0].endsWith("*"), "IFNONNULL: Reference expected");
 		source.iprintln("if ((" + topOfStack[1] + ") != nullptr)");
-		source.iprintln("\tgoto " + instruction.getLabel() + ";");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIFNULL(IndentedOutputStream source, InstructionIFNULL instruction)
@@ -1091,7 +1105,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
 		Assert(topOfStack[0].endsWith("*"), "IFNULL: Reference expected");
 		source.iprintln("if ((" + topOfStack[1] + ") == nullptr)");
-		source.iprintln("\tgoto " + instruction.getLabel() + ";");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIINC(IndentedOutputStream source, InstructionIINC instruction)
@@ -1327,7 +1341,12 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateISUB(IndentedOutputStream source, InstructionISUB instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		Assert(left[0].equals("int"), "ISUB: Integer expected");
+		Assert(right[0].equals("int"), "ISUB: Integer expected");
+		String newEntry = "int" + StackEntrySeparator + "(" + left[1] + ") - (" + right[1] + ")";
+		stack.push(newEntry);
 	}
 
 	private void generateIUSHR(IndentedOutputStream source, InstructionIUSHR instruction)

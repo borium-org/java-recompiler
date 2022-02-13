@@ -35,7 +35,6 @@ public class InstructionINVOKEINTERFACE extends Instruction
 
 	private String methodClassName;
 
-	@SuppressWarnings("unused")
 	private String methodName;
 
 	public InstructionINVOKEINTERFACE(ByteInputStream in, ConstantPool cp)

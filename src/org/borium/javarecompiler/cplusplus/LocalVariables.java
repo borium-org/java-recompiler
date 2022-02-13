@@ -109,12 +109,26 @@ class LocalVariables
 				return entry;
 			}
 		}
-		String message = "Local variable at index " + index;
-		if (address != -1)
+		return null;
+	}
+
+	/**
+	 * Get a variable at specific index and start PC. This variable is an exception
+	 * parameter to the catch block.
+	 *
+	 * @param index   Variable index in local variable table.
+	 * @param address Address of the catch handler where the variable is activated.
+	 * @return Local variable entry or null if not found.
+	 */
+	public LocalVariable get(int index, int address)
+	{
+		for (LocalVariable entry : localVariableTable)
 		{
-			message += " and PC " + hexString(address, 4);
+			if (entry.index == index && address >= entry.startPc && address < entry.endPc)
+			{
+				return entry;
+			}
 		}
-		System.err.println(message + " was not found, someone needs to create it");
 		return null;
 	}
 

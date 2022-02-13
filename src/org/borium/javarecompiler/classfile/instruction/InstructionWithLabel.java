@@ -41,9 +41,14 @@ abstract class InstructionWithLabel extends Instruction
 		stream.println();
 	}
 
-	public String getLabel()
+	public String getTargetLabel()
 	{
 		return "L" + hexString(address + offset, 4);
+	}
+
+	public int getTargetAddress()
+	{
+		return address + offset;
 	}
 
 	@Override

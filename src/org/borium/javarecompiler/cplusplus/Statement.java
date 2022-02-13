@@ -33,7 +33,7 @@ class Statement
 	{
 		source.iprint(addLabel ? "" : "// ");
 		source.print("L");
-		source.printHex(instructions.get(0).address, 4);
+		source.printHex(getAddress(), 4);
 		source.println(":");
 		for (Instruction instruction : instructions)
 		{
@@ -43,6 +43,31 @@ class Statement
 			dumpStack(source, executionContext.getStack());
 		}
 		// TODO Auto-generated method stub
+	}
+
+	public int getAddress()
+	{
+		return instructions.get(0).address;
+	}
+
+	public int getInstructionCount()
+	{
+		return instructions.size();
+	}
+
+	public Instruction getLastInstruction()
+	{
+		return instructions.get(instructions.size() - 1);
+	}
+
+	public int length()
+	{
+		int length = 0;
+		for (Instruction instruction : instructions)
+		{
+			length += instruction.length();
+		}
+		return length;
 	}
 
 	/**
