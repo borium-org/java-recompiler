@@ -131,6 +131,11 @@ public class AttributeCode extends ClassAttribute
 		return instructions;
 	}
 
+	public int getLength()
+	{
+		return codeLength;
+	}
+
 	public int getLocalsCount()
 	{
 		return maxLocals;

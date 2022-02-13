@@ -34,6 +34,9 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	/** Local variables with their simplified C++ types. */
 	private LocalVariables locals;
 
+	/** The bytecode size in bytes. */
+	private int codeSize;
+
 	protected CppExecutionContext(CppMethod cppMethod, CppClass cppClass, ClassMethod javaMethod)
 	{
 		super(javaMethod);
@@ -42,6 +45,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		locals = new LocalVariables(javaMethod.getLocalVariableTable(), cppClass);
 		cppType = new JavaTypeConverter(type, javaMethod.isStatic(), locals).getCppType();
 		classType = cppClass.namespace + "::" + cppClass.className + "*";
+		codeSize = javaMethod.getCode().getLength();
 	}
 
 	public void generate(IndentedOutputStream source, Instruction instruction)
@@ -508,6 +512,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		default:
 			System.out.println("Instruction " + opcode + " execution not supported");
 		}
+	}
+
+	public int getCodeSize()
+	{
+		return codeSize;
 	}
 
 	public LocalVariable getLocalVariable(int index, int address)

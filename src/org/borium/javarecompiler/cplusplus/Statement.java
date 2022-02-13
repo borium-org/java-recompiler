@@ -60,6 +60,16 @@ class Statement
 		return instructions.get(instructions.size() - 1);
 	}
 
+	public int length()
+	{
+		int length = 0;
+		for (Instruction instruction : instructions)
+		{
+			length += instruction.length();
+		}
+		return length;
+	}
+
 	/**
 	 * Dump stack contents. Comments start indented, and content has 4 tabs before
 	 * the actual stack content.
