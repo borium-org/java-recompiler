@@ -524,6 +524,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		return locals.get(index, address);
 	}
 
+	public boolean hasLabel(int address)
+	{
+		return labels[address];
+	}
+
 	@Override
 	public String typeSimplifier(String type)
 	{

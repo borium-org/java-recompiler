@@ -8,6 +8,10 @@ import org.borium.javarecompiler.cplusplus.*;
 
 public class Recompiler
 {
+	public static boolean instructionComments;
+
+	public static boolean stackComments;
+
 	public static void main(String[] args)
 	{
 		if (args.length == 0)
@@ -16,7 +20,8 @@ public class Recompiler
 					"-classpath", "bin", //
 					"-outputpath", "../JrcPortCpp", //
 					"-mainclass", "org.borium.javarecompiler.Recompiler", //
-					"-vs", "2005",//
+					"-vs", "2005", //
+					"-comments", "none", //
 			};
 		}
 		Recompiler recompiler = new Recompiler();
@@ -35,6 +40,9 @@ public class Recompiler
 				break;
 			case "-vs":
 				recompiler.setVisualStudio(args[argc + 1]);
+				break;
+			case "-comments":
+				recompiler.setCommentLevel(args[argc + 1]);
 				break;
 			default:
 				throw new RuntimeException("Unsupported argument " + args[argc]);
@@ -184,6 +192,24 @@ public class Recompiler
 			e.printStackTrace();
 		}
 		return classFile;
+	}
+
+	private void setCommentLevel(String commentLevel)
+	{
+		switch (commentLevel)
+		{
+		case "all":
+			instructionComments = true;
+			stackComments = true;
+			break;
+		case "none":
+			instructionComments = false;
+			stackComments = false;
+			break;
+		default:
+			throw new RuntimeException("Unsupported comment level " + commentLevel);
+		}
+
 	}
 
 	private void writeClasses()

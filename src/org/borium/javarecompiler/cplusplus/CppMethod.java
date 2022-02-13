@@ -195,7 +195,7 @@ class CppMethod
 		{
 			source.println(" :");
 			source.indent(2);
-			statements.get(0).generateSource(source, false);
+			statements.get(0).generateSource(source);
 			boolean first = true;
 			for (CppField field : fields)
 			{
@@ -257,7 +257,7 @@ class CppMethod
 		{
 			Statement statement = statements.get(address);
 			Assert(statement != null, "Before try: Null statement");
-			statement.generateSource(source, true);
+			statement.generateSource(source);
 			address += statement.length();
 		}
 		Assert(address == endAddress, "End address mismatch");
@@ -313,7 +313,7 @@ class CppMethod
 			// block ends.
 			Statement statement = statements.get(address);
 			Assert(statement != null, "GOTO: Null statement");
-			statement.generateSource(source, true);
+			statement.generateSource(source);
 			address += statement.length();
 			source.indent(-1);
 			source.iprintln("}");
