@@ -510,6 +510,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		}
 	}
 
+	public LocalVariable getLocalVariable(int index, int address)
+	{
+		return locals.get(index, address);
+	}
+
 	@Override
 	public String typeSimplifier(String type)
 	{
@@ -1327,7 +1332,12 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateISUB(IndentedOutputStream source, InstructionISUB instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		Assert(left[0].equals("int"), "ISUB: Integer expected");
+		Assert(right[0].equals("int"), "ISUB: Integer expected");
+		String newEntry = "int" + StackEntrySeparator + "(" + left[1] + ") - (" + right[1] + ")";
+		stack.push(newEntry);
 	}
 
 	private void generateIUSHR(IndentedOutputStream source, InstructionIUSHR instruction)

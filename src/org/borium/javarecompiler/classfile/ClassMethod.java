@@ -5,6 +5,7 @@ import static org.borium.javarecompiler.classfile.ClassFile.*;
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.attribute.*;
+import org.borium.javarecompiler.classfile.attribute.AttributeCode.*;
 import org.borium.javarecompiler.classfile.attribute.AttributeLocalVariableTable.*;
 import org.borium.javarecompiler.classfile.constants.*;
 import org.borium.javarecompiler.classfile.instruction.*;
@@ -248,6 +249,12 @@ public class ClassMethod
 	public String getDescriptor()
 	{
 		return descriptor;
+	}
+
+	public ExceptionTable[] getExceptionTable()
+	{
+		AttributeCode code = (AttributeCode) attributes.get("Code");
+		return code.getExceptionTable();
 	}
 
 	public Instruction[] getInstructions()

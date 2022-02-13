@@ -50,6 +50,16 @@ class Statement
 		return instructions.get(0).address;
 	}
 
+	public int getInstructionCount()
+	{
+		return instructions.size();
+	}
+
+	public Instruction getLastInstruction()
+	{
+		return instructions.get(instructions.size() - 1);
+	}
+
 	/**
 	 * Dump stack contents. Comments start indented, and content has 4 tabs before
 	 * the actual stack content.

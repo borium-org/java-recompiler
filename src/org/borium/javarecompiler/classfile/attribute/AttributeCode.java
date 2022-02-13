@@ -9,7 +9,7 @@ import org.borium.javarecompiler.classfile.instruction.*;
 
 public class AttributeCode extends ClassAttribute
 {
-	private static class ExceptionTable
+	public static class ExceptionTable
 	{
 		/**
 		 * The values of the two items start_pc and end_pc indicate the ranges in the
@@ -19,7 +19,7 @@ public class AttributeCode extends ClassAttribute
 		 * opcode of an instruction or must be equal to code_length, the length of the
 		 * code array. The value of start_pc must be less than the value of end_pc.
 		 */
-		int startPc;
+		public int startPc;
 
 		/**
 		 * The values of the two items start_pc and end_pc indicate the ranges in the
@@ -29,14 +29,14 @@ public class AttributeCode extends ClassAttribute
 		 * opcode of an instruction or must be equal to code_length, the length of the
 		 * code array. The value of start_pc must be less than the value of end_pc.
 		 */
-		int endPc;
+		public int endPc;
 
 		/**
 		 * The value of the handler_pc item indicates the start of the exception
 		 * handler. The value of the item must be a valid index into the code array and
 		 * must be the index of the opcode of an instruction.
 		 */
-		int handlerPc;
+		public int handlerPc;
 
 		/**
 		 * If the value of the catch_type item is nonzero, it must be a valid index into
@@ -56,6 +56,11 @@ public class AttributeCode extends ClassAttribute
 			endPc = in.u2();
 			handlerPc = in.u2();
 			catchType = in.u2();
+		}
+
+		public String getExceptionClass()
+		{
+			return catchClass.getName();
 		}
 
 		void addLabels(boolean[] labels)
@@ -114,6 +119,11 @@ public class AttributeCode extends ClassAttribute
 	{
 		super(attribute);
 		decode(cp);
+	}
+
+	public ExceptionTable[] getExceptionTable()
+	{
+		return exceptionTable;
 	}
 
 	public Instruction[] getInstructions()
