@@ -54,7 +54,14 @@ class CppField
 		}
 		if ((accessFlags & AccessStatic) != 0)
 		{
-			throw new RuntimeException("Static field not supported");
+			// ignore access level and mask off static, see if we have anything else
+			int mask = ~AccessStatic & ~AccessPrivate & ~AccessProtected & ~AccessPublic;
+			if ((accessFlags & mask) != 0)
+			{
+				throw new RuntimeException("Static field with other flags not supported");
+			}
+			header.iprintln("static " + newType + " " + name + ";");
+			return;
 		}
 		header.iprintln(newType + " " + name + ";");
 	}

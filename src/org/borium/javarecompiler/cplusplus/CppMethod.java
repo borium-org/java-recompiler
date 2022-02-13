@@ -230,7 +230,8 @@ class CppMethod
 		}
 		source.iprintln("{");
 		source.indent(1);
-		generateStatementSource(source, isConstructor);
+		boolean isStaticConstructor = newName.endsWith("::ClassInit");
+		generateStatementSource(source, isConstructor, isStaticConstructor);
 		// TODO the other stuff
 		if (!isConstructor && !returnType.equals("void"))
 		{
@@ -277,12 +278,23 @@ class CppMethod
 	 * generated more than once, each catch block would have their unique exception
 	 * type.
 	 *
-	 * @param source        Source file where to generate the method.
-	 * @param isConstructor True if this is a constructor and first statement must
-	 *                      be skipped.
+	 * @param source              Source file where to generate the method.
+	 * @param isConstructor       True if this is a constructor and first statement
+	 *                            must be skipped.
+	 * @param isStaticConstructor True if this is static initializer. Super class
+	 *                            static constructor is invoked first. Static field
+	 *                            access code generation is modified.
 	 */
-	private void generateStatementSource(IndentedOutputStream source, boolean isConstructor)
+	private void generateStatementSource(IndentedOutputStream source, boolean isConstructor,
+			boolean isStaticConstructor)
 	{
+		executionContext.isStaticConstructor = isStaticConstructor;
+		if (isStaticConstructor)
+		{
+			String parentClassName = cppClass.parentClassName;
+			parentClassName = cppClass.simplifyType(parentClassName);
+			source.iprintln(parentClassName + "::ClassInit();");
+		}
 		int address = 0;
 		if (isConstructor)
 		{

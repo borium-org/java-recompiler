@@ -8,9 +8,9 @@ import org.borium.javarecompiler.cplusplus.*;
 
 public class Recompiler
 {
-	public static boolean instructionComments;
+	public static boolean instructionComments = false;
 
-	public static boolean stackComments;
+	public static boolean stackComments = false;
 
 	public static void main(String[] args)
 	{

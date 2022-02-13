@@ -167,7 +167,7 @@ public class JavaTypeConverter
 			index++;
 			break;
 		case 'Z':
-			cppType += "boolean";
+			cppType += "bool";
 			index++;
 			break;
 		case 'L':

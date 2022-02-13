@@ -37,6 +37,12 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	/** The bytecode size in bytes. */
 	private int codeSize;
 
+	/**
+	 * True if method is a static constructor. This affects GETSTATIC, PUTSTATIC and
+	 * INVOKESTATIC code generation.
+	 */
+	boolean isStaticConstructor;
+
 	protected CppExecutionContext(CppMethod cppMethod, CppClass cppClass, ClassMethod javaMethod)
 	{
 		super(javaMethod);
@@ -906,8 +912,18 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String fieldName = instruction.getFieldName();
 		String fieldType = new JavaTypeConverter(instruction.getFieldType(), true).getCppType();
 		fieldType = cppClass.simplifyType(fieldType);
-		String newEntry = fieldType + StackEntrySeparator + //
-				"GetStatic(" + className + "::ClassInit, " + className + "::" + fieldName + ")";
+		String newEntry;
+		if (isStaticConstructor)
+		{
+			newEntry = fieldType + StackEntrySeparator + //
+					className + "::" + fieldName;
+			Assert(false, "");
+		}
+		else
+		{
+			newEntry = fieldType + StackEntrySeparator + //
+					"GetStatic(" + className + "::ClassInit, " + className + "::" + fieldName + ")";
+		}
 		stack.push(newEntry);
 	}
 
@@ -1235,6 +1251,14 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String methodCppClass = javaToCppClass(instruction.getMethodClassName());
 		methodCppClass = cppClass.simplifyType(methodCppClass);
+		// First, initialize the class if we're not in static constructor. This code is
+		// injected while the stack expression is being built, so it will execute before
+		// the actual expression is popped from stack and is generated in the source
+		// file.
+		if (!isStaticConstructor)
+		{
+			source.iprintln(methodCppClass + "::ClassInit();");
+		}
 		String methodName = instruction.getMethodName();
 		String methodDescriptor = instruction.getmethodDescriptor();
 		String[] parameterTypes = new JavaTypeConverter(methodDescriptor, false).parseParameterTypes();
@@ -1611,6 +1635,39 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generatePUTSTATIC(IndentedOutputStream source, InstructionPUTSTATIC instruction)
 	{
+		String className = new JavaTypeConverter(instruction.getClassName(), true).getCppType();
+		className = cppClass.simplifyType(className);
+		// remove star for static access
+		Assert(className.endsWith("*"), "PUTSTATIC: * expected");
+		className = className.substring(0, className.length() - 1);
+		String fieldName = instruction.getFieldName();
+		String fieldType = new JavaTypeConverter(instruction.getFieldType(), true).getCppType();
+		fieldType = cppClass.simplifyType(fieldType);
+		String[] value = stack.pop().split(SplitStackEntrySeparator);
+		// First, initialize the class if we're not in static constructor.
+		if (!isStaticConstructor)
+		{
+			source.iprintln(className + "::ClassInit();");
+		}
+		// Special handling for type mismatch: boolean literals are passed as ints, for
+		// example
+		switch (fieldType + "=" + value[0])
+		{
+		case "bool=int":
+			// Constant 1 or 0 - translate to true or false
+			switch (value[1])
+			{
+			case "1":
+				source.iprintln(className + "::" + fieldName + " = true;");
+				break;
+			case "0":
+				source.iprintln(className + "::" + fieldName + " = false;");
+				break;
+			default:
+				Assert(false, "PUTFIELD: Non-boolean integer");
+			}
+			return;
+		}
 		notSupported(instruction);
 	}
 
