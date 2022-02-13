@@ -894,7 +894,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateGOTO(IndentedOutputStream source, InstructionGOTO instruction)
 	{
-		source.iprintln("goto " + instruction.getLabel() + ";");
+		source.iprintln("goto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateGOTO_W(IndentedOutputStream source, InstructionGOTO_W instruction)
@@ -1005,7 +1005,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		Assert(left[0].equals("int"), "IF_ICMLPT: Integer expected");
 		Assert(right[0].equals("int"), "IF_ICMLPT: Integer expected");
 		source.iprintln("if ((" + left[1] + ") < (" + right[1] + "))");
-		source.iprintln("\tgoto " + instruction.getLabel() + ";");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIF_ICMPNE(IndentedOutputStream source, InstructionIF_ICMPNE instruction)
@@ -1020,11 +1020,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		{
 		case "int":
 			source.iprintln("if ((" + topOfStack[1] + ") == 0)");
-			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 			break;
 		case "bool":
 			source.iprintln("if (!(" + topOfStack[1] + "))");
-			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 			break;
 		default:
 			Assert(false, "IFEQ: Unhandled operand type " + topOfStack[0]);
@@ -1043,7 +1043,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		{
 		case "int":
 			source.iprintln("if ((" + topOfStack[1] + ") > 0)");
-			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 			break;
 		default:
 			Assert(false, "IFGT: Unhandled operand type " + topOfStack[0]);
@@ -1067,11 +1067,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		{
 		case "int":
 			source.iprintln("if ((" + topOfStack[1] + ") != 0)");
-			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 			break;
 		case "bool":
 			source.iprintln("if (" + topOfStack[1] + ")");
-			source.iprintln("\tgoto " + instruction.getLabel() + ";");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 			break;
 		default:
 			Assert(false, "IFNE: Unhandled operand type " + topOfStack[0]);
@@ -1083,7 +1083,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
 		Assert(topOfStack[0].endsWith("*"), "IFNONNULL: Reference expected");
 		source.iprintln("if ((" + topOfStack[1] + ") != nullptr)");
-		source.iprintln("\tgoto " + instruction.getLabel() + ";");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIFNULL(IndentedOutputStream source, InstructionIFNULL instruction)
@@ -1091,7 +1091,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
 		Assert(topOfStack[0].endsWith("*"), "IFNULL: Reference expected");
 		source.iprintln("if ((" + topOfStack[1] + ") == nullptr)");
-		source.iprintln("\tgoto " + instruction.getLabel() + ";");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIINC(IndentedOutputStream source, InstructionIINC instruction)
