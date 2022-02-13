@@ -109,12 +109,6 @@ class LocalVariables
 				return entry;
 			}
 		}
-		String message = "Local variable at index " + index;
-		if (address != -1)
-		{
-			message += " and PC " + hexString(address, 4);
-		}
-		System.err.println(message + " was not found, someone needs to create it");
 		return null;
 	}
 

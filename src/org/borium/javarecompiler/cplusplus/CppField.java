@@ -20,8 +20,6 @@ class CppField
 		String javaType = javaField.getType();
 		accessFlags = javaField.getAccessFlags();
 		type = new JavaTypeConverter(javaType, (accessFlags & AccessStatic) != 0).getCppType();
-		// TODO Auto-generated constructor stub
-		System.out.println(type + " " + name + "; // " + javaType);
 	}
 
 	/**

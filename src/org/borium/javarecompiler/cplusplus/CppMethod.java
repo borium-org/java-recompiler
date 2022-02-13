@@ -251,6 +251,19 @@ class CppMethod
 		return executionContext.cppType;
 	}
 
+	private int generateStatements(IndentedOutputStream source, int address, int endAddress)
+	{
+		while (address < endAddress)
+		{
+			Statement statement = statements.get(address);
+			Assert(statement != null, "Before try: Null statement");
+			statement.generateSource(source, true);
+			address += statement.length();
+		}
+		Assert(address == endAddress, "End address mismatch");
+		return address;
+	}
+
 	/**
 	 * Generate source for statements. It is assumed that in derived class
 	 * constructor first statement is an invocation of the base class constructor,
@@ -270,10 +283,6 @@ class CppMethod
 	 */
 	private void generateStatementSource(IndentedOutputStream source, boolean isConstructor)
 	{
-		if (executionContext.name.equals("processClassFile"))
-		{
-			source.iprintln("");
-		}
 		int address = 0;
 		if (isConstructor)
 		{
@@ -287,35 +296,17 @@ class CppMethod
 			// exception handlers
 			if (handler == null)
 			{
-				while (address < lastAddress)
-				{
-					Statement statement = statements.get(address);
-					Assert(statement != null, "No try: Null statement");
-					statement.generateSource(source, true);
-					address += statement.length();
-				}
+				generateStatements(source, address, lastAddress);
 				break;
 			}
 			// We have a handler. However, our current statement may be above the try block.
-			while (address < handler.startPc)
-			{
-				Statement statement = statements.get(address);
-				Assert(statement != null, "Before try: Null statement");
-				statement.generateSource(source, true);
-				address += statement.length();
-			}
+			address = generateStatements(source, address, handler.startPc);
 			// Now statement is at the startPc of the exception address that we found.
 			source.iprintln("try");
 			source.iprintln("{");
 			source.indent(1);
 			// Generate all statements in the try block.
-			while (address < handler.endPc)
-			{
-				Statement statement = statements.get(address);
-				Assert(statement != null, "Before try: Null statement");
-				statement.generateSource(source, true);
-				address += statement.length();
-			}
+			address = generateStatements(source, address, handler.endPc);
 			// We stopped at endPc, however, there's one more statement with GOTO
 			// instruction that transfers past the end of catch block. We need to generate
 			// it and we also need to know the GOTO target so we would know where the catch
@@ -350,14 +341,7 @@ class CppMethod
 				source.iprintln("catch (" + exceptionClass + " *" + catchParam.getName() + ")");
 				source.iprintln("{");
 				source.indent(1);
-				int catchAddress = catchStartPc;
-				while (catchAddress < endCatch)
-				{
-					statement = statements.get(catchAddress);
-					Assert(statement != null, "Catch: Null statement");
-					statement.generateSource(source, true);
-					catchAddress += statement.length();
-				}
+				generateStatements(source, catchStartPc, endCatch);
 				source.indent(-1);
 				source.iprintln("}");
 			}
