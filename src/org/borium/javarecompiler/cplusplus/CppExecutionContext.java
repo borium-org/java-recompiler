@@ -1231,7 +1231,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			String simpleBaseClassName = cppClass.simplifyType(methodClassName);
 			String ctor = simpleBaseClassName + "(";
 			ctor += commaSeparatedList(parameterValues);
-			ctor += ")";
+			ctor += ") //";
 			source.iprintln(ctor);
 			return;
 		}

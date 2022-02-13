@@ -34,7 +34,7 @@ class Statement
 	{
 		if (executionContext.hasLabel(getAddress()))
 		{
-			source.iprintln("L" + hexString(getAddress(), 4) + ":");
+			source.iprintln("L" + hexString(getAddress(), 4) + ": //");
 		}
 		for (Instruction instruction : instructions)
 		{
