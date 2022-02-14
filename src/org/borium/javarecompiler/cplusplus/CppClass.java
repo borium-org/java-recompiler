@@ -350,10 +350,6 @@ public class CppClass
 			String fieldType = field.getType();
 			String newType = simplifyType(fieldType);
 			field.generateHeader(header, newType);
-			if (newType.endsWith("*"))
-			{
-				header.iprintln("CountedReference<" + newType + "> ref_" + field.getName() + ";");
-			}
 		}
 		header.println();
 	}

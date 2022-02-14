@@ -78,7 +78,6 @@ class CppField
 
 	public boolean isStatic()
 	{
-		// TODO Auto-generated method stub
-		return false;
+		return (accessFlags & AccessStatic) != 0;
 	}
 }

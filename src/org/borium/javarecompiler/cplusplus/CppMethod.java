@@ -213,13 +213,6 @@ class CppMethod
 					}
 					first = false;
 					source.println(field.getName() + "(0) //");
-					String fieldType = cppClass.simplifyType(field.getType());
-					if (fieldType.endsWith("*"))
-					{
-						source.indent(2);
-						source.iprintln(", ref_" + field.getName() + "(" + field.getName() + ") //");
-						source.indent(-2);
-					}
 				}
 			}
 			source.indent(-2);
