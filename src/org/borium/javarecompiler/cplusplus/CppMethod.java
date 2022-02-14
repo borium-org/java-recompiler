@@ -225,11 +225,6 @@ class CppMethod
 		source.indent(1);
 		boolean isStaticConstructor = newName.endsWith("::ClassInit");
 		generateStatementSource(source, isConstructor, isStaticConstructor);
-		// TODO the other stuff
-		if (!isConstructor && !returnType.equals("void"))
-		{
-			source.iprintln("return 0;");
-		}
 		source.indent(-1);
 		source.iprintln("}");
 		source.println();

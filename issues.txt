@@ -1,4 +1,3 @@
 generate local variables
 exception handlers: check for internal variables
-unnecessary return 0 from methods, leftover code
 label at front of try block: generate it before the try{} starts
