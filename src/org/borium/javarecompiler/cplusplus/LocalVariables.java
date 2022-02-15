@@ -15,10 +15,10 @@ class LocalVariables
 		 * Start PC defines where in the code the variable becomes active. StartPc is
 		 * adjusted for the length of xStore instruction if necessary.
 		 */
-		private int startPc;
+		int startPc;
 
 		/** End PC defines where in the code the variable becomes inactive. */
-		private int endPc;
+		int endPc;
 
 		/** Variable name. */
 		private String name;
@@ -30,7 +30,7 @@ class LocalVariables
 		 * Index in the local variable table where this variable is stored. Same slot
 		 * can be occupied by different variables if their PC ranges do not overlap.
 		 */
-		private int index;
+		int index;
 
 		public LocalVariable(int index, String type, int address)
 		{
@@ -130,6 +130,11 @@ class LocalVariables
 			}
 		}
 		return null;
+	}
+
+	public ArrayList<LocalVariable> getVariables()
+	{
+		return localVariableTable;
 	}
 
 	public LocalVariable set(int index, String type, int address)

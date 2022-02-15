@@ -28,6 +28,27 @@ public class Statics
 	}
 
 	/**
+	 * Calculate number of parameters to the method that is part of this name and
+	 * type info. 'This' is not assumed to be present.
+	 *
+	 * @param javaDescriptor Java method descriptor.
+	 * @return Parameter count, excluding optional 'this'.
+	 */
+	public static int getParameterCount(String javaDescriptor)
+	{
+		if (!javaDescriptor.startsWith("("))
+		{
+			throw new RuntimeException("Get parameter count for non-method");
+		}
+		int[] data = { 1, 0 };
+		while (javaDescriptor.charAt(data[0]) != ')')
+		{
+			parseSingleType(javaDescriptor, data);
+		}
+		return data[1];
+	}
+
+	/**
 	 * Generate upper-cased hex string. String will have leading zeros if necessary.
 	 *
 	 * @param value  Value to fill the string with.
@@ -102,5 +123,59 @@ public class Statics
 	public static String removeStar(String typeWithStar)
 	{
 		return typeWithStar.substring(0, typeWithStar.length() - 1);
+	}
+
+	private static void parseClass(String descriptor, int[] data)
+	{
+		while (descriptor.charAt(data[0]) != ';' && descriptor.charAt(data[0]) != '<')
+		{
+			data[0]++;
+		}
+		if (descriptor.charAt(data[0]) == '<')
+		{
+			throw new RuntimeException("Templates not supported");
+//			data[0]++;
+//			while (descriptor.charAt(data[0]) != '>')
+//			{
+//				int count = data[1];
+//				parseSingleType(data);
+//				data[1] = count;
+//			}
+//			data[0]++;
+		}
+		if (descriptor.charAt(data[0]) == ';')
+		{
+			data[0]++;
+		}
+	}
+
+	private static void parseSingleType(String descriptor, int[] data)
+	{
+		while (descriptor.charAt(data[0]) == '[')
+		{
+			data[0]++;
+		}
+		switch (descriptor.charAt(data[0]))
+		{
+		case 'B':
+		case 'C':
+		case 'D':
+		case 'F':
+		case 'I':
+		case 'J':
+		case 'S':
+		case 'Z':
+			data[0]++;
+			data[1]++;
+			break;
+		case 'L':
+			data[0]++;
+			data[1]++;
+			parseClass(descriptor, data);
+			break;
+		case 'V':
+			data[0]++;
+			break;
+		}
 	}
 }

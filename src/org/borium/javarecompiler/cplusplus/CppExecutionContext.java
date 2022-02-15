@@ -2,6 +2,8 @@ package org.borium.javarecompiler.cplusplus;
 
 import static org.borium.javarecompiler.Statics.*;
 
+import java.util.*;
+
 import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.constants.*;
 import org.borium.javarecompiler.classfile.instruction.*;
@@ -528,6 +530,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	public LocalVariable getLocalVariable(int index, int address)
 	{
 		return locals.get(index, address);
+	}
+
+	public ArrayList<LocalVariable> getLocalVariables()
+	{
+		return locals.getVariables();
 	}
 
 	public boolean hasLabel(int address)
