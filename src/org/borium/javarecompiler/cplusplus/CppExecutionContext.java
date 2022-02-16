@@ -1138,7 +1138,10 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIINC(IndentedOutputStream source, InstructionIINC instruction)
 	{
-		source.iprintln("local" + instruction.getIndex() + " += " + instruction.getValue() + ";");
+		LocalVariable local = locals.get(instruction.getIndex(), instruction);
+		Assert(local != null, "IINC: No local " + instruction.getIndex());
+		Assert(local.getType().equals("int"), "IINC: Local is not int");
+		source.iprintln(local.getName() + " += " + instruction.getValue() + ";");
 	}
 
 	private void generateILOAD(IndentedOutputStream source, InstructionILOAD instruction)
