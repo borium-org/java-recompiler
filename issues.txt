@@ -2,5 +2,5 @@ generate local auto-generated variables
 label at front of try block: generate it before the try{} starts
 static initializer: initialize statics from classes that are not superclasses of this class
 DUP ASTORE should replace top of stack with ASTORE-d variable.
-
+if GOTO LABEL jumps forward and that statement ends with GOTO back past the first label, create a block
 code should be generated twice, once into null output for checking for auto-generated local variables
