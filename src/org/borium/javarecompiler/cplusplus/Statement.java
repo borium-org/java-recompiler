@@ -1,7 +1,10 @@
 package org.borium.javarecompiler.cplusplus;
 
+import static org.borium.javarecompiler.Statics.*;
+
 import java.util.*;
 
+import org.borium.javarecompiler.*;
 import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.instruction.*;
 
@@ -25,24 +28,27 @@ class Statement
 	/**
 	 * Generate C++ source code for the statement.
 	 *
-	 * @param source   Source output stream.
-	 * @param addLabel True if need to add label, false if statement is in this
-	 *                 class constructor to invoke base class constructor.
+	 * @param source Source output stream.
 	 */
-	public void generateSource(IndentedOutputStream source, boolean addLabel)
+	public void generateSource(IndentedOutputStream source)
 	{
-		source.iprint(addLabel ? "" : "// ");
-		source.print("L");
-		source.printHex(getAddress(), 4);
-		source.println(":");
+		if (executionContext.hasLabel(getAddress()))
+		{
+			source.iprintln("L" + hexString(getAddress(), 4) + ": //");
+		}
 		for (Instruction instruction : instructions)
 		{
-			source.iprint("//");
-			instruction.oneLineDump(source);
+			if (Recompiler.instructionComments)
+			{
+				source.iprint("//");
+				instruction.oneLineDump(source);
+			}
 			executionContext.generate(source, instruction);
-			dumpStack(source, executionContext.getStack());
+			if (Recompiler.stackComments)
+			{
+				dumpStack(source, executionContext.getStack());
+			}
 		}
-		// TODO Auto-generated method stub
 	}
 
 	public int getAddress()

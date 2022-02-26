@@ -115,7 +115,6 @@ public class CppClass
 		case "int=char":
 			return true;
 		}
-		Assert(false, "Check object inheritance tree");
 		return false;
 	}
 
@@ -237,7 +236,7 @@ public class CppClass
 		source.println();
 
 		source.indent(1);
-		// TODO source static fields
+		generateSourceStaticFields(source);
 		generateSourceMethods(source);
 		source.indent(-1);
 
@@ -350,10 +349,6 @@ public class CppClass
 			String fieldType = field.getType();
 			String newType = simplifyType(fieldType);
 			field.generateHeader(header, newType);
-			if (newType.endsWith("*"))
-			{
-				header.iprintln("CountedReference<" + newType + "> ref_" + field.getName() + ";");
-			}
 		}
 		header.println();
 	}
@@ -395,7 +390,7 @@ public class CppClass
 			}
 			else if (methodName.equals("<clinit>"))
 			{
-				methodName = className + "StaticInit";
+				methodName = "ClassInit";
 			}
 			method.generateHeader(header, methodName, newType);
 		}
@@ -415,9 +410,22 @@ public class CppClass
 			}
 			else if (methodName.equals("<clinit>"))
 			{
-				methodName = className + "StaticInit";
+				methodName = "ClassInit";
 			}
 			method.generateSource(source, className + "::" + methodName, methodType, fields);
+		}
+	}
+
+	private void generateSourceStaticFields(IndentedOutputStream source)
+	{
+		for (CppField field : fields)
+		{
+			if (field.isStatic())
+			{
+				// TODO initializers if any
+				source.iprintln(field.getType() + " " + className + "::" + field.getName() + ";");
+				source.println();
+			}
 		}
 	}
 

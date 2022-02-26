@@ -1,5 +1,6 @@
 package org.borium.javarecompiler;
 
+import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.cplusplus.*;
 
 /**
@@ -15,6 +16,14 @@ public class Statics
 		}
 	}
 
+	public static void Check(IndentedOutputStream stream, boolean condition, String errorMessage)
+	{
+		if (!condition)
+		{
+			stream.iprintln("// " + errorMessage);
+		}
+	}
+
 	public static String commaSeparatedList(String[] values)
 	{
 		String result = "";
@@ -25,6 +34,27 @@ public class Statics
 			separator = ", ";
 		}
 		return result;
+	}
+
+	/**
+	 * Calculate number of parameters to the method that is part of this name and
+	 * type info. 'This' is not assumed to be present.
+	 *
+	 * @param javaDescriptor Java method descriptor.
+	 * @return Parameter count, excluding optional 'this'.
+	 */
+	public static int getParameterCount(String javaDescriptor)
+	{
+		if (!javaDescriptor.startsWith("("))
+		{
+			throw new RuntimeException("Get parameter count for non-method");
+		}
+		int[] data = { 1, 0 };
+		while (javaDescriptor.charAt(data[0]) != ')')
+		{
+			parseSingleType(javaDescriptor, data);
+		}
+		return data[1];
 	}
 
 	/**
@@ -65,32 +95,54 @@ public class Statics
 		int pos = javaMethodSignature.indexOf(')');
 		Assert(pos >= 1, "Method with no return type");
 		String type = javaMethodSignature.substring(pos + 1);
+		int dimensions = 0;
+		while (type.charAt(0) == '[')
+		{
+			dimensions++;
+			type = type.substring(1);
+		}
+		String returnType = "";
 		switch (type.charAt(0))
 		{
 		case 'B':
-			return "byte";
+			returnType = "byte";
+			break;
 		case 'C':
-			return "char";
+			returnType = "char";
+			break;
 		case 'D':
-			return "double";
+			returnType = "double";
+			break;
 		case 'F':
-			return "float";
+			returnType = "float";
+			break;
 		case 'I':
-			return "int";
+			returnType = "int";
+			break;
 		case 'J':
-			return "long";
+			returnType = "long";
+			break;
 		case 'S':
-			return "short";
+			returnType = "short";
+			break;
 		case 'Z':
-			return "bool";
+			returnType = "bool";
+			break;
 		case 'L':
-			return new JavaTypeConverter(type, false).getCppType();
+			returnType = new JavaTypeConverter(type, false).getCppType();
+			break;
 		case 'V':
-			return "void";
+			returnType = "void";
+			break;
 		default:
 			Assert(false, "Unhandled type " + type);
 		}
-		return null;
+		while (dimensions > 0)
+		{
+			returnType += "[]";
+			dimensions--;
+		}
+		return returnType;
 	}
 
 	/**
@@ -102,5 +154,59 @@ public class Statics
 	public static String removeStar(String typeWithStar)
 	{
 		return typeWithStar.substring(0, typeWithStar.length() - 1);
+	}
+
+	private static void parseClass(String descriptor, int[] data)
+	{
+		while (descriptor.charAt(data[0]) != ';' && descriptor.charAt(data[0]) != '<')
+		{
+			data[0]++;
+		}
+		if (descriptor.charAt(data[0]) == '<')
+		{
+			throw new RuntimeException("Templates not supported");
+//			data[0]++;
+//			while (descriptor.charAt(data[0]) != '>')
+//			{
+//				int count = data[1];
+//				parseSingleType(data);
+//				data[1] = count;
+//			}
+//			data[0]++;
+		}
+		if (descriptor.charAt(data[0]) == ';')
+		{
+			data[0]++;
+		}
+	}
+
+	private static void parseSingleType(String descriptor, int[] data)
+	{
+		while (descriptor.charAt(data[0]) == '[')
+		{
+			data[0]++;
+		}
+		switch (descriptor.charAt(data[0]))
+		{
+		case 'B':
+		case 'C':
+		case 'D':
+		case 'F':
+		case 'I':
+		case 'J':
+		case 'S':
+		case 'Z':
+			data[0]++;
+			data[1]++;
+			break;
+		case 'L':
+			data[0]++;
+			data[1]++;
+			parseClass(descriptor, data);
+			break;
+		case 'V':
+			data[0]++;
+			break;
+		}
 	}
 }

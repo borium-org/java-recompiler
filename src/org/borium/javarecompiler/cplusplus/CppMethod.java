@@ -79,6 +79,44 @@ class CppMethod
 		}
 
 		/**
+		 * Find an exception handler where the specified local is used as a catch
+		 * parameter.
+		 *
+		 * @param local Potential catch block parameter.
+		 * @return Exception handler or null.
+		 */
+		public ExceptionHandler isParameter(LocalVariable local)
+		{
+			for (ExceptionHandler handler : handlers)
+			{
+				if (local.startPc == handler.handlerPc + 2)
+				{
+					return handler;
+				}
+			}
+			return null;
+		}
+
+		/**
+		 * Find an exception handler where the specified local variable is internal to
+		 * the catch block.
+		 *
+		 * @param local Potential catch block variable.
+		 * @return Exception handler or null.
+		 */
+		public ExceptionHandler isTryVariable(LocalVariable local)
+		{
+			for (ExceptionHandler handler : handlers)
+			{
+				if (local.startPc >= handler.startPc && local.endPc <= handler.endPc)
+				{
+					return handler;
+				}
+			}
+			return null;
+		}
+
+		/**
 		 * Find an exception handler that is at or past the given address. The range
 		 * between current address and start PC of the exception handler is outside of
 		 * the try block. The assumption is that address is not within catch block.
@@ -143,11 +181,19 @@ class CppMethod
 	/** Exception handlers for the method. */
 	private ExceptionHandlers exceptionHandlers;
 
+	/**
+	 * Parameter count for this method. Parameters and locals use same index space,
+	 * so parameterCount is needed for filtering out true local variables. Anything
+	 * with index greater or equal parameter count is a local variable.
+	 */
+	private int parameterCount;
+
 	public CppMethod(CppClass cppClass, ClassMethod javaMethod)
 	{
 		this.cppClass = cppClass;
 		executionContext = new CppExecutionContext(this, cppClass, javaMethod);
 		isStatic = javaMethod.isStatic();
+		parameterCount = javaMethod.getParameterCount();
 		exceptionHandlers = new ExceptionHandlers(javaMethod.getExceptionTable(), cppClass);
 		parseStatements();
 	}
@@ -195,7 +241,7 @@ class CppMethod
 		{
 			source.println(" :");
 			source.indent(2);
-			statements.get(0).generateSource(source, false);
+			statements.get(0).generateSource(source);
 			boolean first = true;
 			for (CppField field : fields)
 			{
@@ -213,13 +259,6 @@ class CppMethod
 					}
 					first = false;
 					source.println(field.getName() + "(0) //");
-					String fieldType = cppClass.simplifyType(field.getType());
-					if (fieldType.endsWith("*"))
-					{
-						source.indent(2);
-						source.iprintln(", ref_" + field.getName() + "(" + field.getName() + ") //");
-						source.indent(-2);
-					}
 				}
 			}
 			source.indent(-2);
@@ -230,12 +269,9 @@ class CppMethod
 		}
 		source.iprintln("{");
 		source.indent(1);
-		generateStatementSource(source, isConstructor);
-		// TODO the other stuff
-		if (!isConstructor && !returnType.equals("void"))
-		{
-			source.iprintln("return 0;");
-		}
+		generateLocalVariables(source);
+		boolean isStaticConstructor = newName.endsWith("::ClassInit");
+		generateStatementSource(source, isConstructor, isStaticConstructor);
 		source.indent(-1);
 		source.iprintln("}");
 		source.println();
@@ -251,13 +287,52 @@ class CppMethod
 		return executionContext.cppType;
 	}
 
+	private void generateLocalVariableInitializer(IndentedOutputStream source, LocalVariable local)
+	{
+		String type = local.getType();
+		String name = local.getName();
+		String initializer = "0";
+		if (type.endsWith("*"))
+		{
+			type = removeStar(type);
+			name = "*" + name;
+			initializer = "nullptr";
+		}
+		if (type.equals("bool"))
+		{
+			initializer = "false";
+		}
+		source.iprintln(type + " " + name + " = " + initializer + ";");
+	}
+
+	private void generateLocalVariables(IndentedOutputStream source)
+	{
+		ArrayList<LocalVariable> locals = executionContext.getLocalVariables();
+		for (LocalVariable local : locals)
+		{
+			if (local.index < parameterCount)
+			{
+				continue;
+			}
+			if (exceptionHandlers.isParameter(local) != null)
+			{
+				continue;
+			}
+			if (exceptionHandlers.isTryVariable(local) != null)
+			{
+				continue;
+			}
+			generateLocalVariableInitializer(source, local);
+		}
+	}
+
 	private int generateStatements(IndentedOutputStream source, int address, int endAddress)
 	{
 		while (address < endAddress)
 		{
 			Statement statement = statements.get(address);
 			Assert(statement != null, "Before try: Null statement");
-			statement.generateSource(source, true);
+			statement.generateSource(source);
 			address += statement.length();
 		}
 		Assert(address == endAddress, "End address mismatch");
@@ -277,12 +352,23 @@ class CppMethod
 	 * generated more than once, each catch block would have their unique exception
 	 * type.
 	 *
-	 * @param source        Source file where to generate the method.
-	 * @param isConstructor True if this is a constructor and first statement must
-	 *                      be skipped.
+	 * @param source              Source file where to generate the method.
+	 * @param isConstructor       True if this is a constructor and first statement
+	 *                            must be skipped.
+	 * @param isStaticConstructor True if this is static initializer. Super class
+	 *                            static constructor is invoked first. Static field
+	 *                            access code generation is modified.
 	 */
-	private void generateStatementSource(IndentedOutputStream source, boolean isConstructor)
+	private void generateStatementSource(IndentedOutputStream source, boolean isConstructor,
+			boolean isStaticConstructor)
 	{
+		executionContext.isStaticConstructor = isStaticConstructor;
+		if (isStaticConstructor)
+		{
+			String parentClassName = cppClass.parentClassName;
+			parentClassName = cppClass.simplifyType(parentClassName);
+			source.iprintln(parentClassName + "::ClassInit();");
+		}
 		int address = 0;
 		if (isConstructor)
 		{
@@ -305,6 +391,8 @@ class CppMethod
 			source.iprintln("try");
 			source.iprintln("{");
 			source.indent(1);
+			// Generate try block variables
+			generateTryBlockVariables(source, address, handler.endPc);
 			// Generate all statements in the try block.
 			address = generateStatements(source, address, handler.endPc);
 			// We stopped at endPc, however, there's one more statement with GOTO
@@ -313,7 +401,7 @@ class CppMethod
 			// block ends.
 			Statement statement = statements.get(address);
 			Assert(statement != null, "GOTO: Null statement");
-			statement.generateSource(source, true);
+			statement.generateSource(source);
 			address += statement.length();
 			source.indent(-1);
 			source.iprintln("}");
@@ -346,6 +434,27 @@ class CppMethod
 				source.iprintln("}");
 			}
 			address = endCatch;
+		}
+	}
+
+	private void generateTryBlockVariables(IndentedOutputStream source, int address, int endPc)
+	{
+		ArrayList<LocalVariable> locals = executionContext.getLocalVariables();
+		for (LocalVariable local : locals)
+		{
+			if (local.endPc != endPc)
+			{
+				continue;
+			}
+			ExceptionHandler handler = exceptionHandlers.isTryVariable(local);
+			if (handler == null)
+			{
+				continue;
+			}
+			if (local.startPc > handler.startPc && local.endPc == handler.endPc)
+			{
+				generateLocalVariableInitializer(source, local);
+			}
 		}
 	}
 

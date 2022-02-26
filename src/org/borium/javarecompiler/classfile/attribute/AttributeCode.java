@@ -115,6 +115,9 @@ public class AttributeCode extends ClassAttribute
 
 	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
+	/** True for each instruction that is referenced by a goto of some kind. */
+	private boolean[] labels;
+
 	public AttributeCode(ClassAttribute attribute, ConstantPool cp)
 	{
 		super(attribute);
@@ -129,6 +132,11 @@ public class AttributeCode extends ClassAttribute
 	public Instruction[] getInstructions()
 	{
 		return instructions;
+	}
+
+	public boolean[] getLabels()
+	{
+		return labels;
 	}
 
 	public int getLength()
@@ -158,22 +166,6 @@ public class AttributeCode extends ClassAttribute
 		stream.indent(1);
 		stream.iprintln(code);
 		stream.indent(-1);
-
-		boolean[] labels = new boolean[code.length];
-		// First instruction - create a label for start of the method
-		labels[0] = true;
-		for (int address = 0; address < code.length; address++)
-		{
-			Instruction insn = instructions[address];
-			if (insn != null)
-			{
-				insn.addLabel(address, labels);
-			}
-		}
-		for (ExceptionTable exception : exceptionTable)
-		{
-			exception.addLabels(labels);
-		}
 
 		for (int address = 0; address < code.length; address++)
 		{
@@ -259,5 +251,19 @@ public class AttributeCode extends ClassAttribute
 			index += instructions[index].length();
 		}
 		inCode.close();
+
+		labels = new boolean[code.length];
+		for (int address = 0; address < code.length; address++)
+		{
+			Instruction insn = instructions[address];
+			if (insn != null)
+			{
+				insn.addLabel(address, labels);
+			}
+		}
+		for (ExceptionTable exception : exceptionTable)
+		{
+			exception.addLabels(labels);
+		}
 	}
 }

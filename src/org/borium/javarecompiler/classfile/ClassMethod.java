@@ -4,6 +4,7 @@ import static org.borium.javarecompiler.classfile.ClassFile.*;
 
 import java.util.*;
 
+import org.borium.javarecompiler.*;
 import org.borium.javarecompiler.classfile.attribute.*;
 import org.borium.javarecompiler.classfile.attribute.AttributeCode.*;
 import org.borium.javarecompiler.classfile.attribute.AttributeLocalVariableTable.*;
@@ -278,6 +279,11 @@ public class ClassMethod
 	public String getName()
 	{
 		return name;
+	}
+
+	public int getParameterCount()
+	{
+		return Statics.getParameterCount(descriptor) + (isStatic() ? 0 : 1);
 	}
 
 	public boolean isStatic()

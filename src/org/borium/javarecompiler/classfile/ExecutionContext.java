@@ -43,6 +43,9 @@ public class ExecutionContext
 
 	protected Stack<String> stack = new Stack<>();
 
+	/** True for each instruction that is referenced by a goto of some kind. */
+	protected boolean[] labels;
+
 	protected ExecutionContext(ClassMethod javaMethod)
 	{
 		name = javaMethod.getName();
@@ -50,6 +53,7 @@ public class ExecutionContext
 		AttributeCode code = javaMethod.getCode();
 		instructions = code.getInstructions();
 		maxLocals = code.getLocalsCount();
+		labels = code.getLabels();
 	}
 
 	public Stack<String> getStack()
