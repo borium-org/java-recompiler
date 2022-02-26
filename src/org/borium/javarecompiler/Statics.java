@@ -1,5 +1,6 @@
 package org.borium.javarecompiler;
 
+import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.cplusplus.*;
 
 /**
@@ -12,6 +13,14 @@ public class Statics
 		if (!condition)
 		{
 			throw new RuntimeException(errorMessage);
+		}
+	}
+
+	public static void Check(IndentedOutputStream stream, boolean condition, String errorMessage)
+	{
+		if (!condition)
+		{
+			stream.iprintln("// " + errorMessage);
 		}
 	}
 
@@ -86,32 +95,54 @@ public class Statics
 		int pos = javaMethodSignature.indexOf(')');
 		Assert(pos >= 1, "Method with no return type");
 		String type = javaMethodSignature.substring(pos + 1);
+		int dimensions = 0;
+		while (type.charAt(0) == '[')
+		{
+			dimensions++;
+			type = type.substring(1);
+		}
+		String returnType = "";
 		switch (type.charAt(0))
 		{
 		case 'B':
-			return "byte";
+			returnType = "byte";
+			break;
 		case 'C':
-			return "char";
+			returnType = "char";
+			break;
 		case 'D':
-			return "double";
+			returnType = "double";
+			break;
 		case 'F':
-			return "float";
+			returnType = "float";
+			break;
 		case 'I':
-			return "int";
+			returnType = "int";
+			break;
 		case 'J':
-			return "long";
+			returnType = "long";
+			break;
 		case 'S':
-			return "short";
+			returnType = "short";
+			break;
 		case 'Z':
-			return "bool";
+			returnType = "bool";
+			break;
 		case 'L':
-			return new JavaTypeConverter(type, false).getCppType();
+			returnType = new JavaTypeConverter(type, false).getCppType();
+			break;
 		case 'V':
-			return "void";
+			returnType = "void";
+			break;
 		default:
 			Assert(false, "Unhandled type " + type);
 		}
-		return null;
+		while (dimensions > 0)
+		{
+			returnType += "[]";
+			dimensions--;
+		}
+		return returnType;
 	}
 
 	/**

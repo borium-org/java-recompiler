@@ -7,6 +7,9 @@ import org.borium.javarecompiler.classfile.*;
  */
 public class InstructionNEWARRAY extends Instruction
 {
+	private static final String[] elementTypes = { "0", "1", "2", "3", "boolean", "char", "float", "double", "byte",
+			"short", "int", "long" };
+
 	/**
 	 * The atype is a code that indicates the type of array to create. It must take
 	 * one of the following values: <table border>
@@ -59,8 +62,12 @@ public class InstructionNEWARRAY extends Instruction
 	public void detailedDump(IndentedOutputStream stream)
 	{
 		String className = getClass().getSimpleName().substring("Instruction".length()).toLowerCase();
-		String[] types = { "0", "1", "2", "3", "boolean", "char", "float", "double", "byte", "short", "int", "long" };
-		stream.iprintln(className + " " + types[atype]);
+		stream.iprintln(className + " " + elementTypes[atype]);
+	}
+
+	public String getElementType()
+	{
+		return elementTypes[atype];
 	}
 
 	@Override

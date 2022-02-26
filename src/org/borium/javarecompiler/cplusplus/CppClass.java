@@ -115,7 +115,6 @@ public class CppClass
 		case "int=char":
 			return true;
 		}
-		Assert(false, "Check object inheritance tree");
 		return false;
 	}
 

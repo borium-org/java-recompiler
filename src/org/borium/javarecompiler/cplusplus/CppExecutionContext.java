@@ -622,7 +622,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
 		String returnType = parseJavaReturnType(type);
 		returnType = cppClass.simplifyType(returnType);
-		Assert(cppClass.isAssignable(topOfStack[0], returnType), "ARETURN: Type mismatch");
+		Check(source, cppClass.isAssignable(topOfStack[0], returnType), "ARETURN: Type mismatch");
 		source.iprintln("return " + topOfStack[1] + ";");
 	}
 
@@ -646,7 +646,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			local = locals.set(index, topOfStack[0], instruction.address);
 			newVariable = true;
 		}
-		Assert(cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
+		Check(source, cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
 		source.iprint(newVariable ? topOfStack[0] + " " : "");
 		source.println(local.getName() + " = " + topOfStack[1] + ";");
 		if (isStringArray)
@@ -994,7 +994,12 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIAND(IndentedOutputStream source, InstructionIAND instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		Assert(left[0].equals("int"), "IAND: Integer expected");
+		Assert(right[0].equals("int"), "IAND: Integer expected");
+		String newEntry = "int" + StackEntrySeparator + "(" + left[1] + ") & (" + right[1] + ")";
+		stack.push(newEntry);
 	}
 
 	private void generateIASTORE(IndentedOutputStream source, InstructionIASTORE instruction)
@@ -1229,7 +1234,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		{
 			String[] stackEntry = stack.pop().split(SplitStackEntrySeparator);
 			parameterValues[parameterCount - 1 - i] = stackEntry[1];
-			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[i]), "Parameter type mismatch");
+			Check(source, cppClass.isAssignable(stackEntry[0], parameterTypes[i]), "Parameter type mismatch");
 		}
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
 		String methodClassName = javaToCppClass(instruction.getMethodClassName());
@@ -1282,7 +1287,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			String[] stackEntry = stack.pop().split(SplitStackEntrySeparator);
 			int parameterIndex = parameterCount - 1 - i;
 			parameterValues[parameterIndex] = stackEntry[1];
-			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[parameterIndex]), "Parameter type mismatch");
+			Check(source, cppClass.isAssignable(stackEntry[0], parameterTypes[parameterIndex]),
+					"Parameter type mismatch");
 		}
 		String returnType = parseJavaReturnType(methodDescriptor);
 		returnType = cppClass.simplifyType(returnType);
@@ -1348,7 +1354,9 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIRETURN(IndentedOutputStream source, InstructionIRETURN instruction)
 	{
-		notSupported(instruction);
+		String[] value = stack.pop().split(SplitStackEntrySeparator);
+		Assert(value[0].equals("int"), "IRETURN: Integer expected");
+		source.iprintln("return " + value[1] + ";");
 	}
 
 	private void generateISHL(IndentedOutputStream source, InstructionISHL instruction)
@@ -1398,7 +1406,12 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIXOR(IndentedOutputStream source, InstructionIXOR instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		Assert(left[0].equals("int"), "IXOR: Integer expected");
+		Assert(right[0].equals("int"), "IXOR: Integer expected");
+		String newEntry = "int" + StackEntrySeparator + "(" + left[1] + ") ^ (" + right[1] + ")";
+		stack.push(newEntry);
 	}
 
 	private void generateJSR(IndentedOutputStream source, InstructionJSR instruction)
@@ -1501,11 +1514,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		}
 		else if (constant instanceof ConstantInteger intValue)
 		{
-			newEntry = type + " *" + StackEntrySeparator + intValue.getValue();
+			newEntry = "int" + StackEntrySeparator + intValue.getValue();
 		}
 		else if (constant instanceof ConstantFloat floatValue)
 		{
-			newEntry = type + " *" + StackEntrySeparator + floatValue.getValue();
+			newEntry = "float" + StackEntrySeparator + floatValue.getValue();
 		}
 		else
 		{
@@ -1601,7 +1614,9 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateNEWARRAY(IndentedOutputStream source, InstructionNEWARRAY instruction)
 	{
-		notSupported(instruction);
+		String[] value = stack.pop().split(SplitStackEntrySeparator);
+		Assert(value[0].equals("int"), "NEWARRAY: Integer expected");
+		stack.push("int*" + StackEntrySeparator + "new " + instruction.getElementType() + "[" + value[1] + "]");
 	}
 
 	private void generateNOP(IndentedOutputStream source, InstructionNOP instruction)
@@ -1706,7 +1721,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateSIPUSH(IndentedOutputStream source, InstructionSIPUSH instruction)
 	{
-		notSupported(instruction);
+		String stackEntry = "int" + StackEntrySeparator + instruction.getValue();
+		stack.push(stackEntry);
 	}
 
 	private void generateSWAP(IndentedOutputStream source, InstructionSWAP instruction)

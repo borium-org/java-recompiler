@@ -191,13 +191,14 @@ public class JavaTypeConverter
 			if (cppType.endsWith("*"))
 			{
 				cppType = cppType.substring(0, cppType.length() - 1);
-				cppType += " *" + locals.get(parameterIndex, null).getName();
-				parameterIndex++;
+				cppType += " *";
 			}
 			else
 			{
-				Assert(false, "Unhandled non-pointer parameter");
+				cppType += " ";
 			}
+			cppType += locals.get(parameterIndex, null).getName();
+			parameterIndex++;
 		}
 	}
 }
