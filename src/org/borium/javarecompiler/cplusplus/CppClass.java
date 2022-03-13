@@ -357,16 +357,44 @@ public class CppClass
 	 */
 	private void generateHeaderIncludesAndNamespaces(IndentedOutputStream header)
 	{
-		List<String> referencedClassNames = classFile.getReferencedClasses();
-		TreeSet<String> classes = new TreeSet<>();
-		classes.addAll(referencedClassNames);
-		classes.remove(classFile.getClassName());
-		for (String include : classes)
-		{
-			String[] split = include.split("[.]");
-			header.println("#include \"" + String.join("__", split) + ".h\"");
-		}
+		String superClassName = classFile.getParentClassName();
+		header.println("#include \"" + String.join("__", superClassName.split("[.]")) + ".h\"");
 		header.println();
+
+		List<String> referencedClassNames = classFile.getReferencedClasses();
+		TreeMap<String, TreeSet<String>> classes = new TreeMap<>();
+		for (String className : referencedClassNames)
+		{
+			if (className.equals(classFile.getClassName()))
+			{
+				continue;
+			}
+			if (className.equals(classFile.getParentClassName()))
+			{
+				continue;
+			}
+
+			String packageName = className.substring(0, className.lastIndexOf('.'));
+			String simpleName = className.substring(className.lastIndexOf('.') + 1);
+			if (!classes.containsKey(packageName))
+			{
+				classes.put(packageName, new TreeSet<String>());
+			}
+			classes.get(packageName).add(simpleName);
+		}
+		for (String packageName : classes.keySet())
+		{
+			String[] split = packageName.split("[.]");
+			header.println("namespace " + String.join("::", split));
+			header.println("{");
+			TreeSet<String> classNames = classes.get(packageName);
+			for (String className : classNames)
+			{
+				header.println("\tclass " + className + ";");
+			}
+			header.println("}");
+			header.println();
+		}
 
 		for (String namespace : namespaces)
 		{
