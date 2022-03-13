@@ -205,8 +205,7 @@ public class CppClass
 	 */
 	protected void generateHeader(IndentedOutputStream header)
 	{
-		header.println("#ifndef " + fileName.toUpperCase());
-		header.println("#define " + fileName.toUpperCase());
+		header.println("#pragma once");
 		header.println();
 
 		generateHeaderIncludesAndNamespaces(header);
@@ -224,13 +223,11 @@ public class CppClass
 		header.iprintln("};");
 		header.println();
 		generateHeaderEndThisClassNamespace(header);
-
-		header.println();
-		header.println("#endif");
 	}
 
 	protected void generateSource(IndentedOutputStream source)
 	{
+		source.println("#include \"stdafx.h\"");
 		source.println("#include \"" + namespace.replace(':', '_') + "__" + className + ".h\"");
 		source.println();
 		source.println("namespace " + namespace);
