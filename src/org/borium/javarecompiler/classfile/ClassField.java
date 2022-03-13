@@ -186,6 +186,19 @@ public class ClassField
 		return accessFlags;
 	}
 
+	@SuppressWarnings("unchecked")
+	public <T extends ClassAttribute> T getAttribute(Class<T> clazz)
+	{
+		for (ClassAttribute a : attributeList)
+		{
+			if (clazz.isInstance(a))
+			{
+				return (T) a;
+			}
+		}
+		return null;
+	}
+
 	public String getName()
 	{
 		return name;

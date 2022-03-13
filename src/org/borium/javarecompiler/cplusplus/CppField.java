@@ -1,8 +1,12 @@
 package org.borium.javarecompiler.cplusplus;
 
+import static org.borium.javarecompiler.Statics.*;
 import static org.borium.javarecompiler.classfile.ClassField.*;
+import static org.borium.javarecompiler.classfile.constants.Constant.*;
 
 import org.borium.javarecompiler.classfile.*;
+import org.borium.javarecompiler.classfile.attribute.*;
+import org.borium.javarecompiler.classfile.constants.*;
 
 class CppField
 {
@@ -14,11 +18,14 @@ class CppField
 
 	private int accessFlags;
 
+	private AttributeConstantValue attributeConstantValue;
+
 	public CppField(ClassField javaField)
 	{
 		name = javaField.getName();
 		String javaType = javaField.getType();
 		accessFlags = javaField.getAccessFlags();
+		attributeConstantValue = javaField.getAttribute(AttributeConstantValue.class);
 		type = new JavaTypeConverter(javaType, (accessFlags & AccessStatic) != 0).getCppType();
 	}
 
@@ -50,7 +57,24 @@ class CppField
 		}
 		if ((accessFlags & AccessFinal) != 0)
 		{
-			throw new RuntimeException("Final field not supported");
+			Assert((accessFlags & AccessStatic) != 0, "Final must be static");
+			if (attributeConstantValue == null)
+			{
+				System.err.println("bang");
+			}
+			Constant constant = attributeConstantValue.getConstant();
+			String value = "";
+			switch (newType)
+			{
+			case "int":
+				Assert(constant.is(CONSTANT_Integer), "Int: Int expected");
+				value = String.valueOf(((ConstantInteger) constant).getValue());
+				break;
+			default:
+				Assert(false, "Unsupported final type '" + newType + "'");
+			}
+			header.iprintln("const " + newType + " " + name + " = " + value + ";");
+			return;
 		}
 		if ((accessFlags & AccessStatic) != 0)
 		{
@@ -74,6 +98,11 @@ class CppField
 	public String getType()
 	{
 		return type;
+	}
+
+	public boolean isFinal()
+	{
+		return (accessFlags & AccessFinal) != 0;
 	}
 
 	public boolean isStatic()
