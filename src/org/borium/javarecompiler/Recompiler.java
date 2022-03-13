@@ -19,7 +19,7 @@ public class Recompiler
 			args = new String[] { //
 					"-classpath", "bin", //
 					"-outputpath", "../JrcPortCpp", //
-					"-mainclass", "org.borium.javarecompiler.classfile.ClassFile", //
+					"-mainclass", "org.borium.javarecompiler.classfile.constants.ConstantPool", //
 					"-vs", "2005", //
 					"-comments", "all", //
 			};

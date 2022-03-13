@@ -695,8 +695,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
 		String className = javaToCppClass(instruction.getClassName());
-		className = cppClass.simplifyType(className) + "*";
-		source.iprintln("// ASSERT_KINDOF(" + className + ", " + topOfStack[1] + ");");
+		className = cppClass.simplifyType(className);
+		source.iprintln(topOfStack[1] + "->checkCast(" + className + "::getClass());");
 		stack.push(className + StackEntrySeparator + topOfStack[1]);
 	}
 
@@ -1103,7 +1103,16 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIFGE(IndentedOutputStream source, InstructionIFGE instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		switch (topOfStack[0])
+		{
+		case "int":
+			source.iprintln("if ((" + topOfStack[1] + ") >= 0)");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			break;
+		default:
+			Assert(false, "IFGE: Unhandled operand type " + topOfStack[0]);
+		}
 	}
 
 	private void generateIFGT(IndentedOutputStream source, InstructionIFGT instruction)
@@ -1122,12 +1131,30 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIFLE(IndentedOutputStream source, InstructionIFLE instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		switch (topOfStack[0])
+		{
+		case "int":
+			source.iprintln("if ((" + topOfStack[1] + ") <= 0)");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			break;
+		default:
+			Assert(false, "IFLE: Unhandled operand type " + topOfStack[0]);
+		}
 	}
 
 	private void generateIFLT(IndentedOutputStream source, InstructionIFLT instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		switch (topOfStack[0])
+		{
+		case "int":
+			source.iprintln("if ((" + topOfStack[1] + ") < 0)");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			break;
+		default:
+			Assert(false, "IFLT: Unhandled operand type " + topOfStack[0]);
+		}
 	}
 
 	private void generateIFNE(IndentedOutputStream source, InstructionIFNE instruction)
@@ -1193,7 +1220,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateINSTANCEOF(IndentedOutputStream source, InstructionINSTANCEOF instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		String className = instruction.getClassName();
+		className = javaToCppClass(className);
+		className = cppClass.simplifyType(className);
+		stack.push("bool" + StackEntrySeparator + topOfStack[1] + "->instanceOf(" + className + "::getClass())");
 	}
 
 	private void generateINVOKEDYNAMIC(IndentedOutputStream source, InstructionINVOKEDYNAMIC instruction)
@@ -1395,18 +1426,15 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		Assert(index >= 0 && index < maxLocals, "Local index out of range");
 		LocalVariable local = locals.get(index, instruction);
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		if (local != null)
+		String type = "";
+		if (local == null)
 		{
-			Assert(local.getType().equals(topOfStack[0]), "ISTORE: Type mismatch");
-			source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
+			local = locals.set(index, topOfStack[0], instruction.address);
+			type = topOfStack[0] + " ";
 		}
-		else
-		{
-//			locals[index].set(topOfStack[0], "local" + index);
-//			Assert(topOfStack[0].equals("int"), "ISTORE: Integer expected");
-//			source.iprintln("int local" + index + " = " + topOfStack[1] + ";");
-			Assert(false, "");
-		}
+		Assert(local.getType().equals("int"), "ISTORE: Integer expected");
+		Assert(local.getType().equals(topOfStack[0]), "ISTORE: Type mismatch");
+		source.iprintln(type + local.getName() + " = " + topOfStack[1] + ";");
 	}
 
 	private void generateISUB(IndentedOutputStream source, InstructionISUB instruction)
