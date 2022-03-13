@@ -1030,12 +1030,18 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIF_ACMPEQ(IndentedOutputStream source, InstructionIF_ACMPEQ instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		source.iprintln("if ((" + left[1] + ") == (" + right[1] + "))");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIF_ACMPNE(IndentedOutputStream source, InstructionIF_ACMPNE instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		source.iprintln("if ((" + left[1] + ") != (" + right[1] + "))");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIF_ICMPEQ(IndentedOutputStream source, InstructionIF_ICMPEQ instruction)
@@ -1373,7 +1379,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[parameterIndex]), "Parameter type mismatch");
 		}
 		String[] object = stack.pop().split(SplitStackEntrySeparator);
-		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEVIRTUAL: Object/method type mismatch");
+//		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEVIRTUAL: Object/method type mismatch");
 		if (object[1].startsWith("new "))
 		{
 			object[1] = "(" + object[1] + ")";
