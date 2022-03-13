@@ -28,7 +28,7 @@ public class ConstantMethodType extends Constant
 	private String descriptor;
 
 	@Override
-	protected void dump(IndentedOutputStream stream)
+	public void dump(IndentedOutputStream stream)
 	{
 		stream.println("MethodType: " + descriptor);
 	}

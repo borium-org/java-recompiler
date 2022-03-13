@@ -6,23 +6,23 @@ import org.borium.javarecompiler.classfile.*;
 
 public abstract class Constant
 {
-	protected static final int CONSTANT_Utf8 = 1;
-	protected static final int CONSTANT_Integer = 3;
-	protected static final int CONSTANT_Float = 4;
-	protected static final int CONSTANT_Long = 5;
-	protected static final int CONSTANT_Double = 6;
-	protected static final int CONSTANT_Class = 7;
-	protected static final int CONSTANT_String = 8;
-	protected static final int CONSTANT_Fieldref = 9;
-	protected static final int CONSTANT_Methodref = 10;
-	protected static final int CONSTANT_InterfaceMethodref = 11;
-	protected static final int CONSTANT_NameAndType = 12;
-	protected static final int CONSTANT_MethodHandle = 15;
-	protected static final int CONSTANT_MethodType = 16;
-	protected static final int CONSTANT_Dynamic = 17;
-	protected static final int CONSTANT_InvokeDynamic = 18;
-	protected static final int CONSTANT_Module = 19;
-	protected static final int CONSTANT_Package = 20;
+	public static final int CONSTANT_Utf8 = 1;
+	public static final int CONSTANT_Integer = 3;
+	public static final int CONSTANT_Float = 4;
+	public static final int CONSTANT_Long = 5;
+	public static final int CONSTANT_Double = 6;
+	public static final int CONSTANT_Class = 7;
+	public static final int CONSTANT_String = 8;
+	public static final int CONSTANT_Fieldref = 9;
+	public static final int CONSTANT_Methodref = 10;
+	public static final int CONSTANT_InterfaceMethodref = 11;
+	public static final int CONSTANT_NameAndType = 12;
+	public static final int CONSTANT_MethodHandle = 15;
+	public static final int CONSTANT_MethodType = 16;
+	public static final int CONSTANT_Dynamic = 17;
+	public static final int CONSTANT_InvokeDynamic = 18;
+	public static final int CONSTANT_Module = 19;
+	public static final int CONSTANT_Package = 20;
 
 	/**
 	 * Create a Constant-derived object according to the tag from class input
@@ -78,12 +78,12 @@ public abstract class Constant
 	 */
 	protected int tag;
 
+	public abstract void dump(IndentedOutputStream stream);
+
 	public boolean is(int constantType)
 	{
 		return constantType == tag;
 	}
-
-	protected abstract void dump(IndentedOutputStream stream);
 
 	/**
 	 * Fix up references to other constants from this constant.

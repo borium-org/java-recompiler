@@ -28,7 +28,7 @@ public class ConstantDouble extends Constant
 	public double value;
 
 	@Override
-	protected void dump(IndentedOutputStream stream)
+	public void dump(IndentedOutputStream stream)
 	{
 		stream.print("Double: " + value);
 	}

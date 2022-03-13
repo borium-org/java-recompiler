@@ -52,7 +52,7 @@ public class ConstantDynamic extends Constant
 	private String bootstrap;
 
 	@Override
-	protected void dump(IndentedOutputStream stream)
+	public void dump(IndentedOutputStream stream)
 	{
 		stream.println("Dynamic: Bootstrap " + bootstrap + " Name and type " + nameAndType);
 	}

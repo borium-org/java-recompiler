@@ -32,7 +32,7 @@ public class ConstantModule extends Constant
 	private String name;
 
 	@Override
-	protected void dump(IndentedOutputStream stream)
+	public void dump(IndentedOutputStream stream)
 	{
 		stream.println("Module: " + name);
 	}

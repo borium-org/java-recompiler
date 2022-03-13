@@ -25,15 +25,15 @@ public class ConstantInteger extends Constant
 	 */
 	private int value;
 
+	@Override
+	public void dump(IndentedOutputStream stream)
+	{
+		stream.print("Integer: " + value);
+	}
+
 	public int getValue()
 	{
 		return value;
-	}
-
-	@Override
-	protected void dump(IndentedOutputStream stream)
-	{
-		stream.print("Integer: " + value);
 	}
 
 	@Override

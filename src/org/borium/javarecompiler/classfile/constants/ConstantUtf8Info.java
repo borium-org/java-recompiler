@@ -27,15 +27,15 @@ public class ConstantUtf8Info extends Constant
 	 */
 	private String utf8;
 
+	@Override
+	public void dump(IndentedOutputStream stream)
+	{
+		stream.print("UTF8: '" + utf8 + "'");
+	}
+
 	public String string()
 	{
 		return utf8;
-	}
-
-	@Override
-	protected void dump(IndentedOutputStream stream)
-	{
-		stream.print("UTF8: '" + utf8 + "'");
 	}
 
 	@Override

@@ -25,15 +25,15 @@ public class ConstantFloat extends Constant
 	 */
 	private double value;
 
+	@Override
+	public void dump(IndentedOutputStream stream)
+	{
+		stream.print("Float: " + value);
+	}
+
 	public double getValue()
 	{
 		return value;
-	}
-
-	@Override
-	protected void dump(IndentedOutputStream stream)
-	{
-		stream.print("Float: " + value);
 	}
 
 	@Override

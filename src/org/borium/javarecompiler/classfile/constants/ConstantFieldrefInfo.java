@@ -45,18 +45,18 @@ public class ConstantFieldrefInfo extends Constant
 
 	private ConstantNameAndTypeInfo nameTypeInfo;
 
-	public String getClassName()
-	{
-		return classInfo.getName();
-	}
-
 	@Override
-	protected void dump(IndentedOutputStream stream)
+	public void dump(IndentedOutputStream stream)
 	{
 		stream.print("FieldRef:  Class " + classIndex + " ");
 		classInfo.dump(stream);
 		stream.print(" NameType " + nameAndTypeIndex + " ");
 		nameTypeInfo.dump(stream);
+	}
+
+	public String getClassName()
+	{
+		return classInfo.getName();
 	}
 
 	@Override
