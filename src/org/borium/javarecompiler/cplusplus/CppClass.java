@@ -422,7 +422,7 @@ public class CppClass
 	{
 		for (CppField field : fields)
 		{
-			if (field.isStatic())
+			if (field.isStatic() && !field.isFinal())
 			{
 				// TODO initializers if any
 				source.iprintln(field.getType() + " " + className + "::" + field.getName() + ";");

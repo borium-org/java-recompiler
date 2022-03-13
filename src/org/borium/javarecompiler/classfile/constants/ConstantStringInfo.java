@@ -28,6 +28,12 @@ public class ConstantStringInfo extends Constant
 
 	private String string;
 
+	@Override
+	public void dump(IndentedOutputStream stream)
+	{
+		stream.print("String: " + stringIndex + " '" + string + "'");
+	}
+
 	public String getString()
 	{
 		return string;
@@ -36,12 +42,6 @@ public class ConstantStringInfo extends Constant
 	public String getValue(ConstantPool constantPool)
 	{
 		return constantPool.getString(stringIndex);
-	}
-
-	@Override
-	protected void dump(IndentedOutputStream stream)
-	{
-		stream.print("String: " + stringIndex + " '" + string + "'");
 	}
 
 	@Override

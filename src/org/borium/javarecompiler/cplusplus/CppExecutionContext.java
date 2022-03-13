@@ -50,10 +50,16 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		super(javaMethod);
 		this.cppClass = cppClass;
 		this.cppMethod = cppMethod;
-		locals = new LocalVariables(javaMethod.getLocalVariableTable(), cppClass);
+		if (!javaMethod.isAbstract())
+		{
+			locals = new LocalVariables(javaMethod.getLocalVariableTable(), cppClass);
+		}
 		cppType = new JavaTypeConverter(type, javaMethod.isStatic(), locals).getCppType();
 		classType = cppClass.namespace + "::" + cppClass.className + "*";
-		codeSize = javaMethod.getCode().getLength();
+		if (!javaMethod.isAbstract())
+		{
+			codeSize = javaMethod.getCode().getLength();
+		}
 	}
 
 	public void generate(IndentedOutputStream source, Instruction instruction)
@@ -1790,7 +1796,19 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateTABLESWITCH(IndentedOutputStream source, InstructionTABLESWITCH instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(topOfStack[0].equals("int"), "TABLESWITCH: Integer expected");
+		source.iprintln("switch (" + topOfStack[1] + ")");
+		source.iprintln("{");
+		int value = instruction.getFirstValue();
+		for (int i = 0; i < instruction.getCaseCount(); i++)
+		{
+			source.iprintln("case " + (value + i) + ":");
+			source.iprintln("\tgoto " + instruction.getLabel(i) + ";");
+		}
+		source.iprintln("default:");
+		source.iprintln("\tgoto " + instruction.getDefaultLabel() + ";");
+		source.iprintln("}");
 	}
 
 	private void generateWIDE(IndentedOutputStream source, InstructionWIDE instruction)

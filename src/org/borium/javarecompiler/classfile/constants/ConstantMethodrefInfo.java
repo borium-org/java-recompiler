@@ -51,7 +51,7 @@ public class ConstantMethodrefInfo extends Constant
 	private ConstantNameAndTypeInfo nameTypeInfo;
 
 	@Override
-	protected void dump(IndentedOutputStream stream)
+	public void dump(IndentedOutputStream stream)
 	{
 		stream.print("MethodRef: Class " + classIndex + " ");
 		classInfo.dump(stream);

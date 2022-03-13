@@ -286,6 +286,11 @@ public class ClassMethod
 		return Statics.getParameterCount(descriptor) + (isStatic() ? 0 : 1);
 	}
 
+	public boolean isAbstract()
+	{
+		return (accessFlags & 0x0400) != 0;
+	}
+
 	public boolean isStatic()
 	{
 		return (accessFlags & 0x0008) != 0;

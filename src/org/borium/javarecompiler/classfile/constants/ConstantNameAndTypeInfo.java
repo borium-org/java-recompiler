@@ -40,6 +40,12 @@ public class ConstantNameAndTypeInfo extends Constant
 
 	private String descriptor;
 
+	@Override
+	public void dump(IndentedOutputStream stream)
+	{
+		stream.print("NameType: Name " + nameIndex + " " + name + " Descriptor " + descriptorIndex + " " + descriptor);
+	}
+
 	public String getDescriptor()
 	{
 		return descriptor;
@@ -74,12 +80,6 @@ public class ConstantNameAndTypeInfo extends Constant
 		}
 
 		return descriptor.charAt(pos + 1) != 'V' ? 1 : 0;
-	}
-
-	@Override
-	protected void dump(IndentedOutputStream stream)
-	{
-		stream.print("NameType: Name " + nameIndex + " " + name + " Descriptor " + descriptorIndex + " " + descriptor);
 	}
 
 	@Override

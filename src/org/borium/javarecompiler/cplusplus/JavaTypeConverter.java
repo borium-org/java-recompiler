@@ -197,7 +197,7 @@ public class JavaTypeConverter
 			{
 				cppType += " ";
 			}
-			cppType += locals.get(parameterIndex, null).getName();
+			cppType += locals != null ? locals.get(parameterIndex, null).getName() : "param" + parameterIndex;
 			parameterIndex++;
 		}
 	}

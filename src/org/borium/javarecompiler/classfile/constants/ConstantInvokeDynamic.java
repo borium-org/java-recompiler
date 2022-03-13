@@ -46,7 +46,7 @@ public class ConstantInvokeDynamic extends Constant
 	private String nameAndType;
 
 	@Override
-	protected void dump(IndentedOutputStream stream)
+	public void dump(IndentedOutputStream stream)
 	{
 		stream.println("InvokeDynamic: Bootstrap " + bootstrap + " Name and type " + nameAndType);
 	}

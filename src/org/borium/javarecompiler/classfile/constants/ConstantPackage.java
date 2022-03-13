@@ -34,7 +34,7 @@ public class ConstantPackage extends Constant
 	private String name;
 
 	@Override
-	protected void dump(IndentedOutputStream stream)
+	public void dump(IndentedOutputStream stream)
 	{
 		stream.println("Package: " + name);
 	}

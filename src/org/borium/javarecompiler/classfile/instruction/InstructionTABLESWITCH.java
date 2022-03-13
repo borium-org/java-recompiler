@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
+import static org.borium.javarecompiler.Statics.*;
+
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -78,6 +80,26 @@ public class InstructionTABLESWITCH extends Instruction
 			stream.println();
 		}
 		stream.indent(-1);
+	}
+
+	public int getCaseCount()
+	{
+		return offset.length;
+	}
+
+	public String getDefaultLabel()
+	{
+		return "L" + hexString(address + defaultLabel, 4);
+	}
+
+	public int getFirstValue()
+	{
+		return low;
+	}
+
+	public String getLabel(int index)
+	{
+		return "L" + hexString(address + offset[index], 4);
 	}
 
 	@Override

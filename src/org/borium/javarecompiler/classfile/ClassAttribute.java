@@ -38,6 +38,8 @@ public class ClassAttribute
 		{
 		case "Code":
 			return new AttributeCode(attribute, constants);
+		case "ConstantValue":
+			return new AttributeConstantValue(attribute, constants);
 		case "Exceptions":
 			return new AttributeExceptions(attribute, constants);
 		case "InnerClasses":
