@@ -51,9 +51,12 @@ public class ExecutionContext
 		name = javaMethod.getName();
 		type = javaMethod.getDescriptor();
 		AttributeCode code = javaMethod.getCode();
-		instructions = code.getInstructions();
-		maxLocals = code.getLocalsCount();
-		labels = code.getLabels();
+		if (!javaMethod.isAbstract())
+		{
+			instructions = code.getInstructions();
+			maxLocals = code.getLocalsCount();
+			labels = code.getLabels();
+		}
 	}
 
 	public Stack<String> getStack()

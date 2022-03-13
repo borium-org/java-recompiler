@@ -172,6 +172,9 @@ class CppMethod
 	/** True if method is static. */
 	private boolean isStatic;
 
+	/** True if method is abstract. */
+	private boolean isAbstract;
+
 	/**
 	 * C++ class that owns this method. C++ class info is used to simplify field
 	 * types.
@@ -193,9 +196,13 @@ class CppMethod
 		this.cppClass = cppClass;
 		executionContext = new CppExecutionContext(this, cppClass, javaMethod);
 		isStatic = javaMethod.isStatic();
+		isAbstract = javaMethod.isAbstract();
 		parameterCount = javaMethod.getParameterCount();
-		exceptionHandlers = new ExceptionHandlers(javaMethod.getExceptionTable(), cppClass);
-		parseStatements();
+		if (!isAbstract)
+		{
+			exceptionHandlers = new ExceptionHandlers(javaMethod.getExceptionTable(), cppClass);
+			parseStatements();
+		}
 	}
 
 	public void generateHeader(IndentedOutputStream header, String newName, String newType)
@@ -228,6 +235,10 @@ class CppMethod
 	 */
 	public void generateSource(IndentedOutputStream source, String newName, String newType, CppField[] fields)
 	{
+		if (isAbstract)
+		{
+			return;
+		}
 		int pos = newType.indexOf(')');
 		String returnType = newType.substring(pos + 1);
 		boolean isConstructor = returnType.length() == 0;

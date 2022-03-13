@@ -50,10 +50,16 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		super(javaMethod);
 		this.cppClass = cppClass;
 		this.cppMethod = cppMethod;
-		locals = new LocalVariables(javaMethod.getLocalVariableTable(), cppClass);
+		if (!javaMethod.isAbstract())
+		{
+			locals = new LocalVariables(javaMethod.getLocalVariableTable(), cppClass);
+		}
 		cppType = new JavaTypeConverter(type, javaMethod.isStatic(), locals).getCppType();
 		classType = cppClass.namespace + "::" + cppClass.className + "*";
-		codeSize = javaMethod.getCode().getLength();
+		if (!javaMethod.isAbstract())
+		{
+			codeSize = javaMethod.getCode().getLength();
+		}
 	}
 
 	public void generate(IndentedOutputStream source, Instruction instruction)
