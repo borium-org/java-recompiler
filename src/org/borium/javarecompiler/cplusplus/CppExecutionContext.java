@@ -567,14 +567,14 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] value = stack.pop().split(SplitStackEntrySeparator);
 		String[] index = stack.pop().split(SplitStackEntrySeparator);
 		String[] array = stack.pop().split(SplitStackEntrySeparator);
-		Assert(array[0].startsWith("JavaArray<"), "ANEWARRAY: Array expected");
-		Assert(index[0].equals("int"), "ANEWARRAY: Integer index expected");
+		Assert(array[0].startsWith("JavaArray<"), "AASTORE: Array expected");
+		Assert(index[0].equals("int"), "AASTORE: Integer index expected");
 		String arrayElementType = array[0].substring(10);
 		int pos = arrayElementType.indexOf('*');
 		Assert(pos > 0, "JavaArray element is not a pointer");
-		arrayElementType = arrayElementType.substring(0, pos) + " *";
-		Assert(value[0].equals(arrayElementType), "ANEWARRAY: Value does not match JavaArray type");
-		source.iprintln("temp->assignString(" + index[1] + ", " + value[1] + ");");
+		arrayElementType = arrayElementType.substring(0, pos + 1);
+		Assert(value[0].equals(arrayElementType), "AASTORE: Value does not match JavaArray type");
+		source.iprintln(array[1] + "->assign(" + index[1] + ", " + value[1] + ");");
 	}
 
 	private void generateACONST_NULL(IndentedOutputStream source, InstructionACONST_NULL instruction)
@@ -695,8 +695,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
 		String className = javaToCppClass(instruction.getClassName());
-		className = cppClass.simplifyType(className) + "*";
-		source.iprintln("// ASSERT_KINDOF(" + className + ", " + topOfStack[1] + ");");
+		className = cppClass.simplifyType(className);
+		source.iprintln(topOfStack[1] + "->checkCast(" + className + "::getClass());");
 		stack.push(className + StackEntrySeparator + topOfStack[1]);
 	}
 
@@ -989,7 +989,12 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIALOAD(IndentedOutputStream source, InstructionIALOAD instruction)
 	{
-		notSupported(instruction);
+		String[] index = stack.pop().split(SplitStackEntrySeparator);
+		String[] array = stack.pop().split(SplitStackEntrySeparator);
+		Assert(index[0].equals("int"), "IALOAD: Integer index expected");
+		Assert(array[0].equals("JavaArray<int>*"), "IALOAD: Integer array expected");
+		String newEntry = "int" + StackEntrySeparator + array[1] + ".get(" + index[1] + ")";
+		stack.push(newEntry);
 	}
 
 	private void generateIAND(IndentedOutputStream source, InstructionIAND instruction)
@@ -1004,7 +1009,12 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIASTORE(IndentedOutputStream source, InstructionIASTORE instruction)
 	{
-		notSupported(instruction);
+		String[] value = stack.pop().split(SplitStackEntrySeparator);
+		String[] index = stack.pop().split(SplitStackEntrySeparator);
+		String[] array = stack.pop().split(SplitStackEntrySeparator);
+		Assert(index[0].equals("int"), "IASTORE: Integer index expected");
+		Assert(array[0].equals("JavaArray<int>*"), "IASTORE: Integer array expected");
+		source.iprintln(array[1] + "->assign(" + index[1] + ", " + value[1] + ");");
 	}
 
 	private void generateICONST(IndentedOutputStream source, InstructionICONST instruction)
@@ -1020,17 +1030,28 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIF_ACMPEQ(IndentedOutputStream source, InstructionIF_ACMPEQ instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		source.iprintln("if ((" + left[1] + ") == (" + right[1] + "))");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIF_ACMPNE(IndentedOutputStream source, InstructionIF_ACMPNE instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		source.iprintln("if ((" + left[1] + ") != (" + right[1] + "))");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIF_ICMPEQ(IndentedOutputStream source, InstructionIF_ICMPEQ instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		Assert(left[0].equals("int"), "IF_ICMPEQ: Integer expected");
+		Assert(right[0].equals("int"), "IF_ICMPEQ: Integer expected");
+		source.iprintln("if ((" + left[1] + ") == (" + right[1] + "))");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIF_ICMPGE(IndentedOutputStream source, InstructionIF_ICMPGE instruction)
@@ -1052,15 +1073,20 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String[] right = stack.pop().split(SplitStackEntrySeparator);
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
-		Assert(left[0].equals("int"), "IF_ICMLPT: Integer expected");
-		Assert(right[0].equals("int"), "IF_ICMLPT: Integer expected");
+		Assert(left[0].equals("int"), "IF_ICMPLT: Integer expected");
+		Assert(right[0].equals("int"), "IF_ICMPLT: Integer expected");
 		source.iprintln("if ((" + left[1] + ") < (" + right[1] + "))");
 		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIF_ICMPNE(IndentedOutputStream source, InstructionIF_ICMPNE instruction)
 	{
-		notSupported(instruction);
+		String[] right = stack.pop().split(SplitStackEntrySeparator);
+		String[] left = stack.pop().split(SplitStackEntrySeparator);
+		Assert(left[0].equals("int"), "IF_ICMPNE: Integer expected");
+		Assert(right[0].equals("int"), "IF_ICMPNE: Integer expected");
+		source.iprintln("if ((" + left[1] + ") != (" + right[1] + "))");
+		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
 
 	private void generateIFEQ(IndentedOutputStream source, InstructionIFEQ instruction)
@@ -1083,7 +1109,16 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIFGE(IndentedOutputStream source, InstructionIFGE instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		switch (topOfStack[0])
+		{
+		case "int":
+			source.iprintln("if ((" + topOfStack[1] + ") >= 0)");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			break;
+		default:
+			Assert(false, "IFGE: Unhandled operand type " + topOfStack[0]);
+		}
 	}
 
 	private void generateIFGT(IndentedOutputStream source, InstructionIFGT instruction)
@@ -1102,12 +1137,30 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateIFLE(IndentedOutputStream source, InstructionIFLE instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		switch (topOfStack[0])
+		{
+		case "int":
+			source.iprintln("if ((" + topOfStack[1] + ") <= 0)");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			break;
+		default:
+			Assert(false, "IFLE: Unhandled operand type " + topOfStack[0]);
+		}
 	}
 
 	private void generateIFLT(IndentedOutputStream source, InstructionIFLT instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		switch (topOfStack[0])
+		{
+		case "int":
+			source.iprintln("if ((" + topOfStack[1] + ") < 0)");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			break;
+		default:
+			Assert(false, "IFLT: Unhandled operand type " + topOfStack[0]);
+		}
 	}
 
 	private void generateIFNE(IndentedOutputStream source, InstructionIFNE instruction)
@@ -1173,7 +1226,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateINSTANCEOF(IndentedOutputStream source, InstructionINSTANCEOF instruction)
 	{
-		notSupported(instruction);
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		String className = instruction.getClassName();
+		className = javaToCppClass(className);
+		className = cppClass.simplifyType(className);
+		stack.push("bool" + StackEntrySeparator + topOfStack[1] + "->instanceOf(" + className + "::getClass())");
 	}
 
 	private void generateINVOKEDYNAMIC(IndentedOutputStream source, InstructionINVOKEDYNAMIC instruction)
@@ -1322,7 +1379,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[parameterIndex]), "Parameter type mismatch");
 		}
 		String[] object = stack.pop().split(SplitStackEntrySeparator);
-		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEVIRTUAL: Object/method type mismatch");
+//		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEVIRTUAL: Object/method type mismatch");
 		if (object[1].startsWith("new "))
 		{
 			object[1] = "(" + object[1] + ")";
@@ -1375,18 +1432,15 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		Assert(index >= 0 && index < maxLocals, "Local index out of range");
 		LocalVariable local = locals.get(index, instruction);
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		if (local != null)
+		String type = "";
+		if (local == null)
 		{
-			Assert(local.getType().equals(topOfStack[0]), "ISTORE: Type mismatch");
-			source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
+			local = locals.set(index, topOfStack[0], instruction.address);
+			type = topOfStack[0] + " ";
 		}
-		else
-		{
-//			locals[index].set(topOfStack[0], "local" + index);
-//			Assert(topOfStack[0].equals("int"), "ISTORE: Integer expected");
-//			source.iprintln("int local" + index + " = " + topOfStack[1] + ";");
-			Assert(false, "");
-		}
+		Assert(local.getType().equals("int"), "ISTORE: Integer expected");
+		Assert(local.getType().equals(topOfStack[0]), "ISTORE: Type mismatch");
+		source.iprintln(type + local.getName() + " = " + topOfStack[1] + ";");
 	}
 
 	private void generateISUB(IndentedOutputStream source, InstructionISUB instruction)
@@ -1519,6 +1573,10 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		else if (constant instanceof ConstantFloat floatValue)
 		{
 			newEntry = "float" + StackEntrySeparator + floatValue.getValue();
+		}
+		else if (constant instanceof ConstantClassInfo classInfo)
+		{
+			newEntry = "class" + StackEntrySeparator + classInfo.getValue();
 		}
 		else
 		{

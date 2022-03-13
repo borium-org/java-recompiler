@@ -39,6 +39,11 @@ public class ConstantClassInfo extends Constant
 		return name;
 	}
 
+	public String getValue()
+	{
+		return name;
+	}
+
 	@Override
 	protected void fixup(ConstantPool constantPool)
 	{

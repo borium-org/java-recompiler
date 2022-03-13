@@ -111,8 +111,10 @@ public class CppClass
 		switch (assign)
 		{
 		case "RuntimeException*=Exception*":
+		case "ClassFormatError*=Exception*":
 		case "ArrayList*=List*":
 		case "int=char":
+		case "class=Class*":
 			return true;
 		}
 		return false;
