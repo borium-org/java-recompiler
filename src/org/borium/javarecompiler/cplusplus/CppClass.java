@@ -242,6 +242,25 @@ public class CppClass
 		source.println("}");
 	}
 
+	private void addReferencedClass(TreeMap<String, TreeSet<String>> classes, String className)
+	{
+		if (className.equals(classFile.getClassName()))
+		{
+			return;
+		}
+		if (className.equals(classFile.getParentClassName()))
+		{
+			return;
+		}
+		String packageName = className.substring(0, className.lastIndexOf('.'));
+		String simpleName = className.substring(className.lastIndexOf('.') + 1);
+		if (!classes.containsKey(packageName))
+		{
+			classes.put(packageName, new TreeSet<String>());
+		}
+		classes.get(packageName).add(simpleName);
+	}
+
 	/**
 	 * Parse Java class name and extract namespace and class name for C++ code.
 	 *
@@ -365,27 +384,13 @@ public class CppClass
 		TreeMap<String, TreeSet<String>> classes = new TreeMap<>();
 		for (String className : referencedClassNames)
 		{
-			if (className.equals(classFile.getClassName()))
-			{
-				continue;
-			}
-			if (className.equals(classFile.getParentClassName()))
-			{
-				continue;
-			}
-
-			String packageName = className.substring(0, className.lastIndexOf('.'));
-			String simpleName = className.substring(className.lastIndexOf('.') + 1);
-			if (!classes.containsKey(packageName))
-			{
-				classes.put(packageName, new TreeSet<String>());
-			}
-			classes.get(packageName).add(simpleName);
+			addReferencedClass(classes, className);
 		}
+		processMethodArgumentClasses(classes);
+
 		for (String packageName : classes.keySet())
 		{
-			String[] split = packageName.split("[.]");
-			header.println("namespace " + String.join("::", split));
+			header.println("namespace " + dotToNamespace(packageName));
 			header.println("{");
 			TreeSet<String> classNames = classes.get(packageName);
 			for (String className : classNames)
@@ -396,9 +401,12 @@ public class CppClass
 			header.println();
 		}
 
-		for (String namespace : namespaces)
+		for (String namespace : classes.keySet())
 		{
-			header.println("using namespace " + namespace + ";");
+			if (!dotToNamespace(namespace).equals(this.namespace))
+			{
+				header.println("using namespace " + dotToNamespace(namespace) + ";");
+			}
 		}
 		header.println();
 	}
@@ -452,6 +460,45 @@ public class CppClass
 				// TODO initializers if any
 				source.iprintln(field.getType() + " " + className + "::" + field.getName() + ";");
 				source.println();
+			}
+		}
+	}
+
+	/**
+	 * Class parameters used in methods are not listed as referenced classes in the
+	 * constant pool. They need to be extracted from method declarations.
+	 *
+	 * @param classes Referenced classes collection.
+	 */
+	private void processMethodArgumentClasses(TreeMap<String, TreeSet<String>> classes)
+	{
+		for (CppMethod method : methods)
+		{
+			String methodType = method.getType();
+			int pos = methodType.indexOf(')');
+			if (pos + 1 <= methodType.length())
+			{
+				String returnType = methodType.substring(pos + 1);
+				if (returnType.contains("::") && returnType.endsWith("*"))
+				{
+					returnType = returnType.substring(0, returnType.length() - 1);
+					String newType = String.join(".", returnType.split("[:][:]"));
+					addReferencedClass(classes, newType);
+				}
+			}
+			String[] parameters = methodType.substring(1, pos).split("[,]");
+			for (String parameter : parameters)
+			{
+				if (parameter.startsWith(" "))
+				{
+					parameter = parameter.substring(1);
+				}
+				if (parameter.contains("::"))
+				{
+					String typeOnly = parameter.substring(0, parameter.indexOf(' '));
+					String newType = String.join(".", typeOnly.split("[:][:]"));
+					addReferencedClass(classes, newType);
+				}
 			}
 		}
 	}

@@ -36,6 +36,11 @@ public class Statics
 		return result;
 	}
 
+	public static String dotToNamespace(String dots)
+	{
+		return String.join("::", dots.split("[.]"));
+	}
+
 	/**
 	 * Calculate number of parameters to the method that is part of this name and
 	 * type info. 'This' is not assumed to be present.
