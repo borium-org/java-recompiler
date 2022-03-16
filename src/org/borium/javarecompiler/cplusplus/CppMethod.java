@@ -216,8 +216,10 @@ class CppMethod
 		{
 			// anything non-static is virtual
 			header.iprint(isStatic ? "static " : "virtual ");
+			newType = starToPointerMethod(newType);
 			int pos = newType.indexOf(')');
-			header.println(newType.substring(pos + 1) + " " + newName + newType.substring(0, pos + 1) + ";");
+			header.print(newType.substring(pos + 1) + " " + newName + newType.substring(0, pos + 1));
+			header.println(isAbstract ? " = 0;" : ";");
 		}
 	}
 

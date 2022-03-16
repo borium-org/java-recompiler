@@ -211,7 +211,7 @@ public class CppClass
 		generateHeaderIncludesAndNamespaces(header);
 		generateHeaderBeginThisClassNamespace(header);
 		header.println();
-		header.iprintln("class " + classFile.getClassSimpleName() + ": public " + simplifyType(parentClassName));
+		header.iprintln("class " + classFile.getClassSimpleName() + " : public " + simplifyType(parentClassName));
 		header.iprintln("{");
 		header.iprintln("public:");
 		header.indent(1);
