@@ -241,6 +241,7 @@ class CppMethod
 		{
 			return;
 		}
+		newType = starToPointerMethod(newType);
 		int pos = newType.indexOf(')');
 		String returnType = newType.substring(pos + 1);
 		boolean isConstructor = returnType.length() == 0;

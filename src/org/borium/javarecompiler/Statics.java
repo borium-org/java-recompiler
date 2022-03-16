@@ -189,8 +189,30 @@ public class Statics
 
 	public static String starToPointerMethod(String stars)
 	{
-		String[] parts = stars.substring(1).split("[)]");
-		String result = "(" + starToPointer(parts[0]) + ")" + starToPointer(parts[1]);
+		// First opening '('
+		Assert(stars.startsWith("("), "Stars to pointers: Method() expected");
+		String result = "(";
+		stars = stars.substring(1);
+		// Parameters, if any?
+		int pos = stars.indexOf(')');
+		if (pos == 0)
+		{
+			// No parameters
+			result += ')';
+			stars = stars.substring(1);
+		}
+		else
+		{
+			// Parameter list
+			result += starToPointer(stars.substring(0, pos)) + ')';
+			stars = stars.substring(pos + 1);
+		}
+		// Return type, if any?
+		if (stars.length() > 0)
+		{
+			// Yup, got something
+			result += starToPointer(stars);
+		}
 		return result;
 	}
 
