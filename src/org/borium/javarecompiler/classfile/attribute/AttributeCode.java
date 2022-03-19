@@ -115,6 +115,13 @@ public class AttributeCode extends ClassAttribute
 
 	private HashMap<String, ClassAttribute> attributes = new HashMap<>();
 
+	/**
+	 * Same attributes as in attributes map, but guaranteed in order as they appear
+	 * in class file. Also, duplicate attributes are possible in some cases, so this
+	 * list has them all.
+	 */
+	private ArrayList<ClassAttribute> attributeList = new ArrayList<>();
+
 	/** True for each instruction that is referenced by a goto of some kind. */
 	private boolean[] labels;
 
@@ -213,6 +220,14 @@ public class AttributeCode extends ClassAttribute
 			stream.println();
 			stream.indent(-1);
 		}
+		stream.iprintln("Attributes: " + attributes.size());
+		for (int i = 0; i < attributes.size(); i++)
+		{
+			stream.indent(1);
+			stream.iprint(i + ": ");
+			attributeList.get(i).dump(stream);
+			stream.indent(-1);
+		}
 		stream.indent(-1);
 	}
 
@@ -238,6 +253,7 @@ public class AttributeCode extends ClassAttribute
 		{
 			ClassAttribute attribute = ClassAttribute.readAttribute(in, cp);
 			attributes.put(attribute.getName(), attribute);
+			attributeList.add(attribute);
 		}
 		in.close();
 
