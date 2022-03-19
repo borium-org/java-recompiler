@@ -235,9 +235,17 @@ public class ClassFile
 		return superClassName;
 	}
 
-	public List<String> getReferencedClasses()
+	public ReferencedClasses getReferencedClasses()
 	{
-		ArrayList<String> referencedClasses = cp.getReferencedClasses();
+		ReferencedClasses referencedClasses = new ReferencedClasses();
+		for (ClassField field : fields)
+		{
+			field.addReferencedClasses(referencedClasses);
+		}
+		for (ClassMethod method : methods)
+		{
+			method.addReferencedClasses(referencedClasses);
+		}
 		return referencedClasses;
 	}
 

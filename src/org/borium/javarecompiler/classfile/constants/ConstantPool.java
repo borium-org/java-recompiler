@@ -2,8 +2,6 @@ package org.borium.javarecompiler.classfile.constants;
 
 import static org.borium.javarecompiler.classfile.constants.Constant.*;
 
-import java.util.*;
-
 import org.borium.javarecompiler.classfile.*;
 
 public class ConstantPool
@@ -53,19 +51,6 @@ public class ConstantPool
 			return (T) c;
 		}
 		throw new ClassFormatError("Constant " + index + " is not " + clazz.getSimpleName());
-	}
-
-	public ArrayList<String> getReferencedClasses()
-	{
-		ArrayList<String> referencedClasses = new ArrayList<>();
-		for (Constant c : constants)
-		{
-			if (c instanceof ConstantClassInfo ci)
-			{
-				referencedClasses.add(getString(ci.nameIndex).replace('/', '.'));
-			}
-		}
-		return referencedClasses;
 	}
 
 	public String getString(int index)

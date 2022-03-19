@@ -311,20 +311,21 @@ public class CppClass
 	private void extractNamespaces()
 	{
 		HashMap<String, String> classes = new HashMap<>();
-		List<String> referencedClassNames = classFile.getReferencedClasses();
+		ReferencedClasses referencedClassNames = classFile.getReferencedClasses();
 		for (String referencedClassName : referencedClassNames)
 		{
-			int pos = referencedClassName.lastIndexOf('.');
-			String packageName = referencedClassName.substring(0, pos);
+			String cppClassName = referencedClassName.replace('/', '.');
+			int pos = cppClassName.lastIndexOf('.');
+			String packageName = cppClassName.substring(0, pos);
 			String namespace = dotToNamespace(packageName);
 			namespaces.add(namespace);
 
-			String className = referencedClassName.substring(pos + 1);
+			String className = cppClassName.substring(pos + 1);
 			if (classes.containsKey(className) && !classes.containsValue(referencedClassName))
 			{
 				multipleClasses.add(className);
 			}
-			classes.put(className, referencedClassName);
+			classes.put(className, cppClassName);
 		}
 		namespaces.remove(namespace);
 	}
@@ -377,7 +378,7 @@ public class CppClass
 		header.println("#include \"" + dotToNamespace(superClassName).replace(':', '_') + ".h\"");
 		header.println();
 
-		List<String> referencedClassNames = classFile.getReferencedClasses();
+		ReferencedClasses referencedClassNames = classFile.getReferencedClasses();
 		TreeMap<String, TreeSet<String>> classes = new TreeMap<>();
 		for (String className : referencedClassNames)
 		{

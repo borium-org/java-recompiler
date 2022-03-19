@@ -146,6 +146,11 @@ public class ClassField
 
 	private String descriptor;
 
+	public void addReferencedClasses(ReferencedClasses referencedClasses)
+	{
+		referencedClasses.add(getType());
+	}
+
 	public void dump(IndentedOutputStream stream)
 	{
 		stream.println("Field: " + name + " " + descriptor);

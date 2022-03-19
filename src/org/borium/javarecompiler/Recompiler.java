@@ -124,7 +124,7 @@ public class Recompiler
 
 	private void addReferencedClasses(List<String> newClassNames, ClassFile classFile)
 	{
-		List<String> allReferences = classFile.getReferencedClasses();
+		ReferencedClasses allReferences = classFile.getReferencedClasses();
 
 		for (String reference : allReferences)
 		{
