@@ -150,6 +150,18 @@ public class Statics
 		return returnType;
 	}
 
+	public static String removeJavaArray(String javaArray)
+	{
+		Assert(javaArray.startsWith("JavaArray<"), "JavaArray<> expected");
+		return javaArray.substring(10, javaArray.length() - 1);
+	}
+
+	public static String removePointerWrapper(String wrappedObject)
+	{
+		Assert(wrappedObject.startsWith("Pointer<"), "Pointer<> expected");
+		return wrappedObject.substring(8, wrappedObject.length() - 1);
+	}
+
 	/**
 	 * Convenience method to remove trailing star from a pointer type.
 	 *

@@ -63,7 +63,7 @@ public class JavaTypeConverter
 		while (javaType.charAt(index) != ')')
 		{
 			cppType = "";
-			parseSingleType(false);
+			parseSingleType(true, false);
 			parameterTypes.add(cppType);
 		}
 		return parameterTypes.toArray(new String[parameterTypes.size()]);
