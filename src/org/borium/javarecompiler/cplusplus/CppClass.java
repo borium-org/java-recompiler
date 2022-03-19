@@ -216,8 +216,8 @@ public class CppClass
 		header.iprintln("public:");
 		header.indent(1);
 
-//		generateHeaderFields(header);
-//		generateHeaderMethods(header);
+		generateHeaderFields(header);
+		generateHeaderMethods(header);
 
 		header.indent(-1);
 		header.iprintln("};");
