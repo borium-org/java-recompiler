@@ -355,26 +355,38 @@ public class CppClass
 		header.println();
 
 		ReferencedClasses referencedClassNames = classFile.getReferencedClasses();
-		for (String reference : referencedClassNames)
+		for (String packageName : namespaces)
 		{
-			String template = "";
-			reference = dotToNamespace(reference.replace('/', '.'));
-			int pos = reference.indexOf('<');
-			if (pos >= 0)
+			header.println("namespace " + packageName);
+			header.println("{");
+			header.indent(1);
+			for (String reference : referencedClassNames)
 			{
-				int templateCount = Integer.parseInt(reference.substring(pos + 1, reference.length() - 1));
-				reference = reference.substring(0, pos);
-				template = "template <";
-				for (int i = 0; i < templateCount; i++)
+				String template = "";
+				reference = dotToNamespace(reference.replace('/', '.'));
+				if (reference.startsWith(packageName + "::"))
 				{
-					template += i > 0 ? ", " : "";
-					template += "class " + (char) ('A' + i);
+					int pos = reference.indexOf('<');
+					if (pos >= 0)
+					{
+						int templateCount = Integer.parseInt(reference.substring(pos + 1, reference.length() - 1));
+						reference = reference.substring(0, pos);
+						template = "template <";
+						for (int i = 0; i < templateCount; i++)
+						{
+							template += i > 0 ? ", " : "";
+							template += "class " + (char) ('A' + i);
+						}
+						template += "> ";
+					}
+					reference = reference.substring(reference.lastIndexOf(':') + 1);
+					header.iprintln(template + "class " + reference + ";");
 				}
-				template += "> ";
 			}
-			header.println(template + "class " + reference + ";");
+			header.indent(-1);
+			header.println("}");
+			header.println();
 		}
-		header.println();
 
 		for (String packageName : namespaces)
 		{
