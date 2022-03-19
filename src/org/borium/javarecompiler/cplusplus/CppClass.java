@@ -216,8 +216,8 @@ public class CppClass
 		header.iprintln("public:");
 		header.indent(1);
 
-		generateHeaderFields(header);
-		generateHeaderMethods(header);
+//		generateHeaderFields(header);
+//		generateHeaderMethods(header);
 
 		header.indent(-1);
 		header.iprintln("};");
@@ -240,25 +240,6 @@ public class CppClass
 		source.indent(-1);
 
 		source.println("}");
-	}
-
-	private void addReferencedClass(TreeMap<String, TreeSet<String>> classes, String className)
-	{
-		if (className.equals(classFile.getClassName()))
-		{
-			return;
-		}
-		if (className.equals(classFile.getParentClassName()))
-		{
-			return;
-		}
-		String packageName = className.substring(0, className.lastIndexOf('.'));
-		String simpleName = className.substring(className.lastIndexOf('.') + 1);
-		if (!classes.containsKey(packageName))
-		{
-			classes.put(packageName, new TreeSet<String>());
-		}
-		classes.get(packageName).add(simpleName);
 	}
 
 	/**
@@ -337,11 +318,6 @@ public class CppClass
 
 	private void generateHeaderBeginThisClassNamespace(IndentedOutputStream header)
 	{
-		String thisClassName = classFile.getClassName();
-		int pos = thisClassName.lastIndexOf('.');
-		String packageName = thisClassName.substring(0, pos);
-		String[] split = packageName.split("[.]");
-		String namespace = String.join("::", split);
 		header.println("namespace " + namespace);
 		header.println("{");
 		header.indent(1);
@@ -379,32 +355,30 @@ public class CppClass
 		header.println();
 
 		ReferencedClasses referencedClassNames = classFile.getReferencedClasses();
-		TreeMap<String, TreeSet<String>> classes = new TreeMap<>();
-		for (String className : referencedClassNames)
+		for (String reference : referencedClassNames)
 		{
-			addReferencedClass(classes, className);
-		}
-		processMethodArgumentClasses(classes);
-
-		for (String packageName : classes.keySet())
-		{
-			header.println("namespace " + dotToNamespace(packageName));
-			header.println("{");
-			TreeSet<String> classNames = classes.get(packageName);
-			for (String className : classNames)
+			String template = "";
+			reference = dotToNamespace(reference.replace('/', '.'));
+			int pos = reference.indexOf('<');
+			if (pos >= 0)
 			{
-				header.println("\tclass " + className + ";");
+				int templateCount = Integer.parseInt(reference.substring(pos + 1, reference.length() - 1));
+				reference = reference.substring(0, pos);
+				template = "template <";
+				for (int i = 0; i < templateCount; i++)
+				{
+					template += i > 0 ? ", " : "";
+					template += "class " + (char) ('A' + i);
+				}
+				template += "> ";
 			}
-			header.println("}");
-			header.println();
+			header.println(template + "class " + reference + ";");
 		}
+		header.println();
 
-		for (String namespace : classes.keySet())
+		for (String packageName : namespaces)
 		{
-			if (!dotToNamespace(namespace).equals(this.namespace))
-			{
-				header.println("using namespace " + dotToNamespace(namespace) + ";");
-			}
+			header.println("using namespace " + packageName + ";");
 		}
 		header.println();
 	}
@@ -458,45 +432,6 @@ public class CppClass
 				// TODO initializers if any
 				source.iprintln(field.getType() + " " + className + "::" + field.getName() + ";");
 				source.println();
-			}
-		}
-	}
-
-	/**
-	 * Class parameters used in methods are not listed as referenced classes in the
-	 * constant pool. They need to be extracted from method declarations.
-	 *
-	 * @param classes Referenced classes collection.
-	 */
-	private void processMethodArgumentClasses(TreeMap<String, TreeSet<String>> classes)
-	{
-		for (CppMethod method : methods)
-		{
-			String methodType = method.getType();
-			int pos = methodType.indexOf(')');
-			if (pos + 1 <= methodType.length())
-			{
-				String returnType = methodType.substring(pos + 1);
-				if (returnType.contains("::") && returnType.endsWith("*"))
-				{
-					returnType = returnType.substring(0, returnType.length() - 1);
-					String newType = String.join(".", returnType.split("[:][:]"));
-					addReferencedClass(classes, newType);
-				}
-			}
-			String[] parameters = methodType.substring(1, pos).split("[,]");
-			for (String parameter : parameters)
-			{
-				if (parameter.startsWith(" "))
-				{
-					parameter = parameter.substring(1);
-				}
-				if (parameter.contains("::"))
-				{
-					String typeOnly = parameter.substring(0, parameter.indexOf(' '));
-					String newType = String.join(".", typeOnly.split("[:][:]"));
-					addReferencedClass(classes, newType);
-				}
 			}
 		}
 	}
