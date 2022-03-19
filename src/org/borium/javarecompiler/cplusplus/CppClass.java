@@ -268,8 +268,7 @@ public class CppClass
 	 */
 	private void extractCppClassName()
 	{
-		String[] split = classFile.getClassName().split("[.]");
-		String cppName = String.join("::", split);
+		String cppName = dotToNamespace(classFile.getClassName());
 		int pos = cppName.lastIndexOf(':');
 		if (pos == -1)
 		{
@@ -317,8 +316,7 @@ public class CppClass
 		{
 			int pos = referencedClassName.lastIndexOf('.');
 			String packageName = referencedClassName.substring(0, pos);
-			String[] split = packageName.split("[.]");
-			String namespace = String.join("::", split);
+			String namespace = dotToNamespace(packageName);
 			namespaces.add(namespace);
 
 			String className = referencedClassName.substring(pos + 1);
@@ -333,8 +331,7 @@ public class CppClass
 
 	private void extractParentClassName()
 	{
-		String[] split = classFile.getParentClassName().split("[.]");
-		parentClassName = String.join("::", split);
+		parentClassName = dotToNamespace(classFile.getParentClassName());
 	}
 
 	private void generateHeaderBeginThisClassNamespace(IndentedOutputStream header)
@@ -377,7 +374,7 @@ public class CppClass
 	private void generateHeaderIncludesAndNamespaces(IndentedOutputStream header)
 	{
 		String superClassName = classFile.getParentClassName();
-		header.println("#include \"" + String.join("__", superClassName.split("[.]")) + ".h\"");
+		header.println("#include \"" + dotToNamespace(superClassName).replace(':', '_') + ".h\"");
 		header.println();
 
 		List<String> referencedClassNames = classFile.getReferencedClasses();
