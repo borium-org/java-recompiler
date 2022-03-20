@@ -21,7 +21,7 @@ public class Recompiler
 					"-outputpath", "../JrcPortCpp", //
 					"-mainclass", "org.borium.javarecompiler.Recompiler", //
 					"-vs", "2005", //
-					"-comments", "all", //
+					"-comments", "none", //
 			};
 		}
 		Recompiler recompiler = new Recompiler();
