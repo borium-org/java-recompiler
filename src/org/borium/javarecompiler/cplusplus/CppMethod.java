@@ -216,8 +216,10 @@ class CppMethod
 		{
 			// anything non-static is virtual
 			header.iprint(isStatic ? "static " : "virtual ");
+			newType = addPointersIfNeeded(newType);
 			int pos = newType.indexOf(')');
-			header.println(newType.substring(pos + 1) + " " + newName + newType.substring(0, pos + 1) + ";");
+			header.print(newType.substring(pos + 1) + " " + newName + newType.substring(0, pos + 1));
+			header.println(isAbstract ? " = 0;" : ";");
 		}
 	}
 
@@ -239,6 +241,7 @@ class CppMethod
 		{
 			return;
 		}
+		newType = addPointersIfNeeded(newType);
 		int pos = newType.indexOf(')');
 		String returnType = newType.substring(pos + 1);
 		boolean isConstructor = returnType.length() == 0;
@@ -258,18 +261,23 @@ class CppMethod
 			{
 				if (!field.isStatic())
 				{
-					if (first)
+					String type = field.getType();
+					String initializer = createInitializer(type);
+					if (initializer.length() > 0)
 					{
-						source.iprint(", ");
+						if (first)
+						{
+							source.iprint(", ");
+						}
+						else
+						{
+							source.indent(2);
+							source.iprint(", ");
+							source.indent(-2);
+						}
+						first = false;
+						source.println(field.getName() + "(" + initializer + ") //");
 					}
-					else
-					{
-						source.indent(2);
-						source.iprint(", ");
-						source.indent(-2);
-					}
-					first = false;
-					source.println(field.getName() + "(0) //");
 				}
 			}
 			source.indent(-2);
@@ -298,22 +306,27 @@ class CppMethod
 		return executionContext.cppType;
 	}
 
+	private String createInitializer(String type)
+	{
+		String initializer = " = 0";
+		if (type.equals("bool"))
+		{
+			initializer = " = false";
+		}
+		type = addPointerIfNeeded(type);
+		if (type.startsWith("Pointer<"))
+		{
+			initializer = "";
+		}
+		return initializer;
+	}
+
 	private void generateLocalVariableInitializer(IndentedOutputStream source, LocalVariable local)
 	{
 		String type = local.getType();
 		String name = local.getName();
-		String initializer = "0";
-		if (type.endsWith("*"))
-		{
-			type = removeStar(type);
-			name = "*" + name;
-			initializer = "nullptr";
-		}
-		if (type.equals("bool"))
-		{
-			initializer = "false";
-		}
-		source.iprintln(type + " " + name + " = " + initializer + ";");
+		String initializer = createInitializer(type);
+		source.iprintln(addPointerIfNeeded(type) + " " + name + initializer + ";");
 	}
 
 	private void generateLocalVariables(IndentedOutputStream source)

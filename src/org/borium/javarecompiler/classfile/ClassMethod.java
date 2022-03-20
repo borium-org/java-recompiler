@@ -203,6 +203,11 @@ public class ClassMethod
 	/** This method descriptor. */
 	private String descriptor;
 
+	public void addReferencedClasses(ReferencedClasses referencedClasses)
+	{
+		referencedClasses.add(getType());
+	}
+
 	public void dump(IndentedOutputStream stream, ConstantPool cp)
 	{
 		stream.println("Method: " + cp.getString(nameIndex) + " " + cp.getString(descriptorIndex));
@@ -284,6 +289,16 @@ public class ClassMethod
 	public int getParameterCount()
 	{
 		return Statics.getParameterCount(descriptor) + (isStatic() ? 0 : 1);
+	}
+
+	public String getType()
+	{
+		if (attributes.containsKey("Signature"))
+		{
+			AttributeSignature sig = (AttributeSignature) attributes.get("Signature");
+			return sig.getSignature();
+		}
+		return descriptor;
 	}
 
 	public boolean isAbstract()

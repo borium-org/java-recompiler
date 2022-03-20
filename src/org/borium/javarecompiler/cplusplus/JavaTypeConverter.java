@@ -95,7 +95,6 @@ public class JavaTypeConverter
 		}
 		if (javaType.charAt(index) == ';')
 		{
-			cppType += '*';
 			index++;
 		}
 	}
@@ -183,21 +182,13 @@ public class JavaTypeConverter
 		}
 		while (dimensions > 0)
 		{
-			cppType = cppType.substring(0, oldPos) + "JavaArray<" + cppType.substring(oldPos) + ">*";
+			Assert(dimensions == 1, "Dimensions more than 1 not supported yet");
+			cppType = cppType.substring(0, oldPos) + "JavaArray<" + cppType.substring(oldPos) + ">";
 			dimensions--;
 		}
 		if (addParameter)
 		{
-			if (cppType.endsWith("*"))
-			{
-				cppType = cppType.substring(0, cppType.length() - 1);
-				cppType += " *";
-			}
-			else
-			{
-				cppType += " ";
-			}
-			cppType += locals != null ? locals.get(parameterIndex, null).getName() : "param" + parameterIndex;
+			cppType += " " + (locals != null ? locals.get(parameterIndex, null).getName() : "param" + parameterIndex);
 			parameterIndex++;
 		}
 	}

@@ -52,6 +52,13 @@ public class ClassAttribute
 			return new AttributeSourceFile(attribute, constants);
 		case "LocalVariableTable":
 			return new AttributeLocalVariableTable(attribute, constants);
+		case "LineNumberTable":
+			return new AttributeLineNumberTable(attribute, constants);
+		case "LocalVariableTypeTable":
+			return new AttributeLocalVariableTypeTable(attribute, constants);
+		case "StackMapTable":
+			return new AttributeStackMapTable(attribute, constants);
+
 		}
 		return attribute;
 	}

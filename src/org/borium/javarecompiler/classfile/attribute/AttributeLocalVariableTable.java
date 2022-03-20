@@ -44,6 +44,18 @@ public class AttributeLocalVariableTable extends ClassAttribute
 			descriptor = cp.getString(descriptorIndex);
 			index = in.u2();
 		}
+
+		public void dump(IndentedOutputStream stream)
+		{
+			stream.println(name + ": " + descriptor);
+			stream.indent(1);
+			stream.iprint("Start PC: ");
+			stream.printHex(startPc, 4);
+			stream.print(", End PC: ");
+			stream.printHex(startPc + length, 4);
+			stream.print(", Index: " + index);
+			stream.indent(-1);
+		}
 	}
 
 	/** All the variables in this table. */
@@ -58,6 +70,20 @@ public class AttributeLocalVariableTable extends ClassAttribute
 	public VariableTableEntry[] getVariableTable()
 	{
 		return variableTable;
+	}
+
+	@Override
+	protected void detailedDump(IndentedOutputStream stream)
+	{
+		stream.iprintln("Local Variables: " + variableTable.length);
+		stream.indent(1);
+		for (int i = 0; i < variableTable.length; i++)
+		{
+			stream.iprint(i + ": ");
+			variableTable[i].dump(stream);
+			stream.println();
+		}
+		stream.indent(-1);
 	}
 
 	private void decode(ConstantPool cp)

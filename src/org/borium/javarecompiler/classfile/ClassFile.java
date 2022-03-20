@@ -197,6 +197,11 @@ public class ClassFile
 	/** Fully qualified super class name. */
 	private String superClassName;
 
+	public void addReferencedClasses(ReferencedClasses referencedClassNames)
+	{
+		cp.addReferencedClasses(referencedClassNames);
+	}
+
 	public void dump(IndentedOutputStream stream)
 	{
 		stream.println("Class: " + className);
@@ -235,9 +240,17 @@ public class ClassFile
 		return superClassName;
 	}
 
-	public List<String> getReferencedClasses()
+	public ReferencedClasses getReferencedClasses()
 	{
-		ArrayList<String> referencedClasses = cp.getReferencedClasses();
+		ReferencedClasses referencedClasses = new ReferencedClasses();
+		for (ClassField field : fields)
+		{
+			field.addReferencedClasses(referencedClasses);
+		}
+		for (ClassMethod method : methods)
+		{
+			method.addReferencedClasses(referencedClasses);
+		}
 		return referencedClasses;
 	}
 

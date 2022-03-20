@@ -87,19 +87,11 @@ public class CppClass
 		source = simplifyType(source);
 		destination = simplifyType(destination);
 		// In some cases types may have a space between type and '*'
-		if (source.endsWith(" *"))
-		{
-			source = source.substring(0, source.length() - 2) + "*";
-		}
-		if (destination.endsWith(" *"))
-		{
-			destination = destination.substring(0, destination.length() - 2) + "*";
-		}
 		if (source.equals(destination))
 		{
 			return true;
 		}
-		if (destination.equals("Object*"))
+		if (destination.equals("Object"))
 		{
 			return true;
 		}
@@ -110,11 +102,11 @@ public class CppClass
 		String assign = source + "=" + destination;
 		switch (assign)
 		{
-		case "RuntimeException*=Exception*":
-		case "ClassFormatError*=Exception*":
-		case "ArrayList*=List*":
+		case "RuntimeException=Exception":
+		case "ClassFormatError=Exception":
+		case "ArrayList=List":
 		case "int=char":
-		case "class=Class*":
+		case "class=Class":
 			return true;
 		}
 		return false;
@@ -205,14 +197,13 @@ public class CppClass
 	 */
 	protected void generateHeader(IndentedOutputStream header)
 	{
-		header.println("#ifndef " + fileName.toUpperCase());
-		header.println("#define " + fileName.toUpperCase());
+		header.println("#pragma once");
 		header.println();
 
 		generateHeaderIncludesAndNamespaces(header);
 		generateHeaderBeginThisClassNamespace(header);
 		header.println();
-		header.iprintln("class " + classFile.getClassSimpleName() + ": public " + simplifyType(parentClassName));
+		header.iprintln("class " + classFile.getClassSimpleName() + " : public " + simplifyType(parentClassName));
 		header.iprintln("{");
 		header.iprintln("public:");
 		header.indent(1);
@@ -224,15 +215,14 @@ public class CppClass
 		header.iprintln("};");
 		header.println();
 		generateHeaderEndThisClassNamespace(header);
-
-		header.println();
-		header.println("#endif");
 	}
 
 	protected void generateSource(IndentedOutputStream source)
 	{
+		source.println("#include \"stdafx.h\"");
 		source.println("#include \"" + namespace.replace(':', '_') + "__" + className + ".h\"");
 		source.println();
+		generateSourceIncludesAndNamespaces(source);
 		source.println("namespace " + namespace);
 		source.println("{");
 		source.println();
@@ -252,8 +242,7 @@ public class CppClass
 	 */
 	private void extractCppClassName()
 	{
-		String[] split = classFile.getClassName().split("[.]");
-		String cppName = String.join("::", split);
+		String cppName = dotToNamespace(classFile.getClassName());
 		int pos = cppName.lastIndexOf(':');
 		if (pos == -1)
 		{
@@ -296,38 +285,32 @@ public class CppClass
 	private void extractNamespaces()
 	{
 		HashMap<String, String> classes = new HashMap<>();
-		List<String> referencedClassNames = classFile.getReferencedClasses();
+		ReferencedClasses referencedClassNames = classFile.getReferencedClasses();
 		for (String referencedClassName : referencedClassNames)
 		{
-			int pos = referencedClassName.lastIndexOf('.');
-			String packageName = referencedClassName.substring(0, pos);
-			String[] split = packageName.split("[.]");
-			String namespace = String.join("::", split);
+			String cppClassName = referencedClassName.replace('/', '.');
+			int pos = cppClassName.lastIndexOf('.');
+			String packageName = cppClassName.substring(0, pos);
+			String namespace = dotToNamespace(packageName);
 			namespaces.add(namespace);
 
-			String className = referencedClassName.substring(pos + 1);
+			String className = cppClassName.substring(pos + 1);
 			if (classes.containsKey(className) && !classes.containsValue(referencedClassName))
 			{
 				multipleClasses.add(className);
 			}
-			classes.put(className, referencedClassName);
+			classes.put(className, cppClassName);
 		}
 		namespaces.remove(namespace);
 	}
 
 	private void extractParentClassName()
 	{
-		String[] split = classFile.getParentClassName().split("[.]");
-		parentClassName = String.join("::", split);
+		parentClassName = dotToNamespace(classFile.getParentClassName());
 	}
 
 	private void generateHeaderBeginThisClassNamespace(IndentedOutputStream header)
 	{
-		String thisClassName = classFile.getClassName();
-		int pos = thisClassName.lastIndexOf('.');
-		String packageName = thisClassName.substring(0, pos);
-		String[] split = packageName.split("[.]");
-		String namespace = String.join("::", split);
 		header.println("namespace " + namespace);
 		header.println("{");
 		header.indent(1);
@@ -360,20 +343,47 @@ public class CppClass
 	 */
 	private void generateHeaderIncludesAndNamespaces(IndentedOutputStream header)
 	{
-		List<String> referencedClassNames = classFile.getReferencedClasses();
-		TreeSet<String> classes = new TreeSet<>();
-		classes.addAll(referencedClassNames);
-		classes.remove(classFile.getClassName());
-		for (String include : classes)
-		{
-			String[] split = include.split("[.]");
-			header.println("#include \"" + String.join("__", split) + ".h\"");
-		}
+		String superClassName = classFile.getParentClassName();
+		header.println("#include \"" + dotToNamespace(superClassName).replace(':', '_') + ".h\"");
 		header.println();
 
-		for (String namespace : namespaces)
+		ReferencedClasses referencedClassNames = classFile.getReferencedClasses();
+		for (String packageName : namespaces)
 		{
-			header.println("using namespace " + namespace + ";");
+			header.println("namespace " + packageName);
+			header.println("{");
+			header.indent(1);
+			for (String reference : referencedClassNames)
+			{
+				String template = "";
+				reference = dotToNamespace(reference.replace('/', '.'));
+				if (reference.startsWith(packageName + "::"))
+				{
+					int pos = reference.indexOf('<');
+					if (pos >= 0)
+					{
+						int templateCount = Integer.parseInt(reference.substring(pos + 1, reference.length() - 1));
+						reference = reference.substring(0, pos);
+						template = "template <";
+						for (int i = 0; i < templateCount; i++)
+						{
+							template += i > 0 ? ", " : "";
+							template += "class " + (char) ('A' + i);
+						}
+						template += "> ";
+					}
+					reference = reference.substring(reference.lastIndexOf(':') + 1);
+					header.iprintln(template + "class " + reference + ";");
+				}
+			}
+			header.indent(-1);
+			header.println("}");
+			header.println();
+		}
+
+		for (String packageName : namespaces)
+		{
+			header.println("using namespace " + packageName + ";");
 		}
 		header.println();
 	}
@@ -396,6 +406,40 @@ public class CppClass
 			}
 			method.generateHeader(header, methodName, newType);
 		}
+	}
+
+	private void generateSourceIncludesAndNamespaces(IndentedOutputStream source)
+	{
+		ReferencedClasses referencedClassNames = classFile.getReferencedClasses();
+		classFile.addReferencedClasses(referencedClassNames);
+		referencedClassNames.removeClass(classFile.getClassName());
+		referencedClassNames.removeClass(classFile.getParentClassName());
+
+		// Includes for each class, #pragma once in each will prevent repetition
+		for (String clazz : referencedClassNames)
+		{
+			int pos = clazz.indexOf('<');
+			if (pos >= 0)
+			{
+				clazz = clazz.substring(0, pos);
+			}
+			source.println("#include \"" + dotToNamespace(clazz.replace('/', '.')).replace(':', '_') + ".h\"");
+		}
+		source.println();
+
+		// Namespaces, but don't repeat yourself
+		String lastNamespace = "";
+		for (String clazz : referencedClassNames)
+		{
+			String namespace = clazz.substring(0, clazz.lastIndexOf('/')).replace('/', '.');
+			namespace = dotToNamespace(namespace);
+			if (!namespace.equals(lastNamespace))
+			{
+				source.println("using namespace " + namespace + ";");
+				lastNamespace = namespace;
+			}
+		}
+		source.println();
 	}
 
 	private void generateSourceMethods(IndentedOutputStream source)
@@ -424,7 +468,6 @@ public class CppClass
 		{
 			if (field.isStatic() && !field.isFinal())
 			{
-				// TODO initializers if any
 				source.iprintln(field.getType() + " " + className + "::" + field.getName() + ";");
 				source.println();
 			}

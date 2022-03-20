@@ -8,6 +8,61 @@ import org.borium.javarecompiler.cplusplus.*;
  */
 public class Statics
 {
+	public static String addPointerIfNeeded(String type)
+	{
+		switch (type)
+		{
+		case "byte":
+		case "char":
+		case "double":
+		case "float":
+		case "int":
+		case "long":
+		case "short":
+		case "bool":
+		case "void":
+			return type;
+		}
+		return "Pointer<" + type + ">";
+	}
+
+	public static String addPointersIfNeeded(String methodType)
+	{
+		String signature = methodType;
+		// First opening '('
+		Assert(signature.startsWith("("), "Method type: Method() expected");
+		String result = "(";
+		signature = signature.substring(1);
+		// Parameters, if any?
+		while (!signature.startsWith(")"))
+		{
+			int pos = signature.indexOf(' ');
+			Assert(pos > 0, "Method type: Space between type and name not found");
+			String type = signature.substring(0, pos);
+			result += addPointerIfNeeded(type) + " ";
+			signature = signature.substring(pos + 1);
+			while (signature.charAt(0) != ',' && signature.charAt(0) != ')')
+			{
+				result += signature.substring(0, 1);
+				signature = signature.substring(1);
+			}
+			if (signature.startsWith(", "))
+			{
+				result += ", ";
+				signature = signature.substring(2);
+			}
+		}
+		result += ')';
+		signature = signature.substring(1);
+		// Return type, if any?
+		if (signature.length() > 0)
+		{
+			// Yup, got something
+			result += addPointerIfNeeded(signature);
+		}
+		return result;
+	}
+
 	public static void Assert(boolean condition, String errorMessage)
 	{
 		if (!condition)
@@ -34,6 +89,11 @@ public class Statics
 			separator = ", ";
 		}
 		return result;
+	}
+
+	public static String dotToNamespace(String dots)
+	{
+		return String.join("::", dots.split("[.]"));
 	}
 
 	/**
@@ -145,15 +205,16 @@ public class Statics
 		return returnType;
 	}
 
-	/**
-	 * Convenience method to remove trailing star from a pointer type.
-	 *
-	 * @param typeWithStar Pointer type with trailing star.
-	 * @return Pointed-to type, without that trailing star.
-	 */
-	public static String removeStar(String typeWithStar)
+	public static String removeJavaArray(String javaArray)
 	{
-		return typeWithStar.substring(0, typeWithStar.length() - 1);
+		Assert(javaArray.startsWith("JavaArray<"), "JavaArray<> expected");
+		return javaArray.substring(10, javaArray.length() - 1);
+	}
+
+	public static String removePointerWrapper(String wrappedObject)
+	{
+		Assert(wrappedObject.startsWith("Pointer<"), "Pointer<> expected");
+		return wrappedObject.substring(8, wrappedObject.length() - 1);
 	}
 
 	private static void parseClass(String descriptor, int[] data)
