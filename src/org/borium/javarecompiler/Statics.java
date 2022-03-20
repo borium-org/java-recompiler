@@ -26,6 +26,43 @@ public class Statics
 		return "Pointer<" + type + ">";
 	}
 
+	public static String addPointersIfNeeded(String methodType)
+	{
+		String signature = methodType;
+		// First opening '('
+		Assert(signature.startsWith("("), "Method type: Method() expected");
+		String result = "(";
+		signature = signature.substring(1);
+		// Parameters, if any?
+		while (!signature.startsWith(")"))
+		{
+			int pos = signature.indexOf(' ');
+			Assert(pos > 0, "Method type: Space between type and name not found");
+			String type = signature.substring(0, pos);
+			result += addPointerIfNeeded(type) + " ";
+			signature = signature.substring(pos + 1);
+			while (signature.charAt(0) != ',' && signature.charAt(0) != ')')
+			{
+				result += signature.substring(0, 1);
+				signature = signature.substring(1);
+			}
+			if (signature.startsWith(", "))
+			{
+				result += ", ";
+				signature = signature.substring(2);
+			}
+		}
+		result += ')';
+		signature = signature.substring(1);
+		// Return type, if any?
+		if (signature.length() > 0)
+		{
+			// Yup, got something
+			result += addPointerIfNeeded(signature);
+		}
+		return result;
+	}
+
 	public static void Assert(boolean condition, String errorMessage)
 	{
 		if (!condition)
@@ -215,35 +252,6 @@ public class Statics
 			parts[i] = part;
 		}
 		return String.join(", ", parts);
-	}
-
-	public static String starToPointerMethod(String stars)
-	{
-		// First opening '('
-		Assert(stars.startsWith("("), "Stars to pointers: Method() expected");
-		String result = "(";
-		stars = stars.substring(1);
-		// Parameters, if any?
-		int pos = stars.indexOf(')');
-		if (pos == 0)
-		{
-			// No parameters
-			result += ')';
-			stars = stars.substring(1);
-		}
-		else
-		{
-			// Parameter list
-			result += starToPointer(stars.substring(0, pos)) + ')';
-			stars = stars.substring(pos + 1);
-		}
-		// Return type, if any?
-		if (stars.length() > 0)
-		{
-			// Yup, got something
-			result += starToPointer(stars);
-		}
-		return result;
 	}
 
 	private static void parseClass(String descriptor, int[] data)
