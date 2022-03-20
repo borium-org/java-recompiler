@@ -591,7 +591,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		Assert(index >= 0 && index < maxLocals, "ALOAD: index out of range");
 		LocalVariable local = locals.get(index, instruction);
 		Assert(local != null, "Local at " + index + " is not available");
-		stack.push(removePointerWrapper(local.getType()) + StackEntrySeparator + local.getName());
+		stack.push(local.getType() + StackEntrySeparator + local.getName());
 	}
 
 	private void generateANEWARRAY(IndentedOutputStream source, InstructionANEWARRAY instruction)
@@ -662,8 +662,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateATHROW(IndentedOutputStream source, InstructionATHROW instruction)
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		Assert(topOfStack[0].endsWith("*"), "ATHROW: Reference expected");
-		Assert(cppClass.isAssignable(topOfStack[0], "java::lang::Exception*"), "ATHROW: Not an exception thrown");
+		Assert(cppClass.isAssignable(topOfStack[0], "java::lang::Exception"), "ATHROW: Not an exception thrown");
 		source.iprintln("throw " + topOfStack[1] + ";");
 	}
 
@@ -918,9 +917,6 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String className = new JavaTypeConverter(instruction.getClassName(), true).getCppType();
 		className = cppClass.simplifyType(className);
-		// remove star for static access
-		Assert(className.endsWith("*"), "GETSTATIC: * expected");
-		className = className.substring(0, className.length() - 1);
 		String fieldName = instruction.getFieldName();
 		String fieldType = new JavaTypeConverter(instruction.getFieldType(), true).getCppType();
 		fieldType = cppClass.simplifyType(fieldType);
@@ -1186,7 +1182,6 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateIFNONNULL(IndentedOutputStream source, InstructionIFNONNULL instruction)
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		Assert(topOfStack[0].endsWith("*"), "IFNONNULL: Reference expected");
 		source.iprintln("if ((" + topOfStack[1] + ") != nullptr)");
 		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
@@ -1194,7 +1189,6 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateIFNULL(IndentedOutputStream source, InstructionIFNULL instruction)
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		Assert(topOfStack[0].endsWith("*"), "IFNULL: Reference expected");
 		source.iprintln("if ((" + topOfStack[1] + ") == nullptr)");
 		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
@@ -1243,7 +1237,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateINVOKEINTERFACE(IndentedOutputStream source, InstructionINVOKEINTERFACE instruction)
 	{
 		String methodCppClass = javaToCppClass(instruction.getMethodClassName());
-		methodCppClass = cppClass.simplifyType(methodCppClass) + "*";
+		methodCppClass = cppClass.simplifyType(methodCppClass);
 		String methodName = instruction.getMethodName();
 		String methodDescriptor = instruction.getmethodDescriptor();
 		String[] parameterTypes = new JavaTypeConverter(methodDescriptor, false).parseParameterTypes();
@@ -1704,13 +1698,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		CppField field = cppClass.getField(instruction.getFieldName());
 		String fieldType = new JavaTypeConverter(instruction.getFieldType(), false).getCppType();
 		String actualType = field.getType();
-		String baseType = removeStar(fieldType);
-		if (actualType.startsWith(baseType + "<") && actualType.endsWith(">*"))
+		if (actualType.startsWith(fieldType + "<") && actualType.endsWith(">"))
 		{
-			if (value[1].startsWith("new " + removeStar(value[0]) + "("))
+			if (value[1].startsWith("new " + value[0] + "("))
 			{
-				value[1] = "new " + cppClass.simplifyType(removeStar(actualType))
-						+ value[1].substring(value[1].indexOf("("));
+				value[1] = "new " + cppClass.simplifyType(actualType) + value[1].substring(value[1].indexOf("("));
 			}
 			else
 			{
@@ -1725,7 +1717,6 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String className = new JavaTypeConverter(instruction.getClassName(), true).getCppType();
 		className = cppClass.simplifyType(className);
-		className = removePointerWrapper(className);
 		String fieldName = instruction.getFieldName();
 		String fieldType = new JavaTypeConverter(instruction.getFieldType(), true).getCppType();
 		fieldType = cppClass.simplifyType(fieldType);
@@ -1750,7 +1741,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 				source.iprintln(className + "::" + fieldName + " = false;");
 				break;
 			default:
-				Assert(false, "PUTFIELD: Non-boolean integer");
+				Assert(false, "PUTSTATIC: Non-boolean integer");
 			}
 			return;
 		}

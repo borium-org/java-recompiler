@@ -217,43 +217,6 @@ public class Statics
 		return wrappedObject.substring(8, wrappedObject.length() - 1);
 	}
 
-	/**
-	 * Convenience method to remove trailing star from a pointer type.
-	 *
-	 * @param typeWithStar Pointer type with trailing star.
-	 * @return Pointed-to type, without that trailing star.
-	 */
-	public static String removeStar(String typeWithStar)
-	{
-		return typeWithStar.substring(0, typeWithStar.length() - 1);
-	}
-
-	public static String starToPointer(String stars)
-	{
-		String[] parts = stars.split("[,][ ]");
-		for (int i = 0; i < parts.length; i++)
-		{
-			String part = parts[i];
-			String[] typeAndName = part.split("[ ]");
-			if (typeAndName[0].endsWith("*"))
-			{
-				typeAndName[0] = "Pointer<" + typeAndName[0].substring(0, typeAndName[0].length() - 1) + ">";
-			}
-			else if (typeAndName.length > 1 && typeAndName[1].startsWith("*"))
-			{
-				typeAndName[0] = "Pointer<" + typeAndName[0] + ">";
-				typeAndName[1] = typeAndName[1].substring(1);
-			}
-			part = typeAndName[0];
-			if (typeAndName.length > 1)
-			{
-				part += " " + typeAndName[1];
-			}
-			parts[i] = part;
-		}
-		return String.join(", ", parts);
-	}
-
 	private static void parseClass(String descriptor, int[] data)
 	{
 		while (descriptor.charAt(data[0]) != ';' && descriptor.charAt(data[0]) != '<')

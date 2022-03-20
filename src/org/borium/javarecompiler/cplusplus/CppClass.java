@@ -87,19 +87,11 @@ public class CppClass
 		source = simplifyType(source);
 		destination = simplifyType(destination);
 		// In some cases types may have a space between type and '*'
-		if (source.endsWith(" *"))
-		{
-			source = source.substring(0, source.length() - 2) + "*";
-		}
-		if (destination.endsWith(" *"))
-		{
-			destination = destination.substring(0, destination.length() - 2) + "*";
-		}
 		if (source.equals(destination))
 		{
 			return true;
 		}
-		if (destination.equals("Object*"))
+		if (destination.equals("Object"))
 		{
 			return true;
 		}
@@ -110,11 +102,11 @@ public class CppClass
 		String assign = source + "=" + destination;
 		switch (assign)
 		{
-		case "RuntimeException*=Exception*":
-		case "ClassFormatError*=Exception*":
-		case "ArrayList*=List*":
+		case "RuntimeException=Exception":
+		case "ClassFormatError=Exception":
+		case "ArrayList=List":
 		case "int=char":
-		case "class=Class*":
+		case "class=Class":
 			return true;
 		}
 		return false;

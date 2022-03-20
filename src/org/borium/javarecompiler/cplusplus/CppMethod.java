@@ -305,18 +305,17 @@ class CppMethod
 	{
 		String type = local.getType();
 		String name = local.getName();
-		String initializer = "0";
-		if (type.endsWith("*"))
-		{
-			type = removeStar(type);
-			name = "*" + name;
-			initializer = "nullptr";
-		}
+		String initializer = " = 0";
 		if (type.equals("bool"))
 		{
-			initializer = "false";
+			initializer = " = false";
 		}
-		source.iprintln(type + " " + name + " = " + initializer + ";");
+		type = addPointerIfNeeded(type);
+		if (type.startsWith("Pointer<"))
+		{
+			initializer = "";
+		}
+		source.iprintln(type + " " + name + initializer + ";");
 	}
 
 	private void generateLocalVariables(IndentedOutputStream source)
