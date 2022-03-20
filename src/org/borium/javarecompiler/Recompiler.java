@@ -19,7 +19,7 @@ public class Recompiler
 			args = new String[] { //
 					"-classpath", "bin", //
 					"-outputpath", "../JrcPortCpp", //
-					"-mainclass", "org.borium.javarecompiler.classfile.constants.ConstantPool", //
+					"-mainclass", "org.borium.javarecompiler.Recompiler", //
 					"-vs", "2005", //
 					"-comments", "all", //
 			};
@@ -81,13 +81,13 @@ public class Recompiler
 		processedClasses.put(classFile.getClassName(), classFile);
 		List<String> newClassNames = new ArrayList<>();
 		addReferencedClasses(newClassNames, classFile);
-		while (newClassNames.size() > 0)
-		{
-			String newClassName = newClassNames.remove(0);
-			classFile = processClassFile(newClassName);
-			processedClasses.put(classFile.getClassName(), classFile);
-			addReferencedClasses(newClassNames, classFile);
-		}
+//		while (newClassNames.size() > 0)
+//		{
+//			String newClassName = newClassNames.remove(0);
+//			classFile = processClassFile(newClassName);
+//			processedClasses.put(classFile.getClassName(), classFile);
+//			addReferencedClasses(newClassNames, classFile);
+//		}
 		generateClasses();
 		writeClasses();
 	}
@@ -186,6 +186,7 @@ public class Recompiler
 			IndentedOutputStream stream = new IndentedOutputStream(
 					fileName.substring(0, fileName.length() - 5) + "txt");
 			classFile.dump(stream);
+			stream.close();
 		}
 		catch (IOException e)
 		{

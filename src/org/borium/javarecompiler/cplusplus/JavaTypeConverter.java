@@ -49,7 +49,7 @@ public class JavaTypeConverter
 		}
 		else
 		{
-			parseSingleType(true, false);
+			parseSingleType(false);
 		}
 		return cppType;
 	}
@@ -63,7 +63,7 @@ public class JavaTypeConverter
 		while (javaType.charAt(index) != ')')
 		{
 			cppType = "";
-			parseSingleType(true, false);
+			parseSingleType(false);
 			parameterTypes.add(cppType);
 		}
 		return parameterTypes.toArray(new String[parameterTypes.size()]);
@@ -87,7 +87,7 @@ public class JavaTypeConverter
 				{
 					cppType += ", ";
 				}
-				parseSingleType(false, false);
+				parseSingleType(false);
 				count++;
 			}
 			cppType += '>';
@@ -112,25 +112,22 @@ public class JavaTypeConverter
 		{
 			cppType += separator;
 			separator = ", ";
-			parseSingleType(true, true);
+			parseSingleType(true);
 		}
 		cppType += ")";
 		index++;
-		parseSingleType(true, false);
+		parseSingleType(false);
 	}
 
 	/**
 	 * Parse a single type starting with javaType[index]. The type (and parameter if
 	 * allowed) is appended to cppType field.
 	 *
-	 * @param wrapWithPointer If true and type is a pointer, wrap it with C++
-	 *                        Pointer<>.
-	 * @param addParameter    If true, the 'paramX' string is added to the type,
-	 *                        where 'X' is the parameter number in the method
-	 *                        signature. X starts with 1 for regular methods and
-	 *                        with 0 for statics.
+	 * @param addParameter If true, the 'paramX' string is added to the type, where
+	 *                     'X' is the parameter number in the method signature. X
+	 *                     starts with 1 for regular methods and with 0 for statics.
 	 */
-	private void parseSingleType(boolean wrapWithPointer, boolean addParameter)
+	private void parseSingleType(boolean addParameter)
 	{
 		while (javaType.charAt(index) == '[')
 		{
@@ -138,7 +135,6 @@ public class JavaTypeConverter
 			index++;
 		}
 		int oldPos = cppType.length();
-		boolean isClass = false;
 		switch (javaType.charAt(index))
 		{
 		case 'B':
@@ -176,7 +172,6 @@ public class JavaTypeConverter
 		case 'L':
 			index++;
 			parseClass();
-			isClass = true;
 			break;
 		case 'V':
 			cppType += "void";
@@ -185,14 +180,10 @@ public class JavaTypeConverter
 		default:
 			Assert(false, "Unhandled type " + javaType.charAt(index));
 		}
-		if (dimensions == 0 && isClass && wrapWithPointer)
-		{
-			cppType = cppType.substring(0, oldPos) + "Pointer<" + cppType.substring(oldPos) + ">";
-		}
 		while (dimensions > 0)
 		{
 			Assert(dimensions == 1, "Dimensions more than 1 not supported yet");
-			cppType = cppType.substring(0, oldPos) + "Pointer<JavaArray<" + cppType.substring(oldPos) + ">>";
+			cppType = cppType.substring(0, oldPos) + "JavaArray<" + cppType.substring(oldPos) + ">";
 			dimensions--;
 		}
 		if (addParameter)
