@@ -8,6 +8,24 @@ import org.borium.javarecompiler.cplusplus.*;
  */
 public class Statics
 {
+	public static String addPointerIfNeeded(String type)
+	{
+		switch (type)
+		{
+		case "byte":
+		case "char":
+		case "double":
+		case "float":
+		case "int":
+		case "long":
+		case "short":
+		case "bool":
+		case "void":
+			return type;
+		}
+		return "Pointer<" + type + ">";
+	}
+
 	public static void Assert(boolean condition, String errorMessage)
 	{
 		if (!condition)

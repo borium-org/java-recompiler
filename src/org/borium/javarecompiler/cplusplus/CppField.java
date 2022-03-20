@@ -84,10 +84,10 @@ class CppField
 			{
 				throw new RuntimeException("Static field with other flags not supported");
 			}
-			header.iprintln("static " + newType + " " + name + ";");
+			header.iprintln("static " + addPointerIfNeeded(newType) + " " + name + ";");
 			return;
 		}
-		header.iprintln(newType + " " + name + ";");
+		header.iprintln(addPointerIfNeeded(newType) + " " + name + ";");
 	}
 
 	public String getName()
