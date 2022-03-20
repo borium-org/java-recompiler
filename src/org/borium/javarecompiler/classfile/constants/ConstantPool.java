@@ -8,6 +8,18 @@ public class ConstantPool
 {
 	private Constant[] constants;
 
+	public void addReferencedClasses(ReferencedClasses referencedClasses)
+	{
+		for (Constant c : constants)
+		{
+			if (c instanceof ConstantClassInfo ci)
+			{
+				String className = ci.getName();
+				referencedClasses.add("L" + className + ";");
+			}
+		}
+	}
+
 	public void dump(IndentedOutputStream stream)
 	{
 		stream.println("Constants:");

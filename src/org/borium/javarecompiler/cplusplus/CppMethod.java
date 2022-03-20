@@ -326,7 +326,7 @@ class CppMethod
 		String type = local.getType();
 		String name = local.getName();
 		String initializer = createInitializer(type);
-		source.iprintln(type + " " + name + initializer + ";");
+		source.iprintln(addPointerIfNeeded(type) + " " + name + initializer + ";");
 	}
 
 	private void generateLocalVariables(IndentedOutputStream source)

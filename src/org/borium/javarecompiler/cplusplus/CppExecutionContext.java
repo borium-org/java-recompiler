@@ -649,7 +649,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			newVariable = true;
 		}
 		Check(source, cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
-		source.iprint(newVariable ? topOfStack[0] + " " : "");
+		source.iprint(newVariable ? addPointerIfNeeded(topOfStack[0]) + " " : "");
 		source.println(local.getName() + " = " + topOfStack[1] + ";");
 		if (isStringArray)
 		{

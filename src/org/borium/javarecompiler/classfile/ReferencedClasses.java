@@ -56,6 +56,11 @@ public class ReferencedClasses implements Iterable<String>
 		return referencedClasses.iterator();
 	}
 
+	public void removeClass(String className)
+	{
+		referencedClasses.remove(className.replace('.', '/'));
+	}
+
 	private String addClass(String type)
 	{
 		String className = "";
@@ -74,7 +79,8 @@ public class ReferencedClasses implements Iterable<String>
 				type = addClass(type);
 				parameterCount++;
 			}
-			referencedClasses.add(className + "<" + parameterCount + ">");
+			className += "<" + parameterCount + ">";
+			insert(className);
 			Assert(type.charAt(0) == '>', "Template terminator expected");
 			type = type.substring(1);
 			Assert(type.charAt(0) == ';', "Class terminator expected");
@@ -83,8 +89,47 @@ public class ReferencedClasses implements Iterable<String>
 		else if (type.charAt(0) == ';')
 		{
 			type = type.substring(1);
-			referencedClasses.add(className);
+			insert(className);
 		}
 		return type;
+	}
+
+	/**
+	 * Insert new class, but check if name is duplicate first. Duplicates in this
+	 * context are template classes that can be with or without template parameter
+	 * counts. Template classes with parameters are inserted into referenced classes
+	 * collection when header is generated, due to signatures being available.
+	 * Type-erased template classes are inserted into referenced classes collection
+	 * at the time when source is generated, and there signatures are not always
+	 * available.
+	 *
+	 * @param className Class name to check and insert.
+	 */
+	private void insert(String className)
+	{
+		// Exact match? Say we already have it
+		if (referencedClasses.contains(className))
+		{
+			return;
+		}
+		// Check if new class is template and old one isn't
+		if (className.contains("<"))
+		{
+			String rawTemplate = className.substring(0, className.indexOf('<'));
+			referencedClasses.remove(rawTemplate);
+			referencedClasses.add(className);
+			return;
+		}
+		// New class may be a raw version of the template class that we already have
+		String template = className + "<";
+		for (String clazz : referencedClasses)
+		{
+			if (clazz.startsWith(template))
+			{
+				return;
+			}
+		}
+		// Not a match
+		referencedClasses.add(className);
 	}
 }

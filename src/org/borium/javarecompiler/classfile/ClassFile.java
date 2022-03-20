@@ -197,6 +197,11 @@ public class ClassFile
 	/** Fully qualified super class name. */
 	private String superClassName;
 
+	public void addReferencedClasses(ReferencedClasses referencedClassNames)
+	{
+		cp.addReferencedClasses(referencedClassNames);
+	}
+
 	public void dump(IndentedOutputStream stream)
 	{
 		stream.println("Class: " + className);

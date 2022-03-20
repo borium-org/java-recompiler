@@ -222,6 +222,7 @@ public class CppClass
 		source.println("#include \"stdafx.h\"");
 		source.println("#include \"" + namespace.replace(':', '_') + "__" + className + ".h\"");
 		source.println();
+		generateSourceIncludesAndNamespaces(source);
 		source.println("namespace " + namespace);
 		source.println("{");
 		source.println();
@@ -407,6 +408,40 @@ public class CppClass
 		}
 	}
 
+	private void generateSourceIncludesAndNamespaces(IndentedOutputStream source)
+	{
+		ReferencedClasses referencedClassNames = classFile.getReferencedClasses();
+		classFile.addReferencedClasses(referencedClassNames);
+		referencedClassNames.removeClass(classFile.getClassName());
+		referencedClassNames.removeClass(classFile.getParentClassName());
+
+		// Includes for each class, #pragma once in each will prevent repetition
+		for (String clazz : referencedClassNames)
+		{
+			int pos = clazz.indexOf('<');
+			if (pos >= 0)
+			{
+				clazz = clazz.substring(0, pos);
+			}
+			source.println("#include \"" + dotToNamespace(clazz.replace('/', '.')).replace(':', '_') + ".h\"");
+		}
+		source.println();
+
+		// Namespaces, but don't repeat yourself
+		String lastNamespace = "";
+		for (String clazz : referencedClassNames)
+		{
+			String namespace = clazz.substring(0, clazz.lastIndexOf('/')).replace('/', '.');
+			namespace = dotToNamespace(namespace);
+			if (!namespace.equals(lastNamespace))
+			{
+				source.println("using namespace " + namespace + ";");
+				lastNamespace = namespace;
+			}
+		}
+		source.println();
+	}
+
 	private void generateSourceMethods(IndentedOutputStream source)
 	{
 		for (CppMethod method : methods)
@@ -433,7 +468,6 @@ public class CppClass
 		{
 			if (field.isStatic() && !field.isFinal())
 			{
-				// TODO initializers if any
 				source.iprintln(field.getType() + " " + className + "::" + field.getName() + ";");
 				source.println();
 			}
