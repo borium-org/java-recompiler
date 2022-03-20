@@ -261,18 +261,23 @@ class CppMethod
 			{
 				if (!field.isStatic())
 				{
-					if (first)
+					String type = field.getType();
+					String initializer = createInitializer(type);
+					if (initializer.length() > 0)
 					{
-						source.iprint(", ");
+						if (first)
+						{
+							source.iprint(", ");
+						}
+						else
+						{
+							source.indent(2);
+							source.iprint(", ");
+							source.indent(-2);
+						}
+						first = false;
+						source.println(field.getName() + "(" + initializer + ") //");
 					}
-					else
-					{
-						source.indent(2);
-						source.iprint(", ");
-						source.indent(-2);
-					}
-					first = false;
-					source.println(field.getName() + "(0) //");
 				}
 			}
 			source.indent(-2);
@@ -301,10 +306,8 @@ class CppMethod
 		return executionContext.cppType;
 	}
 
-	private void generateLocalVariableInitializer(IndentedOutputStream source, LocalVariable local)
+	private String createInitializer(String type)
 	{
-		String type = local.getType();
-		String name = local.getName();
 		String initializer = " = 0";
 		if (type.equals("bool"))
 		{
@@ -315,6 +318,14 @@ class CppMethod
 		{
 			initializer = "";
 		}
+		return initializer;
+	}
+
+	private void generateLocalVariableInitializer(IndentedOutputStream source, LocalVariable local)
+	{
+		String type = local.getType();
+		String name = local.getName();
+		String initializer = createInitializer(type);
 		source.iprintln(type + " " + name + initializer + ";");
 	}
 
