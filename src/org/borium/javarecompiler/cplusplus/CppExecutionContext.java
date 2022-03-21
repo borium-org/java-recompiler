@@ -642,15 +642,13 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		Assert(index >= 0 && index < maxLocals, "Local index out of range");
 		LocalVariable local = locals.get(index, instruction);
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		boolean newVariable = false;
 		if (local == null)
 		{
 			local = locals.set(index, topOfStack[0], instruction.address);
-			newVariable = true;
+			source.liprintln(addPointerIfNeeded(topOfStack[0]) + " " + local.getName() + ";");
 		}
 		Check(source, cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
-		source.iprint(newVariable ? addPointerIfNeeded(topOfStack[0]) + " " : "");
-		source.println(local.getName() + " = " + topOfStack[1] + ";");
+		source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
 		if (isStringArray)
 		{
 			source.indent(-1);

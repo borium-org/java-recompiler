@@ -289,8 +289,11 @@ class CppMethod
 		source.iprintln("{");
 		source.indent(1);
 		generateLocalVariables(source);
+		source.lock();
+		source.println();
 		boolean isStaticConstructor = newName.endsWith("::ClassInit");
 		generateStatementSource(source, isConstructor, isStaticConstructor);
+		source.unlock();
 		source.indent(-1);
 		source.iprintln("}");
 		source.println();
