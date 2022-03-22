@@ -25,16 +25,29 @@ class Statement
 		this.executionContext = executionContext;
 	}
 
-	/**
-	 * Generate C++ source code for the statement.
-	 *
-	 * @param source Source output stream.
-	 */
-	public void generateSource(IndentedOutputStream source)
+	public void generateLabel(IndentedOutputStream source)
 	{
 		if (executionContext.hasLabel(getAddress()))
 		{
+			source.indent(-1);
 			source.iprintln("L" + hexString(getAddress(), 4) + ": //");
+			source.indent(1);
+		}
+	}
+
+	/**
+	 * Generate C++ source code for the statement.
+	 *
+	 * @param source     Source output stream.
+	 * @param allowLabel If false, label will be suppressed. This is necessary so
+	 *                   that first statement in try block has its label generated
+	 *                   separately outside of the try block.
+	 */
+	public void generateSource(IndentedOutputStream source, boolean allowLabel)
+	{
+		if (allowLabel)
+		{
+			generateLabel(source);
 		}
 		for (Instruction instruction : instructions)
 		{
