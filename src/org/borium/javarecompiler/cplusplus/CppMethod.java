@@ -255,7 +255,7 @@ class CppMethod
 		{
 			source.println(" :");
 			source.indent(1);
-			statements.get(0).generateSource(source);
+			statements.get(0).generateSource(source, true);
 			boolean first = true;
 			for (CppField field : fields)
 			{
@@ -352,13 +352,27 @@ class CppMethod
 		}
 	}
 
-	private int generateStatements(IndentedOutputStream source, int address, int endAddress)
+	/**
+	 * Generate statements in the block between (staring) address and end address.
+	 * Optionally, we can prevent generating the label in first statement. All other
+	 * statements can have their labels, if defined.
+	 *
+	 * @param source     Source file to use for output.
+	 * @param address    Beginning address, inclusive, of the statement block. First
+	 *                   statement will possible have its label missing.
+	 * @param endAddress Ending address, exclusive, of the block, Statement at
+	 *                   endAddress will not be generated.
+	 * @param allowLabel If false, first statement label will not be generated.
+	 * @return
+	 */
+	private int generateStatements(IndentedOutputStream source, int address, int endAddress, boolean allowLabel)
 	{
 		while (address < endAddress)
 		{
 			Statement statement = statements.get(address);
 			Assert(statement != null, "Before try: Null statement");
-			statement.generateSource(source);
+			statement.generateSource(source, allowLabel);
+			allowLabel = true;
 			address += statement.length();
 		}
 		Assert(address == endAddress, "End address mismatch");
@@ -408,26 +422,30 @@ class CppMethod
 			// exception handlers
 			if (handler == null)
 			{
-				generateStatements(source, address, lastAddress);
+				generateStatements(source, address, lastAddress, true);
 				break;
 			}
 			// We have a handler. However, our current statement may be above the try block.
-			address = generateStatements(source, address, handler.startPc);
+			address = generateStatements(source, address, handler.startPc, true);
 			// Now statement is at the startPc of the exception address that we found.
+			// Label is outside of try block, if necessary
+			Statement statement = statements.get(address);
+			statement.generateLabel(source);
 			source.iprintln("try");
 			source.iprintln("{");
 			source.indent(1);
 			// Generate try block variables
 			generateTryBlockVariables(source, address, handler.endPc);
-			// Generate all statements in the try block.
-			address = generateStatements(source, address, handler.endPc);
+			// Generate all statements in the try block, but prohibit generating first
+			// label.
+			address = generateStatements(source, address, handler.endPc, false);
 			// We stopped at endPc, however, there's one more statement with GOTO
 			// instruction that transfers past the end of catch block. We need to generate
 			// it and we also need to know the GOTO target so we would know where the catch
 			// block ends.
-			Statement statement = statements.get(address);
+			statement = statements.get(address);
 			Assert(statement != null, "GOTO: Null statement");
-			statement.generateSource(source);
+			statement.generateSource(source, true);
 			address += statement.length();
 			source.indent(-1);
 			source.iprintln("}");
@@ -455,7 +473,7 @@ class CppMethod
 				source.iprintln("catch (" + exceptionClass + "* " + catchParam.getName() + ")");
 				source.iprintln("{");
 				source.indent(1);
-				generateStatements(source, catchStartPc, endCatch);
+				generateStatements(source, catchStartPc, endCatch, true);
 				source.indent(-1);
 				source.iprintln("}");
 			}
