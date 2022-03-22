@@ -34,7 +34,9 @@ class Statement
 	{
 		if (executionContext.hasLabel(getAddress()))
 		{
+			source.indent(-1);
 			source.iprintln("L" + hexString(getAddress(), 4) + ": //");
+			source.indent(1);
 		}
 		for (Instruction instruction : instructions)
 		{

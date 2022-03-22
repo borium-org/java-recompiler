@@ -254,7 +254,7 @@ class CppMethod
 		if (isConstructor)
 		{
 			source.println(" :");
-			source.indent(2);
+			source.indent(1);
 			statements.get(0).generateSource(source);
 			boolean first = true;
 			for (CppField field : fields)
@@ -280,7 +280,7 @@ class CppMethod
 					}
 				}
 			}
-			source.indent(-2);
+			source.indent(-1);
 		}
 		else
 		{
@@ -452,7 +452,7 @@ class CppMethod
 				int catchStartPc = astore.address + astore.length();
 				LocalVariable catchParam = executionContext.getLocalVariable(astore.getIndex(), catchStartPc);
 				Assert(catchParam != null, "Catch: Parameter not found");
-				source.iprintln("catch (" + exceptionClass + " *" + catchParam.getName() + ")");
+				source.iprintln("catch (" + exceptionClass + "* " + catchParam.getName() + ")");
 				source.iprintln("{");
 				source.indent(1);
 				generateStatements(source, catchStartPc, endCatch);

@@ -979,7 +979,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
 		Assert(left[0].equals("int"), "IADD: Integer expected");
 		Assert(right[0].equals("int"), "IADD: Integer expected");
-		String newEntry = "int" + StackEntrySeparator + "(" + left[1] + ") + (" + right[1] + ")";
+		String newEntry = "int" + StackEntrySeparator + "(" + left[1] + ")+(" + right[1] + ")";
 		stack.push(newEntry);
 	}
 
@@ -1589,7 +1589,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		source.iprintln("{");
 		for (int i = 0; i < instruction.getCaseCount(); i++)
 		{
-			source.iprintln("case (int) 0x" + hexString(instruction.getMatch(i), 8) + ":");
+			source.iprintln("case (int)0x" + hexString(instruction.getMatch(i), 8) + ":");
 			source.iprintln("\tgoto " + instruction.getLabel(i) + ";");
 		}
 		source.iprintln("default:");
