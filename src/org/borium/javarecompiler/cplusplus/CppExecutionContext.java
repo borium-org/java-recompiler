@@ -30,9 +30,6 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	@SuppressWarnings("unused")
 	private CppMethod cppMethod;
 
-	/** True for special handling of initialized string array construction. */
-	private boolean isStringArray = false;
-
 	/** Local variables with their simplified C++ types. */
 	private LocalVariables locals;
 
@@ -602,21 +599,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String type = instruction.getClassName();
 		type = javaToCppClass(type);
 		String simpleType = cppClass.simplifyType(type);
-		isStringArray = type.equals("java::lang::String");
-		if (isStringArray)
-		{
-			source.iprintln("{");
-			source.indent(1);
-			source.iprintln("Pointer<JavaArray<String>> temp = new JavaArray<" + simpleType + ">(" + length + ");");
-			String newEntry = "JavaArray<" + simpleType + ">" + StackEntrySeparator + "temp";
-			stack.push(newEntry);
-		}
-		else
-		{
-			String newEntry = "Pointer<JavaArray<" + simpleType + ">>" + StackEntrySeparator + //
-					"new JavaArray<" + simpleType + ">(" + length + ")";
-			stack.push(newEntry);
-		}
+		String tempName = "temp_" + hexString(instruction.address, 4);
+		source.liprintln("Pointer<JavaArray<" + simpleType + ">> " + tempName + ";");
+		source.iprintln(tempName + " = new JavaArray<" + simpleType + ">(" + length + ");");
+		String newEntry = "JavaArray<" + simpleType + ">" + StackEntrySeparator + tempName;
+		stack.push(newEntry);
 	}
 
 	private void generateARETURN(IndentedOutputStream source, InstructionARETURN instruction)
@@ -649,12 +636,6 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		}
 		Check(source, cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
 		source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
-		if (isStringArray)
-		{
-			source.indent(-1);
-			source.iprintln("}");
-		}
-		isStringArray = false;
 	}
 
 	private void generateATHROW(IndentedOutputStream source, InstructionATHROW instruction)
