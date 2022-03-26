@@ -4,6 +4,7 @@ import java.util.*;
 
 import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.attribute.AttributeLocalVariableTable.*;
+import org.borium.javarecompiler.classfile.attribute.AttributeLocalVariableTypeTable.*;
 import org.borium.javarecompiler.classfile.constants.*;
 import org.borium.javarecompiler.classfile.instruction.*;
 
@@ -159,7 +160,14 @@ public class AttributeCode extends ClassAttribute
 	public VariableTableEntry[] getLocalVariableTable()
 	{
 		AttributeLocalVariableTable table = (AttributeLocalVariableTable) attributes.get("LocalVariableTable");
-		return table.getVariableTable();
+		VariableTableEntry[] entries = table.getVariableTable();
+		AttributeLocalVariableTypeTable types = (AttributeLocalVariableTypeTable) attributes
+				.get("LocalVariableTypeTable");
+		if (types != null)
+		{
+			updateEntries(entries, types.getLocalVariableTypes());
+		}
+		return entries;
 	}
 
 	@Override
@@ -280,6 +288,21 @@ public class AttributeCode extends ClassAttribute
 		for (ExceptionTable exception : exceptionTable)
 		{
 			exception.addLabels(labels);
+		}
+	}
+
+	private void updateEntries(VariableTableEntry[] entries, LocalVariableType[] localVariableTypes)
+	{
+		for (LocalVariableType type : localVariableTypes)
+		{
+			for (VariableTableEntry entry : entries)
+			{
+				if (entry.name.equals(type.name))
+				{
+					entry.descriptor = type.signature;
+					return;
+				}
+			}
 		}
 	}
 }

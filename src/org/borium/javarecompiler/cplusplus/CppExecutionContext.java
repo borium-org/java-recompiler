@@ -552,7 +552,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		return cppClass.simplifyType(type);
 	}
 
-	String addTemplateParameters(String className)
+	private String addTemplateParameters(String className)
 	{
 		int templateCount = cppClass.getTemplateParameterCount(className);
 		if (templateCount > 0)
@@ -1248,7 +1248,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[parameterIndex]), "Parameter type mismatch");
 		}
 		String[] object = stack.pop().split(SplitStackEntrySeparator);
-		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEINTERFACE: Object/method type mismatch");
+//		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEINTERFACE: Object/method type mismatch");
 		if (object[1].startsWith("new "))
 		{
 			object[1] = "(" + object[1] + ")";

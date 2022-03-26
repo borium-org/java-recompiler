@@ -98,7 +98,15 @@ public class CppClass
 		// Some types may be simplified, so simplify them both
 		source = simplifyType(source);
 		destination = simplifyType(destination);
-		// In some cases types may have a space between type and '*'
+		// For now we will ignore template parameter lists
+		if (source.contains("<"))
+		{
+			source = source.substring(0, source.indexOf('<'));
+		}
+		if (destination.contains("<"))
+		{
+			destination = destination.substring(0, destination.indexOf('<'));
+		}
 		if (source.equals(destination))
 		{
 			return true;
