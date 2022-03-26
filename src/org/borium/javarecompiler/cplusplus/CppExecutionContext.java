@@ -552,7 +552,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		return cppClass.simplifyType(type);
 	}
 
-	private String addTemplateParameters(String className)
+	String addTemplateParameters(String className)
 	{
 		int templateCount = cppClass.getTemplateParameterCount(className);
 		if (templateCount > 0)

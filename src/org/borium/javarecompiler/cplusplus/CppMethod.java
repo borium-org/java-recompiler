@@ -328,6 +328,7 @@ class CppMethod
 		String type = local.getType();
 		String name = local.getName();
 		String initializer = createInitializer(type);
+		type += executionContext.addTemplateParameters(type);
 		source.iprintln(addPointerIfNeeded(type) + " " + name + initializer + ";");
 	}
 
