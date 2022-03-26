@@ -115,12 +115,15 @@ public class IndentedOutputStream
 	 *
 	 * @param string String to print with newline added to the end.
 	 */
-	public void liprintln(String string)
+	public void liprintln(int temporaryIndent, String string)
 	{
 		Assert(locked, "liprintln() is made for printing into locked files");
 		boolean saveLocked = locked;
 		locked = false;
+		int currentIndent = indentLevel;
+		indentLevel = temporaryIndent;
 		iprintln(string);
+		indentLevel = currentIndent;
 		locked = saveLocked;
 	}
 
