@@ -600,7 +600,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		type = javaToCppClass(type);
 		String simpleType = cppClass.simplifyType(type);
 		String tempName = "temp_" + hexString(instruction.address, 4);
-		source.liprintln("Pointer<JavaArray<" + simpleType + ">> " + tempName + ";");
+		source.liprintln(2, "Pointer<JavaArray<" + simpleType + ">> " + tempName + ";");
 		source.iprintln(tempName + " = new JavaArray<" + simpleType + ">(" + length + ");");
 		String newEntry = "JavaArray<" + simpleType + ">" + StackEntrySeparator + tempName;
 		stack.push(newEntry);
@@ -632,7 +632,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		if (local == null)
 		{
 			local = locals.set(index, topOfStack[0], instruction.address);
-			source.liprintln(addPointerIfNeeded(topOfStack[0]) + " " + local.getName() + ";");
+			source.liprintln(2, addPointerIfNeeded(topOfStack[0]) + " " + local.getName() + ";");
 		}
 		Check(source, cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
 		source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
@@ -1290,12 +1290,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		Assert(topOfStack[0].equals(methodClassName) && topOfStack[1].equals("new"), "Bad stack top");
 		String[] dupInStack = stack.pop().split(SplitStackEntrySeparator);
 		Assert(dupInStack[0].equals(methodClassName) && dupInStack[1].equals("new"), "Bad stack DUP");
-		String newStackTop = dupInStack[0] + StackEntrySeparator + "new ";
-		newStackTop += dupInStack[0] + "(";
-		newStackTop += commaSeparatedList(parameterValues);
-		newStackTop += ")";
 		String tempName = "temp_" + hexString(instruction.address, 4);
-		source.liprintln("Pointer<" + methodClassName + "> " + tempName + ";");
+		source.liprintln(2, "Pointer<" + methodClassName + "> " + tempName + ";");
 		source.iprintln(tempName + " = new " + dupInStack[0] + "(" + commaSeparatedList(parameterValues) + ");");
 		stack.push(dupInStack[0] + StackEntrySeparator + tempName);
 	}
@@ -1678,19 +1674,6 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		Assert(object[0].equals(cppClass.simplifyType(cppClass.getFullClassName())) && object[1].equals("this"),
 				"Assigning to non-this class " + object[0] + " field " + instruction.getFieldName());
 		CppField field = cppClass.getField(instruction.getFieldName());
-		String fieldType = new JavaTypeConverter(instruction.getFieldType(), false).getCppType();
-		String actualType = field.getType();
-//		if (actualType.startsWith(fieldType + "<") && actualType.endsWith(">"))
-//		{
-//			if (value[1].startsWith("new " + value[0] + "("))
-//			{
-//				value[1] = "new " + cppClass.simplifyType(actualType) + value[1].substring(value[1].indexOf("("));
-//			}
-//			else
-//			{
-//				Assert(false, "Don't know what is going on yet");
-//			}
-//		}
 		source.iprint(object[1] + "->");
 		source.println(field.getName() + " = " + value[1] + ";");
 	}
