@@ -200,6 +200,8 @@ public class ClassFile
 	public void addReferencedClasses(ReferencedClasses referencedClassNames)
 	{
 		cp.addReferencedClasses(referencedClassNames);
+		referencedClassNames.removeClass(getClassName());
+		referencedClassNames.removeClass(getParentClassName());
 	}
 
 	public void dump(IndentedOutputStream stream)
@@ -251,6 +253,8 @@ public class ClassFile
 		{
 			method.addReferencedClasses(referencedClasses);
 		}
+		referencedClasses.removeClass(getClassName());
+		referencedClasses.removeClass(getParentClassName());
 		return referencedClasses;
 	}
 

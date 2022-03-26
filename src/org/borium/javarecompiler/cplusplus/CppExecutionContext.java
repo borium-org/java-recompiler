@@ -552,6 +552,22 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		return cppClass.simplifyType(type);
 	}
 
+	private String addTemplateParameters(String className)
+	{
+		int templateCount = cppClass.getTemplateParameterCount(className);
+		if (templateCount > 0)
+		{
+			ArrayList<String> params = new ArrayList<>();
+			for (int i = 0; i < templateCount; i++)
+			{
+				params.add("Object");
+			}
+			String parameters = commaSeparatedList(params.toArray(new String[templateCount]));
+			return "<" + parameters + ">";
+		}
+		return "";
+	}
+
 	private void generateAALOAD(IndentedOutputStream source, InstructionAALOAD instruction)
 	{
 		String[] index = stack.pop().split(SplitStackEntrySeparator);
@@ -632,6 +648,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		if (local == null)
 		{
 			local = locals.set(index, topOfStack[0], instruction.address);
+			topOfStack[0] += addTemplateParameters(topOfStack[0]);
 			source.liprintln(2, addPointerIfNeeded(topOfStack[0]) + " " + local.getName() + ";");
 		}
 		Check(source, cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
@@ -1291,6 +1308,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] dupInStack = stack.pop().split(SplitStackEntrySeparator);
 		Assert(dupInStack[0].equals(methodClassName) && dupInStack[1].equals("new"), "Bad stack DUP");
 		String tempName = "temp_" + hexString(instruction.address, 4);
+		methodClassName += addTemplateParameters(methodClassName);
 		source.liprintln(2, "Pointer<" + methodClassName + "> " + tempName + ";");
 		source.iprintln(tempName + " = new " + dupInStack[0] + "(" + commaSeparatedList(parameterValues) + ");");
 		stack.push(dupInStack[0] + StackEntrySeparator + tempName);

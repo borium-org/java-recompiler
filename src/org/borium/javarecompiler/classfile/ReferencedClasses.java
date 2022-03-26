@@ -14,6 +14,20 @@ public class ReferencedClasses implements Iterable<String>
 	private TreeSet<String> referencedClasses = new TreeSet<>();
 
 	/**
+	 * Construct a pre-initialized referenced classes object. Classes are added in
+	 * here manually if they need template parameters but there is no type
+	 * information for these classes in compiled class file. The overhead of always
+	 * adding these classes is quite low. Classes added:
+	 * <ul>
+	 * <li>java.util.Iterator<T></li>
+	 * </ul>
+	 */
+	public ReferencedClasses()
+	{
+		add("Ljava/util/Iterator<Ljava/lang/Object;>;");
+	}
+
+	/**
 	 * Add a type as a referenced type. Only class types are added, and template
 	 * types are simplified or split into multiple classes where each template
 	 * argument is added separately.
@@ -48,6 +62,26 @@ public class ReferencedClasses implements Iterable<String>
 				throw new RuntimeException("Bad prefix '" + prefix + "'");
 			}
 		}
+	}
+
+	public int getTemplateParameterCount(String fullClassName)
+	{
+		for (String referencedClass : referencedClasses)
+		{
+			referencedClass = javaToCppClass(referencedClass.replace('/', '.'));
+			int pos = referencedClass.indexOf('<');
+			Assert(pos != 0, "'<' at the beginning of class name");
+			if (pos >= 0)
+			{
+				String baseName = referencedClass.substring(0, pos);
+				if (baseName.equals(fullClassName) || baseName.endsWith("::" + fullClassName))
+				{
+					String templateCount = referencedClass.substring(pos + 1, referencedClass.length() - 1);
+					return Integer.parseInt(templateCount);
+				}
+			}
+		}
+		return 0;
 	}
 
 	@Override
