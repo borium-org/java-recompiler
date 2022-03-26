@@ -1294,7 +1294,10 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		newStackTop += dupInStack[0] + "(";
 		newStackTop += commaSeparatedList(parameterValues);
 		newStackTop += ")";
-		stack.push(newStackTop);
+		String tempName = "temp_" + hexString(instruction.address, 4);
+		source.liprintln("Pointer<" + methodClassName + "> " + tempName + ";");
+		source.iprintln(tempName + " = new " + dupInStack[0] + "(" + commaSeparatedList(parameterValues) + ");");
+		stack.push(dupInStack[0] + StackEntrySeparator + tempName);
 	}
 
 	private void generateINVOKESTATIC(IndentedOutputStream source, InstructionINVOKESTATIC instruction)
@@ -1677,17 +1680,17 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		CppField field = cppClass.getField(instruction.getFieldName());
 		String fieldType = new JavaTypeConverter(instruction.getFieldType(), false).getCppType();
 		String actualType = field.getType();
-		if (actualType.startsWith(fieldType + "<") && actualType.endsWith(">"))
-		{
-			if (value[1].startsWith("new " + value[0] + "("))
-			{
-				value[1] = "new " + cppClass.simplifyType(actualType) + value[1].substring(value[1].indexOf("("));
-			}
-			else
-			{
-				Assert(false, "Don't know what is going on yet");
-			}
-		}
+//		if (actualType.startsWith(fieldType + "<") && actualType.endsWith(">"))
+//		{
+//			if (value[1].startsWith("new " + value[0] + "("))
+//			{
+//				value[1] = "new " + cppClass.simplifyType(actualType) + value[1].substring(value[1].indexOf("("));
+//			}
+//			else
+//			{
+//				Assert(false, "Don't know what is going on yet");
+//			}
+//		}
 		source.iprint(object[1] + "->");
 		source.println(field.getName() + " = " + value[1] + ";");
 	}
