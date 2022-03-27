@@ -1692,8 +1692,18 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		Assert(object[0].equals(cppClass.simplifyType(cppClass.getFullClassName())) && object[1].equals("this"),
 				"Assigning to non-this class " + object[0] + " field " + instruction.getFieldName());
 		CppField field = cppClass.getField(instruction.getFieldName());
+		String fieldType = cppClass.simplifyType(field.getType());
+		String dataType = cppClass.simplifyType(value[0]);
 		source.iprint(object[1] + "->");
-		source.println(field.getName() + " = " + value[1] + ";");
+		source.print(field.getName() + " = ");
+		if (!fieldType.equals(dataType))
+		{
+			source.println("(" + fieldType + " *) (" + value[1] + ".getValue());");
+		}
+		else
+		{
+			source.println(value[1] + ";");
+		}
 	}
 
 	private void generatePUTSTATIC(IndentedOutputStream source, InstructionPUTSTATIC instruction)
