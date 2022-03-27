@@ -1310,7 +1310,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String tempName = "temp_" + hexString(instruction.address, 4);
 		methodClassName += addTemplateParameters(methodClassName);
 		source.liprintln(2, "Pointer<" + methodClassName + "> " + tempName + ";");
-		source.iprintln(tempName + " = new " + dupInStack[0] + "(" + commaSeparatedList(parameterValues) + ");");
+		source.iprintln(tempName + " = new " + methodClassName + "(" + commaSeparatedList(parameterValues) + ");");
 		stack.push(dupInStack[0] + StackEntrySeparator + tempName);
 	}
 
