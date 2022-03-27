@@ -1311,7 +1311,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		methodClassName += addTemplateParameters(methodClassName);
 		source.liprintln(2, "Pointer<" + methodClassName + "> " + tempName + ";");
 		source.iprintln(tempName + " = new " + methodClassName + "(" + commaSeparatedList(parameterValues) + ");");
-		stack.push(dupInStack[0] + StackEntrySeparator + tempName);
+		stack.push(methodClassName + StackEntrySeparator + tempName);
 	}
 
 	private void generateINVOKESTATIC(IndentedOutputStream source, InstructionINVOKESTATIC instruction)
