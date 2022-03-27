@@ -652,7 +652,16 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			source.liprintln(2, addPointerIfNeeded(topOfStack[0]) + " " + local.getName() + ";");
 		}
 		Check(source, cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
-		source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
+		String sourceType = cppClass.simplifyType(topOfStack[0]);
+		String localType = cppClass.simplifyType(local.getType());
+		if (!sourceType.equals(localType) && !sourceType.equals("nullptr"))
+		{
+			source.iprintln(local.getName() + " = (" + localType + " *) (" + topOfStack[1] + ".getValue());");
+		}
+		else
+		{
+			source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
+		}
 	}
 
 	private void generateATHROW(IndentedOutputStream source, InstructionATHROW instruction)
