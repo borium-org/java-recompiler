@@ -704,10 +704,13 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateCHECKCAST(IndentedOutputStream source, InstructionCHECKCAST instruction)
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		String localName = "temp_" + hexString(instruction.address, 4);
 		String className = javaToCppClass(instruction.getClassName());
 		className = cppClass.simplifyType(className);
-		source.iprintln(topOfStack[1] + "->checkCast(" + className + "::getClass());");
-		stack.push(topOfStack[0] + StackEntrySeparator + topOfStack[1]);
+		source.liprintln(2, "Pointer<" + className + "> " + localName + ";");
+		source.iprintln(localName + " = (" + className + "*)((" + topOfStack[1] + ").getValue());");
+		source.iprintln(localName + "->checkCast(" + className + "::getClass());");
+		stack.push(className + StackEntrySeparator + localName);
 	}
 
 	private void generateD2F(IndentedOutputStream source, InstructionD2F instruction)
