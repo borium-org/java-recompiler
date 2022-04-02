@@ -5,25 +5,22 @@ import org.borium.javarecompiler.classfile.constants.*;
 
 public class AttributeLocalVariableTypeTable extends ClassAttribute
 {
-	private static class LocalVariableType
+	static class LocalVariableType
 	{
 		/** Start PC where the variable is active. */
-		@SuppressWarnings("unused")
 		int startPc;
 		/** Length of code starting from start PC where the variable is active. */
-		@SuppressWarnings("unused")
 		int length;
 		/** Valid unqualified name of the local variable. */
-		@SuppressWarnings("unused")
 		int nameIndex;
 		/** The signature of the local variable. */
-		@SuppressWarnings("unused")
 		int signatureIndex;
 		/** Local variable array index of the local variable. */
-		@SuppressWarnings("unused")
 		int index;
-		private String name;
-		private String signature;
+		/** Local variable name for which new type is declared here. */
+		String name;
+		/** Full signature for this local variable. */
+		String signature;
 
 		public LocalVariableType(ByteInputStream in, ConstantPool cp)
 		{
@@ -56,6 +53,11 @@ public class AttributeLocalVariableTypeTable extends ClassAttribute
 	{
 		super(attribute);
 		decode(cp);
+	}
+
+	public LocalVariableType[] getLocalVariableTypes()
+	{
+		return localVariableTypes;
 	}
 
 	@Override

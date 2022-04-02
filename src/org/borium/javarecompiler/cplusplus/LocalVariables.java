@@ -143,17 +143,4 @@ class LocalVariables
 		localVariableTable.add(local);
 		return local;
 	}
-
-//	/**
-//	 * Create a compiler-generated temporary local variable that is not listed in
-//	 * LocalVariableTable attribute.
-//	 *
-//	 * @param index Local variable index.
-//	 * @param local Local variable type and name.
-//	 */
-//	public void set(int index, String[] local)
-//	{
-//		VariableTableEntry entry = new VariableTableEntry(index, local[1], local[0]);
-//		localVariableTable.add(entry);
-//	}
 }

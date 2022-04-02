@@ -41,6 +41,13 @@ public class CppClass
 	String parentClassName;
 
 	/**
+	 * All referenced classes. The list is created when generating the source, so it
+	 * contains all classes that are necessary for header and source, except for
+	 * this class and its base class.
+	 */
+	private ReferencedClasses referencedClasses;
+
+	/**
 	 * Create the C++ class file given the Java class file.
 	 *
 	 * @param classFile Java class file.
@@ -73,6 +80,11 @@ public class CppClass
 		return namespace + "::" + className;
 	}
 
+	public int getTemplateParameterCount(String fullClassName)
+	{
+		return referencedClasses.getTemplateParameterCount(fullClassName);
+	}
+
 	/**
 	 * Determine if the source type is assignable to the destination type.
 	 *
@@ -86,7 +98,15 @@ public class CppClass
 		// Some types may be simplified, so simplify them both
 		source = simplifyType(source);
 		destination = simplifyType(destination);
-		// In some cases types may have a space between type and '*'
+		// For now we will ignore template parameter lists
+		if (source.contains("<"))
+		{
+			source = source.substring(0, source.indexOf('<'));
+		}
+		if (destination.contains("<"))
+		{
+			destination = destination.substring(0, destination.indexOf('<'));
+		}
 		if (source.equals(destination))
 		{
 			return true;
@@ -410,13 +430,11 @@ public class CppClass
 
 	private void generateSourceIncludesAndNamespaces(IndentedOutputStream source)
 	{
-		ReferencedClasses referencedClassNames = classFile.getReferencedClasses();
-		classFile.addReferencedClasses(referencedClassNames);
-		referencedClassNames.removeClass(classFile.getClassName());
-		referencedClassNames.removeClass(classFile.getParentClassName());
+		referencedClasses = classFile.getReferencedClasses();
+		classFile.addReferencedClasses(referencedClasses);
 
 		// Includes for each class, #pragma once in each will prevent repetition
-		for (String clazz : referencedClassNames)
+		for (String clazz : referencedClasses)
 		{
 			int pos = clazz.indexOf('<');
 			if (pos >= 0)
@@ -429,7 +447,7 @@ public class CppClass
 
 		// Namespaces, but don't repeat yourself
 		String lastNamespace = "";
-		for (String clazz : referencedClassNames)
+		for (String clazz : referencedClasses)
 		{
 			String namespace = clazz.substring(0, clazz.lastIndexOf('/')).replace('/', '.');
 			namespace = dotToNamespace(namespace);

@@ -552,6 +552,22 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		return cppClass.simplifyType(type);
 	}
 
+	private String addTemplateParameters(String className)
+	{
+		int templateCount = cppClass.getTemplateParameterCount(className);
+		if (templateCount > 0)
+		{
+			ArrayList<String> params = new ArrayList<>();
+			for (int i = 0; i < templateCount; i++)
+			{
+				params.add("Object");
+			}
+			String parameters = commaSeparatedList(params.toArray(new String[templateCount]));
+			return "<" + parameters + ">";
+		}
+		return "";
+	}
+
 	private void generateAALOAD(IndentedOutputStream source, InstructionAALOAD instruction)
 	{
 		String[] index = stack.pop().split(SplitStackEntrySeparator);
@@ -632,10 +648,24 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		if (local == null)
 		{
 			local = locals.set(index, topOfStack[0], instruction.address);
+			topOfStack[0] += addTemplateParameters(topOfStack[0]);
 			source.liprintln(2, addPointerIfNeeded(topOfStack[0]) + " " + local.getName() + ";");
 		}
-		Check(source, cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
-		source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
+//		Check(source, cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
+		String sourceType = cppClass.simplifyType(topOfStack[0]);
+		String localType = cppClass.simplifyType(local.getType());
+		if (isTemplate(localType))
+		{
+			source.iprintln(local.getName() + " = (" + localType + "*)(" + topOfStack[1] + ".getValue());");
+		}
+		else if (sourceType.equals(localType) || sourceType.equals("nullptr"))
+		{
+			source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
+		}
+		else
+		{
+			source.iprintln(local.getName() + " = (" + localType + "*)(" + topOfStack[1] + ".getValue());");
+		}
 	}
 
 	private void generateATHROW(IndentedOutputStream source, InstructionATHROW instruction)
@@ -677,7 +707,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String className = javaToCppClass(instruction.getClassName());
 		className = cppClass.simplifyType(className);
 		source.iprintln(topOfStack[1] + "->checkCast(" + className + "::getClass());");
-		stack.push(className + StackEntrySeparator + topOfStack[1]);
+		stack.push(topOfStack[0] + StackEntrySeparator + topOfStack[1]);
 	}
 
 	private void generateD2F(IndentedOutputStream source, InstructionD2F instruction)
@@ -1231,7 +1261,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			Assert(cppClass.isAssignable(stackEntry[0], parameterTypes[parameterIndex]), "Parameter type mismatch");
 		}
 		String[] object = stack.pop().split(SplitStackEntrySeparator);
-		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEINTERFACE: Object/method type mismatch");
+//		Assert(cppClass.simplifyType(object[0]).equals(methodCppClass), "INVOKEINTERFACE: Object/method type mismatch");
 		if (object[1].startsWith("new "))
 		{
 			object[1] = "(" + object[1] + ")";
@@ -1291,9 +1321,10 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] dupInStack = stack.pop().split(SplitStackEntrySeparator);
 		Assert(dupInStack[0].equals(methodClassName) && dupInStack[1].equals("new"), "Bad stack DUP");
 		String tempName = "temp_" + hexString(instruction.address, 4);
+		methodClassName += addTemplateParameters(methodClassName);
 		source.liprintln(2, "Pointer<" + methodClassName + "> " + tempName + ";");
-		source.iprintln(tempName + " = new " + dupInStack[0] + "(" + commaSeparatedList(parameterValues) + ");");
-		stack.push(dupInStack[0] + StackEntrySeparator + tempName);
+		source.iprintln(tempName + " = new " + methodClassName + "(" + commaSeparatedList(parameterValues) + ");");
+		stack.push(methodClassName + StackEntrySeparator + tempName);
 	}
 
 	private void generateINVOKESTATIC(IndentedOutputStream source, InstructionINVOKESTATIC instruction)
@@ -1360,6 +1391,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		}
 		String returnType = parseJavaReturnType(methodDescriptor);
 		returnType = cppClass.simplifyType(returnType);
+		returnType += addTemplateParameters(returnType);
 		String newEntry = returnType + StackEntrySeparator + object[1] + "->" + methodName + "(";
 		newEntry += commaSeparatedList(parameterValues);
 		newEntry += ")";
@@ -1674,8 +1706,21 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		Assert(object[0].equals(cppClass.simplifyType(cppClass.getFullClassName())) && object[1].equals("this"),
 				"Assigning to non-this class " + object[0] + " field " + instruction.getFieldName());
 		CppField field = cppClass.getField(instruction.getFieldName());
+		String fieldType = cppClass.simplifyType(field.getType());
+		String dataType = cppClass.simplifyType(value[0]);
 		source.iprint(object[1] + "->");
-		source.println(field.getName() + " = " + value[1] + ";");
+		if (isTemplate(fieldType))
+		{
+			source.println(field.getName() + " = (" + fieldType + "*)(" + value[1] + ".getValue());");
+		}
+		else if (dataType.equals(fieldType) || dataType.equals("nullptr"))
+		{
+			source.println(field.getName() + " = " + value[1] + ";");
+		}
+		else
+		{
+			source.println(field.getName() + " = (" + fieldType + "*)(" + value[1] + ".getValue());");
+		}
 	}
 
 	private void generatePUTSTATIC(IndentedOutputStream source, InstructionPUTSTATIC instruction)

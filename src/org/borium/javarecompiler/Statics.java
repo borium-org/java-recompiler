@@ -131,6 +131,13 @@ public class Statics
 		return result.toUpperCase();
 	}
 
+	public static boolean isTemplate(String type)
+	{
+		int index = type.indexOf('<');
+		Assert(index != 0, "Template: Starts with '<'");
+		return index > 0;
+	}
+
 	/**
 	 * Convert simple non-template non-pointer Java class name to C++ class name by
 	 * replacing all '.' with '::'.
