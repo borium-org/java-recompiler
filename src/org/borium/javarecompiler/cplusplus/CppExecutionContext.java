@@ -651,16 +651,20 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			topOfStack[0] += addTemplateParameters(topOfStack[0]);
 			source.liprintln(2, addPointerIfNeeded(topOfStack[0]) + " " + local.getName() + ";");
 		}
-		Check(source, cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
+//		Check(source, cppClass.isAssignable(topOfStack[0], local.getType()), "ASTORE: Type mismatch");
 		String sourceType = cppClass.simplifyType(topOfStack[0]);
 		String localType = cppClass.simplifyType(local.getType());
-		if (!sourceType.equals(localType) && !sourceType.equals("nullptr"))
+		if (isTemplate(localType))
 		{
-			source.iprintln(local.getName() + " = (" + localType + " *) (" + topOfStack[1] + ".getValue());");
+			source.iprintln(local.getName() + " = (" + localType + "*)(" + topOfStack[1] + ".getValue());");
+		}
+		else if (sourceType.equals(localType) || sourceType.equals("nullptr"))
+		{
+			source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
 		}
 		else
 		{
-			source.iprintln(local.getName() + " = " + topOfStack[1] + ";");
+			source.iprintln(local.getName() + " = (" + localType + "*)(" + topOfStack[1] + ".getValue());");
 		}
 	}
 
@@ -703,7 +707,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String className = javaToCppClass(instruction.getClassName());
 		className = cppClass.simplifyType(className);
 		source.iprintln(topOfStack[1] + "->checkCast(" + className + "::getClass());");
-		stack.push(className + StackEntrySeparator + topOfStack[1]);
+		stack.push(topOfStack[0] + StackEntrySeparator + topOfStack[1]);
 	}
 
 	private void generateD2F(IndentedOutputStream source, InstructionD2F instruction)
@@ -1387,6 +1391,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		}
 		String returnType = parseJavaReturnType(methodDescriptor);
 		returnType = cppClass.simplifyType(returnType);
+		returnType += addTemplateParameters(returnType);
 		String newEntry = returnType + StackEntrySeparator + object[1] + "->" + methodName + "(";
 		newEntry += commaSeparatedList(parameterValues);
 		newEntry += ")";
@@ -1704,14 +1709,17 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String fieldType = cppClass.simplifyType(field.getType());
 		String dataType = cppClass.simplifyType(value[0]);
 		source.iprint(object[1] + "->");
-		source.print(field.getName() + " = ");
-		if (!fieldType.equals(dataType))
+		if (isTemplate(fieldType))
 		{
-			source.println("(" + fieldType + " *) (" + value[1] + ".getValue());");
+			source.println(field.getName() + " = (" + fieldType + "*)(" + value[1] + ".getValue());");
+		}
+		else if (dataType.equals(fieldType) || dataType.equals("nullptr"))
+		{
+			source.println(field.getName() + " = " + value[1] + ";");
 		}
 		else
 		{
-			source.println(value[1] + ";");
+			source.println(field.getName() + " = (" + fieldType + "*)(" + value[1] + ".getValue());");
 		}
 	}
 
