@@ -1058,8 +1058,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String[] right = stack.pop().split(SplitStackEntrySeparator);
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
-		Assert(left[0].equals("int"), "IF_ICMPEQ: Integer expected");
-		Assert(right[0].equals("int"), "IF_ICMPEQ: Integer expected");
+		Assert(left[0].equals("int") || left[0].equals("char"), "IF_ICMPEQ: Integer or char expected");
+		Assert(right[0].equals("int") || right[0].equals("char"), "IF_ICMPEQ: Integer or char expected");
 		source.iprintln("if ((" + left[1] + ") == (" + right[1] + "))");
 		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
@@ -1083,8 +1083,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String[] right = stack.pop().split(SplitStackEntrySeparator);
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
-		Assert(left[0].equals("int"), "IF_ICMPLT: Integer expected");
-		Assert(right[0].equals("int"), "IF_ICMPLT: Integer expected");
+		Assert(left[0].equals("int") || left[0].equals("char"), "IF_ICMPLT: Integer or char expected");
+		Assert(right[0].equals("int") || right[0].equals("char"), "IF_ICMPLT: Integer or char expected");
 		source.iprintln("if ((" + left[1] + ") < (" + right[1] + "))");
 		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
@@ -1093,8 +1093,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String[] right = stack.pop().split(SplitStackEntrySeparator);
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
-		Assert(left[0].equals("int"), "IF_ICMPNE: Integer expected");
-		Assert(right[0].equals("int"), "IF_ICMPNE: Integer expected");
+		Assert(left[0].equals("int") || left[0].equals("char"), "IF_ICMPNE: Integer or char expected");
+		Assert(right[0].equals("int") || right[0].equals("char"), "IF_ICMPNE: Integer or char expected");
 		source.iprintln("if ((" + left[1] + ") != (" + right[1] + "))");
 		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
@@ -1801,7 +1801,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateTABLESWITCH(IndentedOutputStream source, InstructionTABLESWITCH instruction)
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		Assert(topOfStack[0].equals("int"), "TABLESWITCH: Integer expected");
+		Assert(topOfStack[0].equals("int") || topOfStack[0].equals("char"), "TABLESWITCH: Integer expected");
 		source.iprintln("switch (" + topOfStack[1] + ")");
 		source.iprintln("{");
 		int value = instruction.getFirstValue();
