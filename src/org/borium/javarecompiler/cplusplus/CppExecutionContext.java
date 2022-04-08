@@ -817,7 +817,12 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateDUP2(IndentedOutputStream source, InstructionDUP2 instruction)
 	{
-		notSupported(instruction);
+		String value1 = stack.pop();
+		String value2 = stack.pop();
+		stack.push(value2);
+		stack.push(value1);
+		stack.push(value2);
+		stack.push(value1);
 	}
 
 	private void generateDUP2_X1(IndentedOutputStream source, InstructionDUP2_X1 instruction)
