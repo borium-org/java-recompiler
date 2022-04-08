@@ -135,6 +135,7 @@ public class JavaTypeConverter
 			index++;
 		}
 		int oldPos = cppType.length();
+		boolean rawArray = true;
 		switch (javaType.charAt(index))
 		{
 		case 'B':
@@ -170,6 +171,7 @@ public class JavaTypeConverter
 			index++;
 			break;
 		case 'L':
+			rawArray = false;
 			index++;
 			parseClass();
 			break;
@@ -183,7 +185,8 @@ public class JavaTypeConverter
 		while (dimensions > 0)
 		{
 			Assert(dimensions == 1, "Dimensions more than 1 not supported yet");
-			cppType = cppType.substring(0, oldPos) + "JavaArray<" + cppType.substring(oldPos) + ">";
+			cppType = cppType.substring(0, oldPos) + "Java" + (rawArray ? "Raw" : "") + "Array<"
+					+ cppType.substring(oldPos) + ">";
 			dimensions--;
 		}
 		if (addParameter)

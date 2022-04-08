@@ -1002,8 +1002,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] index = stack.pop().split(SplitStackEntrySeparator);
 		String[] array = stack.pop().split(SplitStackEntrySeparator);
 		Assert(index[0].equals("int"), "IALOAD: Integer index expected");
-		Assert(array[0].equals("JavaArray<int>*"), "IALOAD: Integer array expected");
-		String newEntry = "int" + StackEntrySeparator + array[1] + ".get(" + index[1] + ")";
+		Assert(array[0].equals("JavaRawArray<int>"), "IALOAD: Integer array expected");
+		String newEntry = "int" + StackEntrySeparator + array[1] + "->get(" + index[1] + ")";
 		stack.push(newEntry);
 	}
 
@@ -1023,7 +1023,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] index = stack.pop().split(SplitStackEntrySeparator);
 		String[] array = stack.pop().split(SplitStackEntrySeparator);
 		Assert(index[0].equals("int"), "IASTORE: Integer index expected");
-		Assert(array[0].equals("JavaArray<int>*"), "IASTORE: Integer array expected");
+		Assert(array[0].equals("JavaRawArray<int>"), "IASTORE: Integer array expected");
 		source.iprintln(array[1] + "->assign(" + index[1] + ", " + value[1] + ");");
 	}
 
@@ -1681,9 +1681,15 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateNEWARRAY(IndentedOutputStream source, InstructionNEWARRAY instruction)
 	{
-		String[] value = stack.pop().split(SplitStackEntrySeparator);
-		Assert(value[0].equals("int"), "NEWARRAY: Integer expected");
-		stack.push("int" + StackEntrySeparator + "new " + instruction.getElementType() + "[" + value[1] + "]");
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(topOfStack[0].equals("int"), "NEWARRAY: Integer operand expected");
+		String length = topOfStack[1];
+		String type = instruction.getElementType();
+		String tempName = "temp_" + hexString(instruction.address, 4);
+		source.liprintln(2, "Pointer<JavaRawArray<" + type + ">> " + tempName + ";");
+		source.iprintln(tempName + " = new JavaRawArray<" + type + ">(" + length + ");");
+		String newEntry = "JavaRawArray<" + type + ">" + StackEntrySeparator + tempName;
+		stack.push(newEntry);
 	}
 
 	private void generateNOP(IndentedOutputStream source, InstructionNOP instruction)
