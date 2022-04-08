@@ -536,6 +536,9 @@ class CppMethod
 		if (instructions.size() != 0)
 		{
 			System.err.println("Java stack depth is not 0 but " + stackDepth + " at the end of instruction array");
+			Statement statement = new Statement(executionContext, instructions);
+			statements.put(statement.getAddress(), statement);
+			instructions.clear();
 		}
 	}
 }
