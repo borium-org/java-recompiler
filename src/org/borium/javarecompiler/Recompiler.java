@@ -14,14 +14,15 @@ public class Recompiler
 
 	public static void main(String[] args)
 	{
+		IndentedOutputStream.disableLocking();
 		if (args.length == 0)
 		{
 			args = new String[] { //
 					"-classpath", "bin", //
 					"-outputpath", "../JrcPortCpp", //
-					"-mainclass", "org.borium.javarecompiler.Recompiler", //
+					"-mainclass", "org.borium.javarecompiler.Statics", //
 					"-vs", "2005", //
-					"-comments", "none", //
+					"-comments", "all", //
 			};
 		}
 		Recompiler recompiler = new Recompiler();

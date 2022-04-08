@@ -10,6 +10,13 @@ import java.util.*;
  */
 public class IndentedOutputStream
 {
+	private static boolean disableLocking = false;
+
+	public static void disableLocking()
+	{
+		disableLocking = true;
+	}
+
 	/** The print stream where all the stuff goes. */
 	private PrintStream stream;
 
@@ -117,7 +124,10 @@ public class IndentedOutputStream
 	 */
 	public void liprintln(int temporaryIndent, String string)
 	{
-		Assert(locked, "liprintln() is made for printing into locked files");
+		if (!disableLocking)
+		{
+			Assert(locked, "liprintln() is made for printing into locked files");
+		}
 		boolean saveLocked = locked;
 		locked = false;
 		int currentIndent = indentLevel;
@@ -129,9 +139,12 @@ public class IndentedOutputStream
 
 	public void lock()
 	{
-		Assert(!locked, "Stream must be unlocked before locking");
-		locked = true;
-		temporaryOutput = new ArrayList<>();
+		if (!disableLocking)
+		{
+			Assert(!locked, "Stream must be unlocked before locking");
+			locked = true;
+			temporaryOutput = new ArrayList<>();
+		}
 	}
 
 	public void print(String string)
@@ -200,17 +213,20 @@ public class IndentedOutputStream
 
 	public void unlock()
 	{
-		Assert(locked, "Stream must be locked before unlocking");
-		locked = false;
-		for (String string : temporaryOutput)
+		if (!disableLocking)
 		{
-			if (string.endsWith("\n"))
+			Assert(locked, "Stream must be locked before unlocking");
+			locked = false;
+			for (String string : temporaryOutput)
 			{
-				stream.println(string.substring(0, string.length() - 1));
-			}
-			else
-			{
-				stream.print(string);
+				if (string.endsWith("\n"))
+				{
+					stream.println(string.substring(0, string.length() - 1));
+				}
+				else
+				{
+					stream.print(string);
+				}
 			}
 		}
 	}
