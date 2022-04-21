@@ -10,6 +10,12 @@ public class InstructionRETURN extends Instruction
 	}
 
 	@Override
+	public boolean fallsThrough()
+	{
+		return false;
+	}
+
+	@Override
 	public int getStackDepthChange()
 	{
 		return 0;

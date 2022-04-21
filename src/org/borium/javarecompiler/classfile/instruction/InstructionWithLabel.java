@@ -41,14 +41,22 @@ abstract class InstructionWithLabel extends Instruction
 		stream.println();
 	}
 
+	@Override
+	public int getTargetAddress(int index)
+	{
+		Assert(index == 0, "InstructionWithLabel: Bad target index");
+		return address + offset;
+	}
+
+	@Override
+	public int getTargetCount()
+	{
+		return 1;
+	}
+
 	public String getTargetLabel()
 	{
 		return "L" + hexString(address + offset, 4);
-	}
-
-	public int getTargetAddress()
-	{
-		return address + offset;
 	}
 
 	@Override

@@ -13,6 +13,12 @@ public class InstructionGOTO extends InstructionWithLabel
 	}
 
 	@Override
+	public boolean fallsThrough()
+	{
+		return false;
+	}
+
+	@Override
 	public int getStackDepthChange()
 	{
 		return 0;

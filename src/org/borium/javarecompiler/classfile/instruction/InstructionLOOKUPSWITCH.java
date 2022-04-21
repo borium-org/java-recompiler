@@ -79,6 +79,12 @@ public class InstructionLOOKUPSWITCH extends Instruction
 		stream.indent(-1);
 	}
 
+	@Override
+	public boolean fallsThrough()
+	{
+		return false;
+	}
+
 	public int getCaseCount()
 	{
 		return match.length;
@@ -103,6 +109,22 @@ public class InstructionLOOKUPSWITCH extends Instruction
 	public int getStackDepthChange()
 	{
 		return -1;
+	}
+
+	@Override
+	public int getTargetAddress(int index)
+	{
+		if (index == getCaseCount())
+		{
+			return address + defaultLabel;
+		}
+		return address + offset[index];
+	}
+
+	@Override
+	public int getTargetCount()
+	{
+		return getCaseCount() + 1;
 	}
 
 	@Override
