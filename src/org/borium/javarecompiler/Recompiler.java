@@ -14,7 +14,7 @@ public class Recompiler
 
 	public static void main(String[] args)
 	{
-		IndentedOutputStream.disableLocking();
+//		IndentedOutputStream.disableLocking();
 		if (args.length == 0)
 		{
 			args = new String[] { //

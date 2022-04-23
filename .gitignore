@@ -1,2 +1,3 @@
 bin/
 ClassFile.txt
+*.insn.txt

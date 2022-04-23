@@ -2,6 +2,7 @@ package org.borium.javarecompiler.cplusplus;
 
 import static org.borium.javarecompiler.Statics.*;
 
+import java.io.*;
 import java.util.*;
 
 import org.borium.javarecompiler.classfile.*;
@@ -543,7 +544,7 @@ class CppMethod
 				// flow.
 				if (processed[address])
 				{
-					continue;
+					break;
 				}
 				// For each instruction that is being processed:
 				Instruction instruction = code[address];
@@ -612,6 +613,31 @@ class CppMethod
 			}
 		}
 		System.out.println("All instructions are parsed, putting together a Statement list");
+		String traceFileName = executionContext.name + ".insn.txt";
+		if (traceFileName.equals("<init>.insn.txt"))
+		{
+			traceFileName = cppClass.className + ".insn.txt";
+		}
+		try
+		{
+			IndentedOutputStream trace = new IndentedOutputStream(traceFileName);
+			for (int i = 0; i < code.length; i++)
+			{
+				Instruction instruction = code[i];
+				if (instruction != null)
+				{
+					trace.print(hexString(i, 4) + " " + depth[i] + "  ");
+					instruction.oneLineDump(trace);
+				}
+			}
+			trace.close();
+		}
+		catch (IOException e)
+		{
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
 		// Statements are defined as instruction sequences that start at stack depth 0
 		// and end at stack depth 0. There are special cases for exception handler catch
 		// blocks and ternary operators.
