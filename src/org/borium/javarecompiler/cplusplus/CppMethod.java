@@ -5,6 +5,7 @@ import static org.borium.javarecompiler.Statics.*;
 import java.io.*;
 import java.util.*;
 
+import org.borium.javarecompiler.*;
 import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.attribute.AttributeCode.*;
 import org.borium.javarecompiler.classfile.instruction.*;
@@ -613,29 +614,29 @@ class CppMethod
 			}
 		}
 		System.out.println("All instructions are parsed, putting together a Statement list");
-		String traceFileName = executionContext.name + ".insn.txt";
-		if (traceFileName.equals("<init>.insn.txt"))
+		if (Recompiler.dumpInstructions)
 		{
-			traceFileName = cppClass.className + ".insn.txt";
-		}
-		try
-		{
-			IndentedOutputStream trace = new IndentedOutputStream(traceFileName);
-			for (int i = 0; i < code.length; i++)
+			String traceFileName = (executionContext.name.equals("<init>") ? cppClass.className : executionContext.name)
+					+ ".insn.txt";
+			try
 			{
-				Instruction instruction = code[i];
-				if (instruction != null)
+				IndentedOutputStream trace = new IndentedOutputStream(traceFileName);
+				for (int i = 0; i < code.length; i++)
 				{
-					trace.print(hexString(i, 4) + " " + depth[i] + "  ");
-					instruction.oneLineDump(trace);
+					Instruction instruction = code[i];
+					if (instruction != null)
+					{
+						trace.print(hexString(i, 4) + " " + depth[i] + "  ");
+						instruction.oneLineDump(trace);
+					}
 				}
+				trace.close();
 			}
-			trace.close();
-		}
-		catch (IOException e)
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			catch (IOException e)
+			{
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 		}
 
 		// Statements are defined as instruction sequences that start at stack depth 0

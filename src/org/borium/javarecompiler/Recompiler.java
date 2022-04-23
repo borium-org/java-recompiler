@@ -12,6 +12,8 @@ public class Recompiler
 
 	public static boolean stackComments = false;
 
+	public static boolean dumpInstructions = true;
+
 	public static void main(String[] args)
 	{
 //		IndentedOutputStream.disableLocking();
