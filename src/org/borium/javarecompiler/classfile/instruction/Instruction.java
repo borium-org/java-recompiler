@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
+import static org.borium.javarecompiler.Statics.*;
+
 import org.borium.javarecompiler.classfile.*;
 import org.borium.javarecompiler.classfile.constants.*;
 
@@ -661,6 +663,17 @@ public abstract class Instruction
 	}
 
 	/**
+	 * Check if instruction can fall through. There are only few instructions that
+	 * cannot, such as GOTO, xRETURN.
+	 *
+	 * @return True by default.
+	 */
+	public boolean fallsThrough()
+	{
+		return true;
+	}
+
+	/**
 	 * Calculate the stack depth change that is caused by executing this current
 	 * instruction. Total stack depth after executing this instruction should not be
 	 * negative, but here we cannot verify if this is the case.
@@ -668,6 +681,31 @@ public abstract class Instruction
 	 * @return Stack depth change, positive or negative as appropriate.
 	 */
 	public abstract int getStackDepthChange();
+
+	/**
+	 * For statement parsing: Get target address for each potential jump target.
+	 * Assert() if index is out of range.
+	 *
+	 * @param index Jump target index.
+	 * @return Target address.
+	 * @throws RuntimeException if index is out of range.
+	 */
+	public int getTargetAddress(int index)
+	{
+		Assert(false, "Instruction.getTargetAddress: No jump target");
+		return -1;
+	}
+
+	/**
+	 * For statement parsing: Return the count of target addresses where the
+	 * instruction might jump. It is mostly 0.
+	 *
+	 * @return 0 targets for jumps in this instruction by default.
+	 */
+	public int getTargetCount()
+	{
+		return 0;
+	}
 
 	public boolean isXStore()
 	{

@@ -1,5 +1,7 @@
 package org.borium.javarecompiler.classfile.instruction;
 
+import static org.borium.javarecompiler.Statics.*;
+
 import org.borium.javarecompiler.classfile.*;
 
 /**
@@ -36,9 +38,28 @@ public class InstructionGOTO_W extends Instruction
 	}
 
 	@Override
+	public boolean fallsThrough()
+	{
+		return false;
+	}
+
+	@Override
 	public int getStackDepthChange()
 	{
 		return 0;
+	}
+
+	@Override
+	public int getTargetAddress(int index)
+	{
+		Assert(index == 0, "InstructionGOTO_W: Bad target index");
+		return address + offset;
+	}
+
+	@Override
+	public int getTargetCount()
+	{
+		return 1;
 	}
 
 	@Override

@@ -15,7 +15,18 @@ public class ConstantPool
 			if (c instanceof ConstantClassInfo ci)
 			{
 				String className = ci.getName();
-				referencedClasses.add("L" + className + ";");
+				if (className.startsWith("["))
+				{
+					while (className.startsWith("["))
+					{
+						className = className.substring(1);
+					}
+					referencedClasses.add(className);
+				}
+				else
+				{
+					referencedClasses.add("L" + className + ";");
+				}
 			}
 		}
 	}

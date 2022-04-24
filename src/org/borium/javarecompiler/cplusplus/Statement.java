@@ -25,6 +25,17 @@ class Statement
 		this.executionContext = executionContext;
 	}
 
+	public void dumpInstructions(IndentedOutputStream trace)
+	{
+		trace.println("// Statement " + hexString(getAddress(), 4));
+		generateLabel(trace);
+		for (Instruction instruction : instructions)
+		{
+			trace.iprint("//\t");
+			instruction.oneLineDump(trace);
+		}
+	}
+
 	public void generateLabel(IndentedOutputStream source)
 	{
 		if (executionContext.hasLabel(getAddress()))
@@ -74,6 +85,11 @@ class Statement
 		return instructions.size();
 	}
 
+	public ArrayList<Instruction> getInstructions()
+	{
+		return instructions;
+	}
+
 	public Instruction getLastInstruction()
 	{
 		return instructions.get(instructions.size() - 1);
@@ -87,6 +103,36 @@ class Statement
 			length += instruction.length();
 		}
 		return length;
+	}
+
+	/**
+	 * Merge all instructions from next statement into this statement.
+	 *
+	 * @param nextStatement The statement to merge.
+	 */
+	public void merge(Statement nextStatement)
+	{
+		Assert(getAddress() + length() == nextStatement.getAddress(), "Merge: Statements not in sequence");
+		instructions.addAll(nextStatement.instructions);
+	}
+
+	/**
+	 * Create new instruction that has the last instruction of the current
+	 * statement. Last instruction is removed from current statement. The method is
+	 * useful for splitting GOTO/ASTORE instruction pair at the end of try block
+	 * into separate statements so that catch block can start with its own
+	 * statement. Instruction types are not verified here, caller must make sure
+	 * that this method does what it needs to do.
+	 *
+	 * @return New statement containing last instruction of this statement.
+	 */
+	public Statement splitLastInstruction()
+	{
+		ArrayList<Instruction> newInstructions = new ArrayList<>();
+		newInstructions.add(instructions.get(instructions.size() - 1));
+		instructions.remove(instructions.size() - 1);
+		Statement statement = new Statement(executionContext, newInstructions);
+		return statement;
 	}
 
 	/**

@@ -817,7 +817,12 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateDUP2(IndentedOutputStream source, InstructionDUP2 instruction)
 	{
-		notSupported(instruction);
+		String value1 = stack.pop();
+		String value2 = stack.pop();
+		stack.push(value2);
+		stack.push(value1);
+		stack.push(value2);
+		stack.push(value1);
 	}
 
 	private void generateDUP2_X1(IndentedOutputStream source, InstructionDUP2_X1 instruction)
@@ -1002,8 +1007,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] index = stack.pop().split(SplitStackEntrySeparator);
 		String[] array = stack.pop().split(SplitStackEntrySeparator);
 		Assert(index[0].equals("int"), "IALOAD: Integer index expected");
-		Assert(array[0].equals("JavaArray<int>*"), "IALOAD: Integer array expected");
-		String newEntry = "int" + StackEntrySeparator + array[1] + ".get(" + index[1] + ")";
+		Assert(array[0].equals("JavaRawArray<int>"), "IALOAD: Integer array expected");
+		String newEntry = "int" + StackEntrySeparator + array[1] + "->get(" + index[1] + ")";
 		stack.push(newEntry);
 	}
 
@@ -1023,7 +1028,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] index = stack.pop().split(SplitStackEntrySeparator);
 		String[] array = stack.pop().split(SplitStackEntrySeparator);
 		Assert(index[0].equals("int"), "IASTORE: Integer index expected");
-		Assert(array[0].equals("JavaArray<int>*"), "IASTORE: Integer array expected");
+		Assert(array[0].equals("JavaRawArray<int>"), "IASTORE: Integer array expected");
 		source.iprintln(array[1] + "->assign(" + index[1] + ", " + value[1] + ");");
 	}
 
@@ -1058,8 +1063,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String[] right = stack.pop().split(SplitStackEntrySeparator);
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
-		Assert(left[0].equals("int"), "IF_ICMPEQ: Integer expected");
-		Assert(right[0].equals("int"), "IF_ICMPEQ: Integer expected");
+		Assert(left[0].equals("int") || left[0].equals("char"), "IF_ICMPEQ: Integer or char expected");
+		Assert(right[0].equals("int") || right[0].equals("char"), "IF_ICMPEQ: Integer or char expected");
 		source.iprintln("if ((" + left[1] + ") == (" + right[1] + "))");
 		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
@@ -1083,8 +1088,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String[] right = stack.pop().split(SplitStackEntrySeparator);
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
-		Assert(left[0].equals("int"), "IF_ICMPLT: Integer expected");
-		Assert(right[0].equals("int"), "IF_ICMPLT: Integer expected");
+		Assert(left[0].equals("int") || left[0].equals("char"), "IF_ICMPLT: Integer or char expected");
+		Assert(right[0].equals("int") || right[0].equals("char"), "IF_ICMPLT: Integer or char expected");
 		source.iprintln("if ((" + left[1] + ") < (" + right[1] + "))");
 		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
@@ -1093,8 +1098,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String[] right = stack.pop().split(SplitStackEntrySeparator);
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
-		Assert(left[0].equals("int"), "IF_ICMPNE: Integer expected");
-		Assert(right[0].equals("int"), "IF_ICMPNE: Integer expected");
+		Assert(left[0].equals("int") || left[0].equals("char"), "IF_ICMPNE: Integer or char expected");
+		Assert(right[0].equals("int") || right[0].equals("char"), "IF_ICMPNE: Integer or char expected");
 		source.iprintln("if ((" + left[1] + ") != (" + right[1] + "))");
 		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
 	}
@@ -1681,9 +1686,15 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateNEWARRAY(IndentedOutputStream source, InstructionNEWARRAY instruction)
 	{
-		String[] value = stack.pop().split(SplitStackEntrySeparator);
-		Assert(value[0].equals("int"), "NEWARRAY: Integer expected");
-		stack.push("int" + StackEntrySeparator + "new " + instruction.getElementType() + "[" + value[1] + "]");
+		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
+		Assert(topOfStack[0].equals("int"), "NEWARRAY: Integer operand expected");
+		String length = topOfStack[1];
+		String type = instruction.getElementType();
+		String tempName = "temp_" + hexString(instruction.address, 4);
+		source.liprintln(2, "Pointer<JavaRawArray<" + type + ">> " + tempName + ";");
+		source.iprintln(tempName + " = new JavaRawArray<" + type + ">(" + length + ");");
+		String newEntry = "JavaRawArray<" + type + ">" + StackEntrySeparator + tempName;
+		stack.push(newEntry);
 	}
 
 	private void generateNOP(IndentedOutputStream source, InstructionNOP instruction)
@@ -1795,7 +1806,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateTABLESWITCH(IndentedOutputStream source, InstructionTABLESWITCH instruction)
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		Assert(topOfStack[0].equals("int"), "TABLESWITCH: Integer expected");
+		Assert(topOfStack[0].equals("int") || topOfStack[0].equals("char"), "TABLESWITCH: Integer expected");
 		source.iprintln("switch (" + topOfStack[1] + ")");
 		source.iprintln("{");
 		int value = instruction.getFirstValue();
