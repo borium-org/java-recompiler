@@ -57,6 +57,16 @@ class CppMethod
 			}
 		}
 
+		public ArrayList<Integer> getCatchAddresses()
+		{
+			ArrayList<Integer> addresses = new ArrayList<>();
+			for (ExceptionHandler handler : handlers)
+			{
+				addresses.add(handler.handlerPc);
+			}
+			return addresses;
+		}
+
 		/**
 		 * Check if address is the beginning of catch block. This is needed for stack
 		 * depth analysis where stack depth goes negative because of ASTORE instruction.
@@ -599,6 +609,14 @@ class CppMethod
 		System.out.println("Parsing instructions for " + executionContext.name);
 		Stack<Integer> parseStack = new Stack<>();
 		parseStack.push(0);
+		// If the code has exceptions, we need to push them as well, with initial stack
+		// depth +1.
+		for (int address : exceptionHandlers.getCatchAddresses())
+		{
+			parseStack.push(0x10000 + address);
+			depth[address] = 1;
+		}
+		System.out.print("");
 		while (parseStack.size() > 0)
 		{
 			int entry = parseStack.pop();
@@ -686,8 +704,17 @@ class CppMethod
 		System.out.println("All instructions are parsed, putting together a Statement list");
 		if (Recompiler.dumpInstructions)
 		{
-			String traceFileName = (executionContext.name.equals("<init>") ? cppClass.className : executionContext.name)
-					+ ".insn.txt";
+			String traceFileName = executionContext.name;
+			switch (executionContext.name)
+			{
+			case "<init>":
+				traceFileName = cppClass.className;
+				break;
+			case "<clinit>":
+				traceFileName = cppClass.className + "_Class";
+				break;
+			}
+			traceFileName += ".insn.txt";
 			try
 			{
 				IndentedOutputStream trace = new IndentedOutputStream(traceFileName);
@@ -754,12 +781,34 @@ class CppMethod
 					+ executionContext.name);
 		}
 		combineStatements();
+		// Another hack: Since catch blocks are somewhat special in stack depth, their
+		// ASTORE instruction gets merged into the previous statement. The previous
+		// statement is a GOTO in the end of try block, so the pattern is easy to
+		// recognize.
+		for (int address : exceptionHandlers.getCatchAddresses())
+		{
+			int statementAddress = address - 3;
+			Assert(code[statementAddress] instanceof InstructionGOTO, "GOTO expected");
+			Statement statement = statements.get(statementAddress);
+			Assert(statement != null, "Statement expected at the end of try block");
+			Statement catchStatement = statement.splitLastInstruction();
+			statements.put(address, catchStatement);
+		}
 		if (Recompiler.dumpStatements)
 		{
-			int address = 0;
-			String traceFileName = (executionContext.name.equals("<init>") ? cppClass.className : executionContext.name)
-					+ ".stmt.txt";
+			String traceFileName = executionContext.name;
+			switch (executionContext.name)
+			{
+			case "<init>":
+				traceFileName = cppClass.className;
+				break;
+			case "<clinit>":
+				traceFileName = cppClass.className + "_Class";
+				break;
+			}
+			traceFileName += ".stmt.txt";
 
+			int address = 0;
 			try
 			{
 				IndentedOutputStream trace = new IndentedOutputStream(traceFileName);

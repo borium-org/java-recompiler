@@ -117,6 +117,25 @@ class Statement
 	}
 
 	/**
+	 * Create new instruction that has the last instruction of the current
+	 * statement. Last instruction is removed from current statement. The method is
+	 * useful for splitting GOTO/ASTORE instruction pair at the end of try block
+	 * into separate statements so that catch block can start with its own
+	 * statement. Instruction types are not verified here, caller must make sure
+	 * that this method does what it needs to do.
+	 *
+	 * @return New statement containing last instruction of this statement.
+	 */
+	public Statement splitLastInstruction()
+	{
+		ArrayList<Instruction> newInstructions = new ArrayList<>();
+		newInstructions.add(instructions.get(instructions.size() - 1));
+		instructions.remove(instructions.size() - 1);
+		Statement statement = new Statement(executionContext, newInstructions);
+		return statement;
+	}
+
+	/**
 	 * Dump stack contents. Comments start indented, and content has 4 tabs before
 	 * the actual stack content.
 	 *

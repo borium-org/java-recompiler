@@ -24,9 +24,9 @@ public class Recompiler
 			args = new String[] { //
 					"-classpath", "bin", //
 					"-outputpath", "../JrcPortCpp", //
-					"-mainclass", "org.borium.javarecompiler.Statics", //
+					"-mainclass", "org.borium.javarecompiler.Recompiler", //
 					"-vs", "2005", //
-					"-comments", "all", //
+					"-comments", "none", //
 			};
 		}
 		Recompiler recompiler = new Recompiler();
