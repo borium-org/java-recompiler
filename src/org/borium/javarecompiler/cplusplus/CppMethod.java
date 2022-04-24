@@ -310,6 +310,76 @@ class CppMethod
 		return executionContext.cppType;
 	}
 
+	/**
+	 * Combine multiple statements into one of they contain ternary operators.
+	 * <p>
+	 * Ternary operator is implemented using conditional ':' and unconditional '?'
+	 * branches into the middle of the statement that contains the operator. All
+	 * other branches in if and switch statements always target the beginning of a
+	 * statement.
+	 */
+	private void combineStatements()
+	{
+		boolean changed = true;
+		while (changed)
+		{
+			changed = false;
+			for (int address = 0; address < executionContext.getCodeSize();)
+			{
+				Statement statement = statements.get(address);
+				for (Instruction instruction : statement.getInstructions())
+				{
+					// Check all instructions that have branch targets
+					int targets = instruction.getTargetCount();
+					if (targets > 0)
+					{
+						for (int target = 0; target < targets; target++)
+						{
+							// Branch target to the beginning of some statement?
+							int targetAddress = instruction.getTargetAddress(target);
+							Statement targetStatement = statements.get(targetAddress);
+							if (targetStatement == null)
+							{
+								// No such statement, so we're in the middle of something. Keep merging till we
+								// merge the statement that we are targeting.
+								// We may try to transfer into our own statement when all necessary merging is
+								// complete, so test the target address to be within our statement.
+								int nextAddress = address + statement.length();
+								if (targetAddress >= address && targetAddress < nextAddress)
+								{
+									break;
+								}
+								// Merge all statements until we get the one we're targeting in the middle.
+								for (;;)
+								{
+									nextAddress = address + statement.length();
+									if (nextAddress > targetAddress)
+									{
+										break;
+									}
+									Statement nextStatement = statements.get(nextAddress);
+									statement.merge(nextStatement);
+									statements.remove(nextAddress);
+								}
+								changed = true;
+								break;
+							}
+						}
+					}
+					if (changed)
+					{
+						break;
+					}
+				}
+				if (changed)
+				{
+					break;
+				}
+				address += statement.length();
+			}
+		}
+	}
+
 	private String createInitializer(String type)
 	{
 		String initializer = " = 0";
@@ -682,10 +752,8 @@ class CppMethod
 			}
 			System.err.println("Java stack depth is not 0 but " + stackDepth + " at the end of instruction array in "
 					+ executionContext.name);
-////		Statement statement = new Statement(executionContext, instructions);
-////		statements.put(statement.getAddress(), statement);
-////		instructions.clear();
 		}
+		combineStatements();
 		if (Recompiler.dumpStatements)
 		{
 			int address = 0;

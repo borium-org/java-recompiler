@@ -85,6 +85,11 @@ class Statement
 		return instructions.size();
 	}
 
+	public ArrayList<Instruction> getInstructions()
+	{
+		return instructions;
+	}
+
 	public Instruction getLastInstruction()
 	{
 		return instructions.get(instructions.size() - 1);
@@ -98,6 +103,17 @@ class Statement
 			length += instruction.length();
 		}
 		return length;
+	}
+
+	/**
+	 * Merge all instructions from next statement into this statement.
+	 *
+	 * @param nextStatement The statement to merge.
+	 */
+	public void merge(Statement nextStatement)
+	{
+		Assert(getAddress() + length() == nextStatement.getAddress(), "Merge: Statements not in sequence");
+		instructions.addAll(nextStatement.instructions);
 	}
 
 	/**
