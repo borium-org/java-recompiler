@@ -25,6 +25,17 @@ class Statement
 		this.executionContext = executionContext;
 	}
 
+	public void dumpInstructions(IndentedOutputStream trace)
+	{
+		trace.println("// Statement " + hexString(getAddress(), 4));
+		generateLabel(trace);
+		for (Instruction instruction : instructions)
+		{
+			trace.iprint("//\t");
+			instruction.oneLineDump(trace);
+		}
+	}
+
 	public void generateLabel(IndentedOutputStream source)
 	{
 		if (executionContext.hasLabel(getAddress()))

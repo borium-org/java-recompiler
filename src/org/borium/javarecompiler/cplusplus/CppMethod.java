@@ -634,7 +634,6 @@ class CppMethod
 			}
 			catch (IOException e)
 			{
-				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 		}
@@ -686,6 +685,32 @@ class CppMethod
 ////		Statement statement = new Statement(executionContext, instructions);
 ////		statements.put(statement.getAddress(), statement);
 ////		instructions.clear();
+		}
+		if (Recompiler.dumpStatements)
+		{
+			int address = 0;
+			String traceFileName = (executionContext.name.equals("<init>") ? cppClass.className : executionContext.name)
+					+ ".stmt.txt";
+
+			try
+			{
+				IndentedOutputStream trace = new IndentedOutputStream(traceFileName);
+				for (;;)
+				{
+					Statement statement = statements.get(address);
+					if (statement == null)
+					{
+						break;
+					}
+					statement.dumpInstructions(trace);
+					address += statement.length();
+				}
+				trace.close();
+			}
+			catch (IOException e)
+			{
+				e.printStackTrace();
+			}
 		}
 	}
 }
