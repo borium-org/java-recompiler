@@ -748,17 +748,6 @@ class CppMethod
 				instructions.add(instruction);
 				int nextAddress = address + instruction.length();
 				stackDepth = depth[nextAddress];
-//				// Stack depth can become -1 at the beginning of the catch block in exception
-//				// handler. It is implied that JVM pushes the exception object reference to
-//				// stack during ATHROW and first instruction in catch block is ASTORE into a
-//				// local variable. We can't update stack at ATHROW location. We need to handle
-//				// ASTORE stack depth in here if the stack depth goes negative.
-//				if (stackDepth == -1)
-//				{
-//					Assert(instruction instanceof InstructionASTORE, "Stack negative: ASTORE expected");
-//////				Assert(exceptionHandlers.isCatchBlock(address), "Stack negative: ASTORE must be in catch block");
-//////				stackDepth = 0;
-//				}
 				if (stackDepth == 0)
 				{
 					Statement statement = new Statement(executionContext, instructions);
