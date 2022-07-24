@@ -203,6 +203,8 @@ class CppMethod
 	 */
 	private int parameterCount;
 
+	private Instruction[] instructions;
+
 	public CppMethod(CppClass cppClass, ClassMethod javaMethod)
 	{
 		this.cppClass = cppClass;
@@ -210,6 +212,7 @@ class CppMethod
 		isStatic = javaMethod.isStatic();
 		isAbstract = javaMethod.isAbstract();
 		parameterCount = javaMethod.getParameterCount();
+		instructions = javaMethod.getInstructions();
 		if (!isAbstract)
 		{
 			exceptionHandlers = new ExceptionHandlers(javaMethod.getExceptionTable(), cppClass);
@@ -313,6 +316,11 @@ class CppMethod
 		source.indent(-1);
 		source.iprintln("}");
 		source.println();
+	}
+
+	public Instruction[] getInstructions()
+	{
+		return instructions;
 	}
 
 	public String getName()

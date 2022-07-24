@@ -14,6 +14,25 @@ import org.borium.javarecompiler.cplusplus.LocalVariables.*;
  */
 public class CppExecutionContext extends ExecutionContext implements ClassTypeSimplifier
 {
+	private static class TernaryOperator
+	{
+		/**
+		 * Ternary condition expression. Condition is reversed because the code
+		 * generated for the expression jumps to the false path. Type is always assumed
+		 * to be boolean.
+		 */
+		String condition;
+		/** False path address. */
+		int falsePathAddress;
+		/** Address where true and false paths converge. */
+		int endAddress;
+		/**
+		 * End of true path, the location where GOTO instruction goes to the end
+		 * address.
+		 */
+		int endOfTruePath;
+	}
+
 	/** C++ equivalent of method type. */
 	String cppType;
 
@@ -40,6 +59,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	 * INVOKESTATIC code generation.
 	 */
 	boolean isStaticConstructor;
+
+	private Stack<TernaryOperator> ternaryStack = new Stack<>();
 
 	protected CppExecutionContext(CppMethod cppMethod, CppClass cppClass, ClassMethod javaMethod)
 	{
@@ -957,6 +978,11 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		{
 			source.iprintln("goto " + instruction.getTargetLabel() + ";");
 		}
+		else if (ternaryStack.size() > 0)
+		{
+			TernaryOperator ternary = ternaryStack.firstElement();
+			Assert(instruction.address == ternary.endOfTruePath, "GOTO found in wrong place");
+		}
 		else
 		{
 			notSupported(instruction);
@@ -1232,7 +1258,22 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			}
 			else
 			{
-				notSupported(instruction);
+				TernaryOperator ternary = new TernaryOperator();
+				ternary.condition = "((" + topOfStack[1] + ") > 0)";
+				stack.push("bool=" + ternary.condition);
+				ternary.falsePathAddress = instruction.getTargetAddress(0);
+				int trueJumpAddress = ternary.falsePathAddress - 3;
+				Instruction[] instructions = cppMethod.getInstructions();
+				if (instructions[trueJumpAddress]instanceof InstructionGOTO insnGoto)
+				{
+					ternary.endAddress = insnGoto.getTargetAddress(0);
+					ternary.endOfTruePath = trueJumpAddress;
+				}
+				else
+				{
+					Assert(false, "GOTO expected at the end of true path");
+				}
+				ternaryStack.push(ternary);
 			}
 			break;
 		default:
