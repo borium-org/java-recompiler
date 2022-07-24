@@ -76,6 +76,24 @@ public class ConstantPool
 		throw new ClassFormatError("Constant " + index + " is not " + clazz.getSimpleName());
 	}
 
+//	public ArrayList<String> getReferencedClasssses()
+//	{
+//		ArrayList<String> referencedClasses = new ArrayList<>();
+//		for (Constant c : constants)
+//		{
+//			if (c instanceof ConstantClassInfo ci)
+//			{
+//				String className = getString(ci.nameIndex);
+//				if (className.charAt(0) == '[')
+//				{
+//					continue;
+//				}
+//				referencedClasses.add(className.replace('/', '.'));
+//			}
+//		}
+//		return referencedClasses;
+//	}
+
 	public String getString(int index)
 	{
 		Constant constant = get(index);

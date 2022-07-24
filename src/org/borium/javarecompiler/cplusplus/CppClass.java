@@ -308,6 +308,12 @@ public class CppClass
 		ReferencedClasses referencedClassNames = classFile.getReferencedClasses();
 		for (String referencedClassName : referencedClassNames)
 		{
+			// Referenced class could be an array, ignore for now. It may need more special
+			// handling later...
+			if (referencedClassName.charAt(0) == '[')
+			{
+				continue;
+			}
 			String cppClassName = referencedClassName.replace('/', '.');
 			int pos = cppClassName.lastIndexOf('.');
 			String packageName = cppClassName.substring(0, pos);

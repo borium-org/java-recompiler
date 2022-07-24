@@ -217,6 +217,11 @@ class CppMethod
 		}
 	}
 
+	public boolean containsStatementAt(int targetAddress)
+	{
+		return statements.containsKey(targetAddress);
+	}
+
 	public void generateHeader(IndentedOutputStream header, String newName, String newType)
 	{
 		if (newType.endsWith(")"))
