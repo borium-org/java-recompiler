@@ -14,6 +14,25 @@ import org.borium.javarecompiler.cplusplus.LocalVariables.*;
  */
 public class CppExecutionContext extends ExecutionContext implements ClassTypeSimplifier
 {
+	private static class TernaryOperator
+	{
+		/**
+		 * Ternary condition expression. Condition is reversed because the code
+		 * generated for the expression jumps to the false path. Type is always assumed
+		 * to be boolean.
+		 */
+		String condition;
+		/** False path address. */
+		int falsePathAddress;
+		/** Address where true and false paths converge. */
+		int endAddress;
+		/**
+		 * End of true path, the location where GOTO instruction goes to the end
+		 * address.
+		 */
+		int endOfTruePath;
+	}
+
 	/** C++ equivalent of method type. */
 	String cppType;
 
@@ -27,7 +46,6 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private CppClass cppClass;
 
 	/** C++ method that this using this execution context. */
-	@SuppressWarnings("unused")
 	private CppMethod cppMethod;
 
 	/** Local variables with their simplified C++ types. */
@@ -41,6 +59,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	 * INVOKESTATIC code generation.
 	 */
 	boolean isStaticConstructor;
+
+	private Stack<TernaryOperator> ternaryStack = new Stack<>();
 
 	protected CppExecutionContext(CppMethod cppMethod, CppClass cppClass, ClassMethod javaMethod)
 	{
@@ -60,8 +80,36 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		}
 	}
 
+	/**
+	 * Generate a C++ equivalent of a bytecode instruction. If the address of an
+	 * instruction matches the end address of a ternary operator expression, convert
+	 * top 4 stack entries into a single ternary expression first. Multiple ternary
+	 * expressions can have same end address if the false path of the outer ternary
+	 * contains a ternary nested in it.
+	 *
+	 * @param source      Source code output stream.
+	 * @param instruction New instruction to generate.
+	 */
 	public void generate(IndentedOutputStream source, Instruction instruction)
 	{
+		while (ternaryStack.size() > 0)
+		{
+			TernaryOperator ternary = ternaryStack.firstElement();
+			if (ternary.endAddress != instruction.address)
+			{
+				break;
+			}
+			ternaryStack.pop();
+			String[] falseExpr = stack.pop().split(SplitStackEntrySeparator);
+			String[] trueExpr = stack.pop().split(SplitStackEntrySeparator);
+			String[] condition = stack.pop().split(SplitStackEntrySeparator);
+			Assert(condition[0].equals("bool"), "Ternary: Boolean condition expected");
+			Assert(trueExpr[0].equals(falseExpr[0]), "Ternary: True/false expression type mismatch");
+			stack.push(trueExpr[0] + StackEntrySeparator + //
+					"(" + condition[1] + " ? " + //
+					"(" + trueExpr[1] + ") : " + //
+					"(" + falseExpr[1] + "))");
+		}
 		String opcode = instruction.getClass().getSimpleName().substring(11);
 		switch (opcode)
 		{
@@ -954,7 +1002,19 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 
 	private void generateGOTO(IndentedOutputStream source, InstructionGOTO instruction)
 	{
-		source.iprintln("goto " + instruction.getTargetLabel() + ";");
+		if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+		{
+			source.iprintln("goto " + instruction.getTargetLabel() + ";");
+		}
+		else if (ternaryStack.size() > 0)
+		{
+			TernaryOperator ternary = ternaryStack.firstElement();
+			Assert(instruction.address == ternary.endOfTruePath, "GOTO found in wrong place");
+		}
+		else
+		{
+			notSupported(instruction);
+		}
 	}
 
 	private void generateGOTO_W(IndentedOutputStream source, InstructionGOTO_W instruction)
@@ -1047,16 +1107,30 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		String[] right = stack.pop().split(SplitStackEntrySeparator);
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
-		source.iprintln("if ((" + left[1] + ") == (" + right[1] + "))");
-		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+		{
+			source.iprintln("if ((" + left[1] + ") == (" + right[1] + "))");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		}
+		else
+		{
+			notSupported(instruction);
+		}
 	}
 
 	private void generateIF_ACMPNE(IndentedOutputStream source, InstructionIF_ACMPNE instruction)
 	{
 		String[] right = stack.pop().split(SplitStackEntrySeparator);
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
-		source.iprintln("if ((" + left[1] + ") != (" + right[1] + "))");
-		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+		{
+			source.iprintln("if ((" + left[1] + ") != (" + right[1] + "))");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		}
+		else
+		{
+			notSupported(instruction);
+		}
 	}
 
 	private void generateIF_ICMPEQ(IndentedOutputStream source, InstructionIF_ICMPEQ instruction)
@@ -1065,8 +1139,15 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
 		Assert(left[0].equals("int") || left[0].equals("char"), "IF_ICMPEQ: Integer or char expected");
 		Assert(right[0].equals("int") || right[0].equals("char"), "IF_ICMPEQ: Integer or char expected");
-		source.iprintln("if ((" + left[1] + ") == (" + right[1] + "))");
-		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+		{
+			source.iprintln("if ((" + left[1] + ") == (" + right[1] + "))");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		}
+		else
+		{
+			notSupported(instruction);
+		}
 	}
 
 	private void generateIF_ICMPGE(IndentedOutputStream source, InstructionIF_ICMPGE instruction)
@@ -1090,8 +1171,15 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
 		Assert(left[0].equals("int") || left[0].equals("char"), "IF_ICMPLT: Integer or char expected");
 		Assert(right[0].equals("int") || right[0].equals("char"), "IF_ICMPLT: Integer or char expected");
-		source.iprintln("if ((" + left[1] + ") < (" + right[1] + "))");
-		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+		{
+			source.iprintln("if ((" + left[1] + ") < (" + right[1] + "))");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		}
+		else
+		{
+			notSupported(instruction);
+		}
 	}
 
 	private void generateIF_ICMPNE(IndentedOutputStream source, InstructionIF_ICMPNE instruction)
@@ -1100,8 +1188,15 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		String[] left = stack.pop().split(SplitStackEntrySeparator);
 		Assert(left[0].equals("int") || left[0].equals("char"), "IF_ICMPNE: Integer or char expected");
 		Assert(right[0].equals("int") || right[0].equals("char"), "IF_ICMPNE: Integer or char expected");
-		source.iprintln("if ((" + left[1] + ") != (" + right[1] + "))");
-		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+		{
+			source.iprintln("if ((" + left[1] + ") != (" + right[1] + "))");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		}
+		else
+		{
+			notSupported(instruction);
+		}
 	}
 
 	private void generateIFEQ(IndentedOutputStream source, InstructionIFEQ instruction)
@@ -1110,12 +1205,27 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		switch (topOfStack[0])
 		{
 		case "int":
-			source.iprintln("if ((" + topOfStack[1] + ") == 0)");
-			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+			{
+				source.iprintln("if ((" + topOfStack[1] + ") == 0)");
+				source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			}
+			else
+			{
+				String condition = "((" + topOfStack[1] + ") != 0)";
+				generateTernary(instruction, condition);
+			}
 			break;
 		case "bool":
-			source.iprintln("if (!(" + topOfStack[1] + "))");
-			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+			{
+				source.iprintln("if (!(" + topOfStack[1] + "))");
+				source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			}
+			else
+			{
+				notSupported(instruction);
+			}
 			break;
 		default:
 			Assert(false, "IFEQ: Unhandled operand type " + topOfStack[0]);
@@ -1128,8 +1238,15 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		switch (topOfStack[0])
 		{
 		case "int":
-			source.iprintln("if ((" + topOfStack[1] + ") >= 0)");
-			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+			{
+				source.iprintln("if ((" + topOfStack[1] + ") >= 0)");
+				source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			}
+			else
+			{
+				notSupported(instruction);
+			}
 			break;
 		default:
 			Assert(false, "IFGE: Unhandled operand type " + topOfStack[0]);
@@ -1142,8 +1259,15 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		switch (topOfStack[0])
 		{
 		case "int":
-			source.iprintln("if ((" + topOfStack[1] + ") > 0)");
-			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+			{
+				source.iprintln("if ((" + topOfStack[1] + ") > 0)");
+				source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			}
+			else
+			{
+				notSupported(instruction);
+			}
 			break;
 		default:
 			Assert(false, "IFGT: Unhandled operand type " + topOfStack[0]);
@@ -1156,8 +1280,16 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		switch (topOfStack[0])
 		{
 		case "int":
-			source.iprintln("if ((" + topOfStack[1] + ") <= 0)");
-			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+			{
+				source.iprintln("if ((" + topOfStack[1] + ") <= 0)");
+				source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			}
+			else
+			{
+				String condition = "((" + topOfStack[1] + ") > 0)";
+				generateTernary(instruction, condition);
+			}
 			break;
 		default:
 			Assert(false, "IFLE: Unhandled operand type " + topOfStack[0]);
@@ -1170,8 +1302,15 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		switch (topOfStack[0])
 		{
 		case "int":
-			source.iprintln("if ((" + topOfStack[1] + ") < 0)");
-			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+			{
+				source.iprintln("if ((" + topOfStack[1] + ") < 0)");
+				source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			}
+			else
+			{
+				notSupported(instruction);
+			}
 			break;
 		default:
 			Assert(false, "IFLT: Unhandled operand type " + topOfStack[0]);
@@ -1184,12 +1323,26 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		switch (topOfStack[0])
 		{
 		case "int":
-			source.iprintln("if ((" + topOfStack[1] + ") != 0)");
-			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+			{
+				source.iprintln("if ((" + topOfStack[1] + ") != 0)");
+				source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			}
+			else
+			{
+				notSupported(instruction);
+			}
 			break;
 		case "bool":
-			source.iprintln("if (" + topOfStack[1] + ")");
-			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+			{
+				source.iprintln("if (" + topOfStack[1] + ")");
+				source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+			}
+			else
+			{
+				notSupported(instruction);
+			}
 			break;
 		default:
 			Assert(false, "IFNE: Unhandled operand type " + topOfStack[0]);
@@ -1199,15 +1352,29 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	private void generateIFNONNULL(IndentedOutputStream source, InstructionIFNONNULL instruction)
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		source.iprintln("if ((" + topOfStack[1] + ") != nullptr)");
-		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+		{
+			source.iprintln("if ((" + topOfStack[1] + ") != nullptr)");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		}
+		else
+		{
+			notSupported(instruction);
+		}
 	}
 
 	private void generateIFNULL(IndentedOutputStream source, InstructionIFNULL instruction)
 	{
 		String[] topOfStack = stack.pop().split(SplitStackEntrySeparator);
-		source.iprintln("if ((" + topOfStack[1] + ") == nullptr)");
-		source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		if (cppMethod.containsStatementAt(instruction.getTargetAddress(0)))
+		{
+			source.iprintln("if ((" + topOfStack[1] + ") == nullptr)");
+			source.iprintln("\tgoto " + instruction.getTargetLabel() + ";");
+		}
+		else
+		{
+			notSupported(instruction);
+		}
 	}
 
 	private void generateIINC(IndentedOutputStream source, InstructionIINC instruction)
@@ -1752,9 +1919,9 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		}
 		// Special handling for type mismatch: boolean literals are passed as ints, for
 		// example
-		switch (fieldType + "=" + value[0])
+		switch (fieldType + StackEntrySeparator + value[0])
 		{
-		case "bool=int":
+		case "bool" + StackEntrySeparator + "int":
 			// Constant 1 or 0 - translate to true or false
 			switch (value[1])
 			{
@@ -1818,6 +1985,26 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		source.iprintln("default:");
 		source.iprintln("\tgoto " + instruction.getDefaultLabel() + ";");
 		source.iprintln("}");
+	}
+
+	private void generateTernary(InstructionWithLabel instruction, String condition)
+	{
+		TernaryOperator ternary = new TernaryOperator();
+		ternary.condition = condition;
+		stack.push("bool" + StackEntrySeparator + ternary.condition);
+		ternary.falsePathAddress = instruction.getTargetAddress(0);
+		int trueJumpAddress = ternary.falsePathAddress - 3;
+		Instruction[] instructions = cppMethod.getInstructions();
+		if (instructions[trueJumpAddress]instanceof InstructionGOTO insnGoto)
+		{
+			ternary.endAddress = insnGoto.getTargetAddress(0);
+			ternary.endOfTruePath = trueJumpAddress;
+		}
+		else
+		{
+			Assert(false, "GOTO expected at the end of true path");
+		}
+		ternaryStack.push(ternary);
 	}
 
 	private void generateWIDE(IndentedOutputStream source, InstructionWIDE instruction)
