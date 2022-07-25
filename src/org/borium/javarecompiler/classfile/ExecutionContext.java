@@ -13,9 +13,10 @@ public class ExecutionContext
 {
 	/**
 	 * Separator between stack entry type and value. The character must not be
-	 * present in the expression for the value of the stack entry.
+	 * present in the expression for the value of the stack entry. '=' is a bad
+	 * choice because it can be present in the condition part of a ternary operator.
 	 */
-	protected static final String StackEntrySeparator = "=";
+	protected static final String StackEntrySeparator = "#";
 
 	/**
 	 * Since String.split() expects a regular expression, this separator is the

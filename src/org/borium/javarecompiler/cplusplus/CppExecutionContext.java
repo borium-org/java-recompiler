@@ -80,8 +80,36 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		}
 	}
 
+	/**
+	 * Generate a C++ equivalent of a bytecode instruction. If the address of an
+	 * instruction matches the end address of a ternary operator expression, convert
+	 * top 4 stack entries into a single ternary expression first. Multiple ternary
+	 * expressions can have same end address if the false path of the outer ternary
+	 * contains a ternary nested in it.
+	 *
+	 * @param source      Source code output stream.
+	 * @param instruction New instruction to generate.
+	 */
 	public void generate(IndentedOutputStream source, Instruction instruction)
 	{
+		while (ternaryStack.size() > 0)
+		{
+			TernaryOperator ternary = ternaryStack.firstElement();
+			if (ternary.endAddress != instruction.address)
+			{
+				break;
+			}
+			ternaryStack.pop();
+			String[] falseExpr = stack.pop().split(SplitStackEntrySeparator);
+			String[] trueExpr = stack.pop().split(SplitStackEntrySeparator);
+			String[] condition = stack.pop().split(SplitStackEntrySeparator);
+			Assert(condition[0].equals("bool"), "Ternary: Boolean condition expected");
+			Assert(trueExpr[0].equals(falseExpr[0]), "Ternary: True/false expression type mismatch");
+			stack.push(trueExpr[0] + StackEntrySeparator + //
+					"(" + condition[1] + " ? " + //
+					"(" + trueExpr[1] + ") : " + //
+					"(" + falseExpr[1] + "))");
+		}
 		String opcode = instruction.getClass().getSimpleName().substring(11);
 		switch (opcode)
 		{
@@ -1891,9 +1919,9 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		}
 		// Special handling for type mismatch: boolean literals are passed as ints, for
 		// example
-		switch (fieldType + "=" + value[0])
+		switch (fieldType + StackEntrySeparator + value[0])
 		{
-		case "bool=int":
+		case "bool" + StackEntrySeparator + "int":
 			// Constant 1 or 0 - translate to true or false
 			switch (value[1])
 			{
@@ -1963,7 +1991,7 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 	{
 		TernaryOperator ternary = new TernaryOperator();
 		ternary.condition = condition;
-		stack.push("bool=" + ternary.condition);
+		stack.push("bool" + StackEntrySeparator + ternary.condition);
 		ternary.falsePathAddress = instruction.getTargetAddress(0);
 		int trueJumpAddress = ternary.falsePathAddress - 3;
 		Instruction[] instructions = cppMethod.getInstructions();
