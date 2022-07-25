@@ -1184,7 +1184,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			}
 			else
 			{
-				notSupported(instruction);
+				String condition = "((" + topOfStack[1] + ") != 0)";
+				generateTernary(instruction, condition);
 			}
 			break;
 		case "bool":
@@ -1258,22 +1259,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 			}
 			else
 			{
-				TernaryOperator ternary = new TernaryOperator();
-				ternary.condition = "((" + topOfStack[1] + ") > 0)";
-				stack.push("bool=" + ternary.condition);
-				ternary.falsePathAddress = instruction.getTargetAddress(0);
-				int trueJumpAddress = ternary.falsePathAddress - 3;
-				Instruction[] instructions = cppMethod.getInstructions();
-				if (instructions[trueJumpAddress]instanceof InstructionGOTO insnGoto)
-				{
-					ternary.endAddress = insnGoto.getTargetAddress(0);
-					ternary.endOfTruePath = trueJumpAddress;
-				}
-				else
-				{
-					Assert(false, "GOTO expected at the end of true path");
-				}
-				ternaryStack.push(ternary);
+				String condition = "((" + topOfStack[1] + ") > 0)";
+				generateTernary(instruction, condition);
 			}
 			break;
 		default:
@@ -1970,6 +1957,26 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		source.iprintln("default:");
 		source.iprintln("\tgoto " + instruction.getDefaultLabel() + ";");
 		source.iprintln("}");
+	}
+
+	private void generateTernary(InstructionWithLabel instruction, String condition)
+	{
+		TernaryOperator ternary = new TernaryOperator();
+		ternary.condition = condition;
+		stack.push("bool=" + ternary.condition);
+		ternary.falsePathAddress = instruction.getTargetAddress(0);
+		int trueJumpAddress = ternary.falsePathAddress - 3;
+		Instruction[] instructions = cppMethod.getInstructions();
+		if (instructions[trueJumpAddress]instanceof InstructionGOTO insnGoto)
+		{
+			ternary.endAddress = insnGoto.getTargetAddress(0);
+			ternary.endOfTruePath = trueJumpAddress;
+		}
+		else
+		{
+			Assert(false, "GOTO expected at the end of true path");
+		}
+		ternaryStack.push(ternary);
 	}
 
 	private void generateWIDE(IndentedOutputStream source, InstructionWIDE instruction)

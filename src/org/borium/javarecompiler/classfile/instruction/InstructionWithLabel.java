@@ -9,7 +9,7 @@ import org.borium.javarecompiler.classfile.*;
  * instructions are expected to be 3 bytes long unless overridden with other
  * length.
  */
-abstract class InstructionWithLabel extends Instruction
+public abstract class InstructionWithLabel extends Instruction
 {
 	/**
 	 * If the comparison succeeds, the unsigned branchbyte1 and branchbyte2 are used
