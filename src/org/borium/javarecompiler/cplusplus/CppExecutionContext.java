@@ -1178,7 +1178,8 @@ public class CppExecutionContext extends ExecutionContext implements ClassTypeSi
 		}
 		else
 		{
-			notSupported(instruction);
+			String condition = "((" + left[1] + ") >= (" + right[1] + "))";
+			generateTernary(instruction, condition);
 		}
 	}
 
