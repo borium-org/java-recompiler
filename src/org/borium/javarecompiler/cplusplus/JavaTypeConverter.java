@@ -43,13 +43,23 @@ public class JavaTypeConverter
 
 	public String getCppType()
 	{
+		boolean debug = false;
 		if (javaType.startsWith("("))
 		{
 			parseMethod();
 		}
 		else
 		{
+			if (javaType.contains("<"))
+			{
+				debug = true;
+				System.out.println("Converting Java type " + javaType);
+			}
 			parseSingleType(false);
+		}
+		if (debug)
+		{
+			System.out.println("Converted C++ type " + cppType);
 		}
 		return cppType;
 	}
@@ -176,7 +186,6 @@ public class JavaTypeConverter
 			parseClass();
 			break;
 		case 'T':
-			Assert(false, "Unhandled template type " + javaType.substring(index));
 			rawArray = false;
 			index++;
 			parseClass();
