@@ -175,10 +175,18 @@ public class JavaTypeConverter
 			index++;
 			parseClass();
 			break;
+		case 'T':
+			Assert(false, "Unhandled template type " + javaType.substring(index));
+			rawArray = false;
+			index++;
+			parseClass();
+			break;
 		case 'V':
 			cppType += "void";
 			index++;
 			break;
+		case '<':
+			Assert(false, "Unhandled template type " + javaType.substring(index));
 		default:
 			Assert(false, "Unhandled type " + javaType.charAt(index));
 		}

@@ -55,8 +55,14 @@ public class ReferencedClasses implements Iterable<String>
 			case ')': // (), ignore
 			case '[': // array, ignore
 				break;
+			case 'T':
+				type = skipClass(type);
+				break;
 			case 'L':
 				type = addClass(type);
+				break;
+			case '<':
+				type = addTemplateBaseClasses(type);
 				break;
 			default:
 				throw new RuntimeException("Bad prefix '" + prefix + "'");
@@ -107,10 +113,19 @@ public class ReferencedClasses implements Iterable<String>
 		{
 			type = type.substring(1);
 			int parameterCount = 0;
-			while (type.charAt(0) == 'L')
+			while (type.charAt(0) == 'L' || type.charAt(0) == 'T')
 			{
+				// Do not add template parameter classes
+				boolean isClass = type.charAt(0) == 'L';
 				type = type.substring(1);
-				type = addClass(type);
+				if (isClass)
+				{
+					type = addClass(type);
+				}
+				else
+				{
+					type = skipClass(type);
+				}
 				parameterCount++;
 			}
 			className += "<" + parameterCount + ">";
@@ -126,6 +141,22 @@ public class ReferencedClasses implements Iterable<String>
 			insert(className);
 		}
 		return type;
+	}
+
+	private String addTemplateBaseClasses(String type)
+	{
+		while (type.charAt(0) != '>')
+		{
+			// Skip template type parameter name
+			while (type.charAt(0) != ':')
+			{
+				type = type.substring(1);
+			}
+			type = type.substring(1);
+			Assert(type.charAt(0) == 'L', "Template base class expected");
+			type = addClass(type.substring(1));
+		}
+		return type.substring(1);
 	}
 
 	/**
@@ -165,5 +196,31 @@ public class ReferencedClasses implements Iterable<String>
 		}
 		// Not a match
 		referencedClasses.add(className);
+	}
+
+	private String skipClass(String type)
+	{
+		while (type.charAt(0) != ';' && type.charAt(0) != '<')
+		{
+			type = type.substring(1);
+		}
+		if (type.charAt(0) == '<')
+		{
+			type = type.substring(1);
+			while (type.charAt(0) == 'L')
+			{
+				type = type.substring(1);
+				type = skipClass(type);
+			}
+			Assert(type.charAt(0) == '>', "Template terminator expected");
+			type = type.substring(1);
+			Assert(type.charAt(0) == ';', "Class terminator expected");
+			type = type.substring(1);
+		}
+		else if (type.charAt(0) == ';')
+		{
+			type = type.substring(1);
+		}
+		return type;
 	}
 }

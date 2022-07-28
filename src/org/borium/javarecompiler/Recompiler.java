@@ -18,13 +18,13 @@ public class Recompiler
 
 	public static void main(String[] args)
 	{
-//		IndentedOutputStream.disableLocking();
+		IndentedOutputStream.disableLocking();
 		if (args.length == 0)
 		{
 			args = new String[] { //
 					"-classpath", "bin", //
 					"-outputpath", "../JrcPortCpp", //
-					"-mainclass", "org.borium.javarecompiler.Statics", //
+					"-mainclass", "org.borium.javarecompiler.classfile.constants.ConstantPool", //
 					"-vs", "2005", //
 					"-comments", "none", //
 			};
